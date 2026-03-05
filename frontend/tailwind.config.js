@@ -6,24 +6,23 @@ export default {
     ],
     theme: {
         extend: {
-            colors: {
-                primary: '#003580', // Booking.com Dark Blue
-                secondary: '#0071c2', // Booking.com Light Blue
-                accent: '#feba02', // Booking.com Yellow
-                danger: '#d33', // Booking.com Red / Danger
-                background: '#f5f5f5', // Light gray background
-                card: '#ffffff',
-                textPrimary: '#262626',
-                textSecondary: '#6b6b6b',
-            },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],
             },
+            colors: {
+                primary: '#1E3A8A',
+                secondary: '#3B82F6',
+                success: '#10B981',
+                warning: '#F59E0B',
+                danger: '#EF4444',
+                background: '#F3F4F6',
+                cards: '#FFFFFF',
+                text: '#111827',
+                muted: '#6B7280',
+                refunded: '#8B5CF6'
+            },
             boxShadow: {
                 'soft': '0 4px 10px rgba(0,0,0,0.05)',
-            },
-            borderRadius: {
-                'xl': '12px',
             }
         },
     },
