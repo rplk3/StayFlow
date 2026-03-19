@@ -4,7 +4,7 @@ import {
     LineChart, Line, AreaChart, Area, BarChart, Bar,
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
-import { getForecast } from '../services/api';
+import { getForecast } from '../../../services/api';
 
 const Forecasting = () => {
     const [forecast, setForecast] = useState([]);

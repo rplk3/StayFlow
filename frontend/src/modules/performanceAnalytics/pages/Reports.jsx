@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Download, FileText, Calendar, Filter, RefreshCw, BarChart3, TrendingUp } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { generateReport, getReportPdfUrl } from '../services/api';
+import { generateReport, getReportPdfUrl } from '../../../services/api';
 
 const reportTypes = [
     { value: 'revenue', label: 'Revenue Report', icon: '💰' },

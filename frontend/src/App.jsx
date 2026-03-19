@@ -2,11 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './layouts/AdminLayout';
 import LandingPage from './pages/LandingPage';
-import Dashboard from './pages/Dashboard';
-import Forecasting from './pages/Forecasting';
-import Alerts from './pages/Alerts';
-import ConversationalBI from './pages/ConversationalBI';
-import Reports from './pages/Reports';
+import Dashboard from './modules/performanceAnalytics/pages/Dashboard';
+import Forecasting from './modules/performanceAnalytics/pages/Forecasting';
+import Alerts from './modules/performanceAnalytics/pages/Alerts';
+import ConversationalBI from './modules/chatbot/pages/ConversationalBI';
+import Reports from './modules/performanceAnalytics/pages/Reports';
 
 function App() {
   return (

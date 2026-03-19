@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Bot, Loader2 } from 'lucide-react';
-import { queryAnalytics } from '../services/api';
+import { queryAnalytics } from '../../../services/api';
 
 const BotChat = () => {
     const [messages, setMessages] = useState([{
