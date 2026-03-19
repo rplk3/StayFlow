@@ -1,0 +1,62 @@
+const Hotel = require('../models/Hotel');
+const Room = require('../models/Room');
+const RatePlan = require('../models/RatePlan');
+
+// Step 1, 2: Search hotels
+exports.searchHotels = async (req, res) => {
+    try {
+        const { destination, checkIn, checkOut, guests } = req.query;
+
+        // Base query for hotel
+        let query = {};
+        if (destination) {
+            query.destination = { $regex: new RegExp(destination, 'i') };
+        }
+
+        const hotels = await Hotel.find(query);
+
+        if (!hotels.length) {
+            return res.json([]);
+        }
+
+        // If guests is provided, we should ideally filter out hotels that do not have rooms with enough capacity.
+        // For simplicity, we just return hotels matching the destination, and check capacity exactly on Hotel Details page.
+        // But let's do a basic filter:
+        const hotelIds = hotels.map(h => h._id);
+        const roomQuery = { hotelId: { $in: hotelIds } };
+        if (guests) {
+            roomQuery.capacity = { $gte: parseInt(guests) };
+        }
+
+        const validRooms = await Room.find(roomQuery);
+        const validHotelIds = validRooms.map(r => r.hotelId.toString());
+
+        const filteredHotels = hotels.filter(h => validHotelIds.includes(h._id.toString()));
+
+        res.json(filteredHotels);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error during hotel search' });
+    }
+};
+
+// Step 4: System shows room types and rate plans
+exports.getHotelDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const hotel = await Hotel.findById(id);
+        if (!hotel) return res.status(404).json({ error: 'Hotel not found' });
+
+        const rooms = await Room.find({ hotelId: id });
+        const ratePlans = await RatePlan.find({ hotelId: id });
+
+        res.json({
+            hotel,
+            rooms,
+            ratePlans
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error fetching hotel details' });
+    }
+};

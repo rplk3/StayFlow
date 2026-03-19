@@ -8,6 +8,12 @@ import Alerts from './modules/performanceAnalytics/pages/Alerts';
 import ConversationalBI from './modules/chatbot/pages/ConversationalBI';
 import Reports from './modules/performanceAnalytics/pages/Reports';
 
+import SearchPage from './modules/hotelRoom/pages/SearchPage';
+import SearchResults from './modules/hotelRoom/pages/SearchResults';
+import HotelDetails from './modules/hotelRoom/pages/HotelDetails';
+import Checkout from './modules/hotelRoom/pages/Checkout';
+import MyTrips from './modules/hotelRoom/pages/MyTrips';
+
 function App() {
   return (
     <Router>
