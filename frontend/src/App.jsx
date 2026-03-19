@@ -14,12 +14,23 @@ import HotelDetails from './modules/hotelRoom/pages/HotelDetails';
 import Checkout from './modules/hotelRoom/pages/Checkout';
 import MyTrips from './modules/hotelRoom/pages/MyTrips';
 
+import SearchPage from './modules/hotelRoom/pages/SearchPage';
+import SearchResults from './modules/hotelRoom/pages/SearchResults';
+import HotelDetails from './modules/hotelRoom/pages/HotelDetails';
+import Checkout from './modules/hotelRoom/pages/Checkout';
+import MyTrips from './modules/hotelRoom/pages/MyTrips';
+
 function App() {
   return (
     <Router>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/hotels/search" element={<SearchPage />} />
+        <Route path="/hotels/results" element={<SearchResults />} />
+        <Route path="/hotels/:id" element={<HotelDetails />} />
+        <Route path="/hotels/checkout" element={<Checkout />} />
+        <Route path="/my-trips" element={<MyTrips />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>

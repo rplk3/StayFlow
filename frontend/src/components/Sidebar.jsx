@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, TrendingUp, AlertTriangle, MessageSquare, FileText } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, AlertTriangle, MessageSquare, FileText, MapPin, Building } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -43,6 +43,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <NavLink to="/admin/bi" className={navLinkClass}>
                         <MessageSquare className="w-5 h-5 mr-3" />
                         <span>Conversational BI</span>
+                    </NavLink>
+                    <NavLink to="/hotels/search" className={navLinkClass}>
+                        <Building className="w-5 h-5 mr-3" />
+                        <span>Book Hotel</span>
+                    </NavLink>
+                    <NavLink to="/my-trips" className={navLinkClass}>
+                        <MapPin className="w-5 h-5 mr-3" />
+                        <span>My Trips</span>
                     </NavLink>
                 </nav>
             </div>
