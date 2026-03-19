@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DollarSign, Briefcase, Percent, BellDot, RefreshCw, Database, Calendar } from 'lucide-react';
 import StatsCard from '../components/StatsCard';
 import ChartsSection from '../components/ChartsSection';
-import { getDashboardData, rebuildDaily } from '../services/api';
+import { getDashboardData, rebuildDaily } from '../../../services/api';
 
 const Dashboard = () => {
     const [data, setData] = useState(null);

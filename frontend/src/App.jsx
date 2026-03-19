@@ -1,35 +1,30 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Topbar from './components/Topbar';
-import Dashboard from './pages/Dashboard';
-import Forecasting from './pages/Forecasting';
-import Alerts from './pages/Alerts';
-import ConversationalBI from './pages/ConversationalBI';
-import Reports from './pages/Reports';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import AdminLayout from './layouts/AdminLayout';
+import LandingPage from './pages/LandingPage';
+import Dashboard from './modules/performanceAnalytics/pages/Dashboard';
+import Forecasting from './modules/performanceAnalytics/pages/Forecasting';
+import Alerts from './modules/performanceAnalytics/pages/Alerts';
+import ConversationalBI from './modules/chatbot/pages/ConversationalBI';
+import Reports from './modules/performanceAnalytics/pages/Reports';
 
 function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   return (
     <Router>
-      <div className="flex h-screen bg-background font-sans overflow-hidden">
-        <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(false)} />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
 
-        <div className="flex-1 flex flex-col overflow-hidden w-full">
-          <Topbar toggleSidebar={() => setIsSidebarOpen(true)} />
-
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-6">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/forecast" element={<Forecasting />} />
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/bi" element={<ConversationalBI />} />
-              <Route path="/reports" element={<Reports />} />
-            </Routes>
-          </main>
-        </div>
-      </div>
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="forecast" element={<Forecasting />} />
+          <Route path="alerts" element={<Alerts />} />
+          <Route path="bi" element={<ConversationalBI />} />
+          <Route path="reports" element={<Reports />} />
+        </Route>
+      </Routes>
     </Router>
   );
 }

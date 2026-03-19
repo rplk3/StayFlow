@@ -4,9 +4,9 @@
  * and provides dashboard data queries.
  */
 
-const Booking = require('../models/Booking');
-const Payment = require('../models/Payment');
-const Room = require('../models/Room');
+const Booking = require('../../hotelRoom/models/Booking');
+const Payment = require('../../payment/models/Payment');
+const Room = require('../../hotelRoom/models/Room');
 const AnalyticsDaily = require('../models/AnalyticsDaily');
 const Alert = require('../models/Alert');
 

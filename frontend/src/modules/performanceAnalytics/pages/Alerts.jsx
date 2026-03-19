@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, RefreshCw, ShieldAlert, ShieldCheck, Filter } from 'lucide-react';
-import { getAlerts, checkAnomalies, resolveAlert } from '../services/api';
+import { getAlerts, checkAnomalies, resolveAlert } from '../../../services/api';
 
 const severityConfig = {
     HIGH: { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700', badge: 'bg-red-100 text-red-800' },

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
-import { getAlerts, checkAnomalies } from '../services/api';
+import { getAlerts, checkAnomalies } from '../../../services/api';
 
 const AlertsList = () => {
     const [alerts, setAlerts] = useState([]);

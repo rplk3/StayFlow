@@ -14,12 +14,12 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '..', '..', 
 const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']); // Force Google DNS for SRV resolution
 const mongoose = require('mongoose');
-const Booking = require('../models/Booking');
-const Payment = require('../models/Payment');
-const Room = require('../models/Room');
-const AnalyticsDaily = require('../models/AnalyticsDaily');
-const Alert = require('../models/Alert');
-const analyticsService = require('../services/analyticsService');
+const Booking = require('../modules/hotelRoom/models/Booking');
+const Payment = require('../modules/payment/models/Payment');
+const Room = require('../modules/hotelRoom/models/Room');
+const AnalyticsDaily = require('../modules/performanceAnalytics/models/AnalyticsDaily');
+const Alert = require('../modules/performanceAnalytics/models/Alert');
+const analyticsService = require('../modules/performanceAnalytics/services/analyticsService');
 
 // Room type definitions
 const ROOM_TYPES = [

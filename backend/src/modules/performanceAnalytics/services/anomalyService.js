@@ -6,8 +6,8 @@
  * Idempotent: checks if similar alert already exists today before creating.
  */
 
-const Payment = require('../models/Payment');
-const Booking = require('../models/Booking');
+const Payment = require('../../payment/models/Payment');
+const Booking = require('../../hotelRoom/models/Booking');
 const AnalyticsDaily = require('../models/AnalyticsDaily');
 const Alert = require('../models/Alert');
 

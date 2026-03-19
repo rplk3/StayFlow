@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 
-const analyticsRoutes = require('./routes/analyticsRoutes');
-const reportRoutes = require('./routes/reportRoutes');
+const analyticsRoutes = require('./modules/performanceAnalytics/routes/analyticsRoutes');
+const reportRoutes = require('./modules/performanceAnalytics/routes/reportRoutes');
 
 const app = express();
 
