@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const [destination, setDestination] = useState('');
+    const [checkIn, setCheckIn] = useState('');
+    const [checkOut, setCheckOut] = useState('');
+    const [guests, setGuests] = useState(2);
+
+    const handleSearch = () => {
+        if (!destination || !checkIn || !checkOut) {
+            alert('Please fill out all search fields (Destination, Check-in, Check-out).');
+            return;
+        }
+        const searchParams = new URLSearchParams({ destination, checkIn, checkOut, guests });
+        navigate(`/hotels/results?${searchParams.toString()}`);
+    };
 
     return (
         <div className="min-h-screen bg-white font-sans text-gray-800">
@@ -31,21 +44,45 @@ const LandingPage = () => {
                     {/* Destination */}
                     <div className="flex-1 bg-white p-3 rounded flex items-center shadow-sm">
                         <svg className="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <input type="text" placeholder="Where are you going?" className="w-full outline-none text-gray-700" />
+                        <input 
+                            type="text" 
+                            placeholder="Where are you going?" 
+                            className="w-full outline-none text-gray-700" 
+                            value={destination}
+                            onChange={(e) => setDestination(e.target.value)}
+                        />
                     </div>
                     {/* Dates */}
-                    <div className="flex-1 bg-white p-3 rounded flex items-center shadow-sm">
-                        <svg className="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <span className="text-gray-500">Check-in Date &mdash; Check-out Date</span>
+                    <div className="flex-1 bg-white p-3 rounded flex items-center shadow-sm gap-2">
+                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <input 
+                            type="date" 
+                            className="w-full outline-none text-gray-700" 
+                            value={checkIn}
+                            onChange={(e) => setCheckIn(e.target.value)}
+                        />
+                        <span className="text-gray-400">&mdash;</span>
+                        <input 
+                            type="date" 
+                            className="w-full outline-none text-gray-700" 
+                            value={checkOut}
+                            onChange={(e) => setCheckOut(e.target.value)}
+                        />
                     </div>
                     {/* Guests */}
-                    <div className="flex-1 bg-white p-3 rounded flex items-center shadow-sm">
+                    <div className="w-full md:w-32 bg-white p-3 rounded flex items-center shadow-sm">
                         <svg className="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                        <span className="text-gray-500">2 adults &middot; 0 children &middot; 1 room</span>
+                        <input 
+                            type="number" 
+                            min="1"
+                            className="w-full outline-none text-gray-700" 
+                            value={guests}
+                            onChange={(e) => setGuests(parseInt(e.target.value))}
+                        />
                     </div>
                     {/* Search Button */}
                     <button
-                        onClick={() => navigate('/admin/dashboard')}
+                        onClick={handleSearch}
                         className="bg-[#0071C2] hover:bg-[#005999] text-white text-xl font-bold py-3 px-8 rounded transition duration-200"
                     >
                         Search
