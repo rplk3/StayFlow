@@ -14,11 +14,6 @@ import HotelDetails from './modules/hotelRoom/pages/HotelDetails';
 import Checkout from './modules/hotelRoom/pages/Checkout';
 import MyTrips from './modules/hotelRoom/pages/MyTrips';
 
-import SearchPage from './modules/hotelRoom/pages/SearchPage';
-import SearchResults from './modules/hotelRoom/pages/SearchResults';
-import HotelDetails from './modules/hotelRoom/pages/HotelDetails';
-import Checkout from './modules/hotelRoom/pages/Checkout';
-import MyTrips from './modules/hotelRoom/pages/MyTrips';
 
 function App() {
   return (
