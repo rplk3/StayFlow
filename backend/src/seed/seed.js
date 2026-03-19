@@ -57,6 +57,30 @@ async function seedDatabase() {
                 starRating: 4,
                 amenities: ["Free WiFi", "Beachfront", "Pool", "Bar"],
                 images: ["https://images.unsplash.com/photo-1582719508461-905c673771fd?fit=crop&w=800"]
+            },
+            {
+                name: "Kandy Royal Heritage",
+                destination: "Kandy",
+                description: "Historic property nestled in the hills overlooking the lake.",
+                starRating: 4,
+                amenities: ["Free WiFi", "Mountain View", "Restaurant", "Cultural Shows"],
+                images: ["https://images.unsplash.com/photo-1588636402741-dd6052f520b7?fit=crop&w=800"]
+            },
+            {
+                name: "Ella Cloud Forest Retreat",
+                destination: "Ella",
+                description: "Eco-friendly lodges right in the misty mountains of Ella.",
+                starRating: 3,
+                amenities: ["Free WiFi", "Hiking Trails", "Breakfast Included", "Nature Views"],
+                images: ["https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fit=crop&w=800"]
+            },
+            {
+                name: "Luxurious Tea Estate",
+                destination: "Nuwara Eliya",
+                description: "Colonial-style bungalow surrounded by tea plantations.",
+                starRating: 5,
+                amenities: ["Free WiFi", "Fireplace", "High Tea", "Butler Service"],
+                images: ["https://images.unsplash.com/photo-1544413660-299165566b1d?fit=crop&w=800"]
             }
         ]);
 
