@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, Users } from 'lucide-react';
 
-import CustomDatePicker from '../components/CustomDatePicker';
+import CustomDatePicker from '../../../components/CustomDatePicker';
 
 const SearchPage = () => {
     const navigate = useNavigate();
