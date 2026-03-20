@@ -2,16 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, Users } from 'lucide-react';
 
+import CustomDatePicker from '../components/CustomDatePicker';
+
 const SearchPage = () => {
     const navigate = useNavigate();
     const [destination, setDestination] = useState('');
-    const [checkIn, setCheckIn] = useState('');
-    const [checkOut, setCheckOut] = useState('');
+    const [dateRange, setDateRange] = useState({ checkIn: '', checkOut: '' });
     const [guests, setGuests] = useState(2);
 
     const handleSearch = (e) => {
         e.preventDefault();
-        const searchParams = new URLSearchParams({ destination, checkIn, checkOut, guests });
+        const searchParams = new URLSearchParams({ 
+            destination, 
+            checkIn: dateRange.checkIn, 
+            checkOut: dateRange.checkOut, 
+            guests 
+        });
         navigate(`/hotels/search?${searchParams.toString()}`);
     };
 
@@ -32,26 +38,8 @@ const SearchPage = () => {
                     />
                 </div>
 
-                <div className="flex-1 w-full relative">
-                    <Calendar className="absolute left-3 top-3 text-gray-400" size={20} />
-                    <input 
-                        required
-                        type="date"
-                        value={checkIn}
-                        onChange={(e) => setCheckIn(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                    />
-                </div>
-
-                <div className="flex-1 w-full relative">
-                    <Calendar className="absolute left-3 top-3 text-gray-400" size={20} />
-                    <input 
-                        required
-                        type="date"
-                        value={checkOut}
-                        onChange={(e) => setCheckOut(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                    />
+                <div className="flex-[2] w-full relative">
+                    <CustomDatePicker dateRange={dateRange} setDateRange={setDateRange} />
                 </div>
 
                 <div className="w-full md:w-32 relative">

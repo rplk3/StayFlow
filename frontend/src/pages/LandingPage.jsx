@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import CustomDatePicker from '../components/CustomDatePicker';
+
 const LandingPage = () => {
     const navigate = useNavigate();
     const [destination, setDestination] = useState('');
-    const [checkIn, setCheckIn] = useState('');
-    const [checkOut, setCheckOut] = useState('');
+    const [dateRange, setDateRange] = useState({ checkIn: '', checkOut: '' });
     const [guests, setGuests] = useState(2);
 
     const handleSearch = () => {
-        if (!destination || !checkIn || !checkOut) {
+        if (!destination || !dateRange.checkIn || !dateRange.checkOut) {
             alert('Please fill out all search fields (Destination, Check-in, Check-out).');
             return;
         }
-        const searchParams = new URLSearchParams({ destination, checkIn, checkOut, guests });
+        const searchParams = new URLSearchParams({ 
+            destination, 
+            checkIn: dateRange.checkIn, 
+            checkOut: dateRange.checkOut, 
+            guests 
+        });
         navigate(`/hotels/results?${searchParams.toString()}`);
     };
 
@@ -53,21 +59,8 @@ const LandingPage = () => {
                         />
                     </div>
                     {/* Dates */}
-                    <div className="flex-1 bg-white p-3 rounded flex items-center shadow-sm gap-2">
-                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <input 
-                            type="date" 
-                            className="w-full outline-none text-gray-700" 
-                            value={checkIn}
-                            onChange={(e) => setCheckIn(e.target.value)}
-                        />
-                        <span className="text-gray-400">&mdash;</span>
-                        <input 
-                            type="date" 
-                            className="w-full outline-none text-gray-700" 
-                            value={checkOut}
-                            onChange={(e) => setCheckOut(e.target.value)}
-                        />
+                    <div className="flex-[2] bg-white rounded flex items-center shadow-sm relative">
+                        <CustomDatePicker dateRange={dateRange} setDateRange={setDateRange} />
                     </div>
                     {/* Guests */}
                     <div className="w-full md:w-32 bg-white p-3 rounded flex items-center shadow-sm">
