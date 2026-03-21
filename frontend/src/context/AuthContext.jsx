@@ -50,7 +50,9 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data);
             return { success: true };
         } catch (error) {
-            return { success: false, message: error.response?.data?.message || 'Registration failed' };
+            console.error('Frontend Registration Error:', error.response?.data || error);
+            const errorMsg = error.response?.data?.stack || error.response?.data?.error || error.response?.data?.message || 'Registration failed';
+            return { success: false, message: errorMsg };
         }
     };
 
