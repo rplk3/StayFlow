@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 import CustomDatePicker from '../components/CustomDatePicker';
 
@@ -8,6 +9,31 @@ const LandingPage = () => {
     const [destination, setDestination] = useState('');
     const [dateRange, setDateRange] = useState({ checkIn: '', checkOut: '' });
     const [guests, setGuests] = useState(2);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (destination.length > 0) {
+                try {
+                    const res = await axios.get(`http://localhost:5000/api/hotels/suggestions?query=${destination}`);
+                    setSuggestions(res.data);
+                    setShowSuggestions(true);
+                } catch (err) {
+                    console.error("Failed to fetch suggestions:", err);
+                }
+            } else {
+                setSuggestions([]);
+                setShowSuggestions(false);
+            }
+        };
+
+        const timeoutId = setTimeout(() => {
+            fetchSuggestions();
+        }, 300);
+
+        return () => clearTimeout(timeoutId);
+    }, [destination]);
 
     const handleSearch = () => {
         if (!destination || !dateRange.checkIn || !dateRange.checkOut) {
@@ -48,15 +74,36 @@ const LandingPage = () => {
             <div className="max-w-6xl mx-auto px-4 relative -mt-8 mb-12">
                 <div className="bg-[#feba02] p-1 rounded border-2 border-[#feba02] flex flex-col md:flex-row gap-1 shadow-lg">
                     {/* Destination */}
-                    <div className="flex-1 bg-white p-3 rounded flex items-center shadow-sm">
-                        <svg className="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <input 
-                            type="text" 
-                            placeholder="Where are you going?" 
-                            className="w-full outline-none text-gray-700" 
-                            value={destination}
-                            onChange={(e) => setDestination(e.target.value)}
-                        />
+                    <div className="flex-1 bg-white p-3 rounded flex items-center shadow-sm relative">
+                        <svg className="w-6 h-6 text-gray-400 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <div className="w-full relative">
+                            <input 
+                                type="text" 
+                                placeholder="Where are you going?" 
+                                className="w-full outline-none text-gray-700" 
+                                value={destination}
+                                onChange={(e) => setDestination(e.target.value)}
+                                onFocus={() => destination.length > 0 && setShowSuggestions(true)}
+                                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                            />
+                            {showSuggestions && suggestions.length > 0 && (
+                                <ul className="absolute left-0 top-full mt-4 w-full bg-white border border-gray-200 rounded shadow-lg max-h-60 overflow-y-auto z-[100]">
+                                    {suggestions.map((suggestion, index) => (
+                                        <li 
+                                            key={index}
+                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700 flex items-center"
+                                            onClick={() => {
+                                                setDestination(suggestion);
+                                                setShowSuggestions(false);
+                                            }}
+                                        >
+                                            <svg className="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            {suggestion}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
                     </div>
                     {/* Dates */}
                     <div className="flex-[2] bg-white rounded flex items-center shadow-sm relative">

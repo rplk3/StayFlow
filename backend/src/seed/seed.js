@@ -41,48 +41,35 @@ async function seedDatabase() {
         try { await mongoose.connection.db.dropCollection('alerts'); } catch(e){}
 
         console.log('Creating hotels...');
-        const hotels = await Hotel.insertMany([
-            {
-                name: "Grand Plaza StayFlow",
-                destination: "Colombo",
-                description: "Luxury hotel in the heart of Colombo with stunning city views.",
+        const locations = ['Colombo', 'Galle', 'Kandy', 'Ella', 'Nuwara Eliya', 'Kurunegala'];
+        const hotelsData = [];
+        for (const loc of locations) {
+            hotelsData.push({
+                name: `Grand ${loc} Luxury`,
+                destination: loc,
+                description: `A premium 5-star experience in the heart of ${loc}.`,
                 starRating: 5,
-                amenities: ["Free WiFi", "Pool", "Spa", "Gym", "Restaurant"],
-                images: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?fit=crop&w=800"]
-            },
-            {
-                name: "StayFlow Beach Resort",
-                destination: "Galle",
-                description: "Beachfront paradise offering a relaxing getaway.",
+                amenities: ["Free WiFi", "Pool", "Spa", "Gym", "Restaurant", "Valet"],
+                images: [`https://loremflickr.com/800/600/luxury,hotel,${loc.replace(/ /g, '')}`]
+            });
+            hotelsData.push({
+                name: `${loc} Central Hotel`,
+                destination: loc,
+                description: `Comfortable 4-star stay perfectly situated in ${loc}.`,
                 starRating: 4,
-                amenities: ["Free WiFi", "Beachfront", "Pool", "Bar"],
-                images: ["https://images.unsplash.com/photo-1582719508461-905c673771fd?fit=crop&w=800"]
-            },
-            {
-                name: "Kandy Royal Heritage",
-                destination: "Kandy",
-                description: "Historic property nestled in the hills overlooking the lake.",
-                starRating: 4,
-                amenities: ["Free WiFi", "Mountain View", "Restaurant", "Cultural Shows"],
-                images: ["https://images.unsplash.com/photo-1588636402741-dd6052f520b7?fit=crop&w=800"]
-            },
-            {
-                name: "Ella Cloud Forest Retreat",
-                destination: "Ella",
-                description: "Eco-friendly lodges right in the misty mountains of Ella.",
+                amenities: ["Free WiFi", "Breakfast Included", "Air Conditioning", "Bar"],
+                images: [`https://loremflickr.com/800/600/hotel,${loc.replace(/ /g, '')}`]
+            });
+            hotelsData.push({
+                name: `Backpacker's ${loc} Inn`,
+                destination: loc,
+                description: `Budget-friendly 3-star accommodation in ${loc}.`,
                 starRating: 3,
-                amenities: ["Free WiFi", "Hiking Trails", "Breakfast Included", "Nature Views"],
-                images: ["https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fit=crop&w=800"]
-            },
-            {
-                name: "Luxurious Tea Estate",
-                destination: "Nuwara Eliya",
-                description: "Colonial-style bungalow surrounded by tea plantations.",
-                starRating: 5,
-                amenities: ["Free WiFi", "Fireplace", "High Tea", "Butler Service"],
-                images: ["https://images.unsplash.com/photo-1544413660-299165566b1d?fit=crop&w=800"]
-            }
-        ]);
+                amenities: ["Free WiFi", "Shared Lounge", "24/7 Front Desk"],
+                images: [`https://loremflickr.com/800/600/hostel,${loc.replace(/ /g, '')}`]
+            });
+        }
+        const hotels = await Hotel.insertMany(hotelsData);
 
         console.log('Creating rate plans...');
         const ratePlans = [];

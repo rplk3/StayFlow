@@ -60,3 +60,20 @@ exports.getHotelDetails = async (req, res) => {
         res.status(500).json({ error: 'Server error fetching hotel details' });
     }
 };
+
+// Get destination suggestions
+exports.getSuggestions = async (req, res) => {
+    try {
+        const { query } = req.query;
+        if (!query) return res.json([]);
+        
+        const destinations = await Hotel.distinct('destination', {
+            destination: { $regex: new RegExp(`^${query}`, 'i') }
+        });
+        
+        res.json(destinations);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error fetching suggestions' });
+    }
+};

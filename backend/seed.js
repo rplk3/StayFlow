@@ -4,6 +4,7 @@ const Booking = require('./models/Booking');
 const Payment = require('./models/Payment');
 const AnalyticsDaily = require('./models/AnalyticsDaily');
 const Alert = require('./models/Alert');
+const Hotel = require('./models/Hotel');
 
 const roomTypes = ['Standard', 'Deluxe', 'Suite', 'Penthouse'];
 const statuses = ['confirmed', 'cancelled', 'completed'];
@@ -17,8 +18,27 @@ const seedDatabase = async () => {
         await Payment.deleteMany({});
         await AnalyticsDaily.deleteMany({});
         await Alert.deleteMany({});
+        await Hotel.deleteMany({});
 
         console.log('Seeding new dummy data...');
+        const locations = ['Colombo', 'Kandy', 'Galle', 'Nuwara Eliya', 'Ella', 'Kurunegala'];
+        
+        console.log('Seeding hotels and locations...');
+        for (const loc of locations) {
+            for (let j = 1; j <= 5; j++) {
+                const hotelName = `${loc} Grand Hotel ${j}`;
+                const hotel = new Hotel({
+                    name: hotelName,
+                    destination: loc,
+                    starRating: Math.floor(Math.random() * 3) + 3, // 3 to 5 stars
+                    images: [`https://loremflickr.com/400/250/hotel,${loc.replace(' ', '')}`],
+                    amenities: ['Free WiFi', 'Pool', 'Breakfast Included', 'Spa'].slice(0, Math.floor(Math.random() * 4) + 1),
+                    pricePerNight: Math.floor(Math.random() * 15000) + 5000,
+                    description: `A wonderful property located in the heart of ${loc}.`
+                });
+                await hotel.save();
+            }
+        }
         const bookings = [];
         const today = new Date();
 
