@@ -7,6 +7,7 @@ const reportRoutes = require('./modules/performanceAnalytics/routes/reportRoutes
 
 const hotelRoutes = require('./modules/hotelRoom/routes/hotelRoutes');
 const bookingRoutes = require('./modules/hotelRoom/routes/bookingRoutes');
+const authRoutes = require('./modules/auth/routes/authRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/hotels', hotelRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
