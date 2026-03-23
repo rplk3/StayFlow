@@ -43,11 +43,22 @@ export const AuthProvider = ({ children }) => {
         verifyToken();
     }, [token]);
 
+    const updateProfile = async (profileData) => {
+        try {
+            const res = await axios.put('http://localhost:5000/api/auth/profile', profileData);
+            setUser(res.data);
+            return { success: true };
+        } catch (error) {
+            console.error('Frontend Update Profile Error:', error.response?.data || error);
+            const errorMsg = error.response?.data?.message || 'Update failed';
+            return { success: false, message: errorMsg };
+        }
+    };
+
     const register = async (userData) => {
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/register', userData);
-            setToken(res.data.token);
-            setUser(res.data);
+            await axios.post('http://localhost:5000/api/auth/register', userData);
+            // Intentionally bypassing state hydration so user is forced to log in via UI
             return { success: true };
         } catch (error) {
             console.error('Frontend Registration Error:', error.response?.data || error);
@@ -73,7 +84,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, token, register, login, logout }}>
+        <AuthContext.Provider value={{ user, loading, token, register, login, logout, updateProfile }}>
             {!loading && children}
         </AuthContext.Provider>
     );

@@ -4,6 +4,8 @@ import { AuthProvider } from './context/AuthContext';
 import AdminLayout from './layouts/AdminLayout';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
+import UserAccountLayout from './layouts/UserAccountLayout';
+import MyAccount from './pages/MyAccount';
 import Dashboard from './modules/performanceAnalytics/pages/Dashboard';
 import Forecasting from './modules/performanceAnalytics/pages/Forecasting';
 import Alerts from './modules/performanceAnalytics/pages/Alerts';
@@ -30,7 +32,12 @@ function App() {
         <Route path="/hotels/results" element={<SearchResults />} />
         <Route path="/hotels/:id" element={<HotelDetails />} />
         <Route path="/hotels/checkout" element={<Checkout />} />
-        <Route path="/my-trips" element={<MyTrips />} />
+        
+        {/* User Account Routes */}
+        <Route element={<UserAccountLayout />}>
+          <Route path="/my-account" element={<MyAccount />} />
+          <Route path="/my-trips" element={<MyTrips />} />
+        </Route>
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
