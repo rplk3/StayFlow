@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import AdminLayout from './layouts/AdminLayout';
 import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
+import AuthPage from './pages/AuthPage';
 import Dashboard from './modules/performanceAnalytics/pages/Dashboard';
 import Forecasting from './modules/performanceAnalytics/pages/Forecasting';
 import Alerts from './modules/performanceAnalytics/pages/Alerts';
@@ -25,8 +24,8 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/register" element={<AuthPage />} />
           <Route path="/hotels/search" element={<SearchPage />} />
         <Route path="/hotels/results" element={<SearchResults />} />
         <Route path="/hotels/:id" element={<HotelDetails />} />
