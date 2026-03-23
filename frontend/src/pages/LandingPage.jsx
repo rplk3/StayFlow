@@ -42,11 +42,11 @@ const LandingPage = () => {
             alert('Please fill out all search fields (Destination, Check-in, Check-out).');
             return;
         }
-        const searchParams = new URLSearchParams({ 
-            destination, 
-            checkIn: dateRange.checkIn, 
-            checkOut: dateRange.checkOut, 
-            guests 
+        const searchParams = new URLSearchParams({
+            destination,
+            checkIn: dateRange.checkIn,
+            checkOut: dateRange.checkOut,
+            guests
         });
         navigate(`/hotels/results?${searchParams.toString()}`);
     };
@@ -61,13 +61,13 @@ const LandingPage = () => {
                         {user ? (
                             <div className="flex items-center space-x-4">
                                 <span className="font-medium text-white">Hi, {user.firstName || 'User'}</span>
-                                <button 
+                                <button
                                     onClick={() => navigate('/my-trips')}
                                     className="bg-[#0071C2] text-white px-4 py-2 font-medium rounded hover:bg-[#005999] transition border border-[#0071C2]"
                                 >
-                                    My Trips
+                                    My Account
                                 </button>
-                                <button 
+                                <button
                                     onClick={logout}
                                     className="bg-transparent text-white px-4 py-2 font-medium rounded hover:bg-white hover:text-[#003B95] border border-white transition"
                                 >
@@ -99,10 +99,10 @@ const LandingPage = () => {
                     <div className="flex-1 bg-white p-3 rounded flex items-center shadow-sm relative">
                         <svg className="w-6 h-6 text-gray-400 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         <div className="w-full relative">
-                            <input 
-                                type="text" 
-                                placeholder="Where are you going?" 
-                                className="w-full outline-none text-gray-700" 
+                            <input
+                                type="text"
+                                placeholder="Where are you going?"
+                                className="w-full outline-none text-gray-700"
                                 value={destination}
                                 onChange={(e) => setDestination(e.target.value)}
                                 onFocus={() => destination.length > 0 && setShowSuggestions(true)}
@@ -111,7 +111,7 @@ const LandingPage = () => {
                             {showSuggestions && suggestions.length > 0 && (
                                 <ul className="absolute left-0 top-full mt-4 w-full bg-white border border-gray-200 rounded shadow-lg max-h-60 overflow-y-auto z-[100]">
                                     {suggestions.map((suggestion, index) => (
-                                        <li 
+                                        <li
                                             key={index}
                                             className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700 flex items-center"
                                             onClick={() => {
@@ -134,10 +134,10 @@ const LandingPage = () => {
                     {/* Guests */}
                     <div className="w-full md:w-32 bg-white p-3 rounded flex items-center shadow-sm">
                         <svg className="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                        <input 
-                            type="number" 
+                        <input
+                            type="number"
                             min="1"
-                            className="w-full outline-none text-gray-700" 
+                            className="w-full outline-none text-gray-700"
                             value={guests}
                             onChange={(e) => setGuests(parseInt(e.target.value))}
                         />
