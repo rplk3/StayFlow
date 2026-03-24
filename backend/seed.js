@@ -5,6 +5,7 @@ const Payment = require('./models/Payment');
 const AnalyticsDaily = require('./models/AnalyticsDaily');
 const Alert = require('./models/Alert');
 const Hotel = require('./models/Hotel');
+const User = require('./src/modules/auth/models/User'); // Added User import
 
 const roomTypes = ['Standard', 'Deluxe', 'Suite', 'Penthouse'];
 const statuses = ['confirmed', 'cancelled', 'completed'];
@@ -23,6 +24,17 @@ const seedDatabase = async () => {
         console.log('Seeding new dummy data...');
         const locations = ['Colombo', 'Kandy', 'Galle', 'Nuwara Eliya', 'Ella', 'Kurunegala'];
         
+        console.log('Seeding admin user...');
+        const adminEmail = 'adminportal@gmail.com';
+        await User.deleteMany({ email: adminEmail });
+        await User.create({
+            firstName: 'Admin',
+            lastName: 'User',
+            email: adminEmail,
+            password: 'Admin@123',
+            role: 'admin'
+        });
+
         console.log('Seeding hotels and locations...');
         for (const loc of locations) {
             for (let j = 1; j <= 5; j++) {

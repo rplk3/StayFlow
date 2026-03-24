@@ -47,6 +47,12 @@ function App() {
           <Route path="alerts" element={<Alerts />} />
           <Route path="bi" element={<ConversationalBI />} />
           <Route path="reports" element={<Reports />} />
+          
+          {/* Admin Placeholder Routes */}
+          <Route path="room-bookings" element={<div className="p-8 text-xl">Room Bookings Management (Coming Soon)</div>} />
+          <Route path="transport" element={<div className="p-8 text-xl">Guest Transport Management (Coming Soon)</div>} />
+          <Route path="event-bookings" element={<div className="p-8 text-xl">Event Bookings Management (Coming Soon)</div>} />
+          <Route path="payments" element={<div className="p-8 text-xl">Payments Management (Coming Soon)</div>} />
         </Route>
       </Routes>
     </Router>

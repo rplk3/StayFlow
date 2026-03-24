@@ -38,7 +38,11 @@ const AuthPage = () => {
         setError('');
         const res = await login(loginData.email, loginData.password);
         if (res.success) {
-            navigate('/');
+            if (loginData.email === 'adminportal@gmail.com' || loginData.email === 'admin@stayflow.com') {
+                navigate('/admin/dashboard');
+            } else {
+                navigate('/');
+            }
         } else {
             setError(res.message);
         }

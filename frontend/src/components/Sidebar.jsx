@@ -1,8 +1,9 @@
-import React from 'react';
-import { LayoutDashboard, TrendingUp, AlertTriangle, MessageSquare, FileText, MapPin, Building } from 'lucide-react';
+import React, { useState } from 'react';
+import { LayoutDashboard, TrendingUp, AlertTriangle, MessageSquare, FileText, MapPin, Building, ChevronDown, ChevronRight, Calendar, Car, CalendarCheck, CreditCard, Bot } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+    const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
 
     // Style for inactive and active states
     const navLinkClass = ({ isActive }) =>
@@ -23,34 +24,66 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </div>
                 </div>
 
-                <nav className="mt-4 px-4 space-y-2">
+                <nav className="mt-4 px-4 space-y-2 pb-20">
                     <NavLink to="/admin/dashboard" className={navLinkClass} end>
                         <LayoutDashboard className="w-5 h-5 mr-3" />
                         <span>Dashboard</span>
                     </NavLink>
-                    <NavLink to="/admin/forecast" className={navLinkClass}>
-                        <TrendingUp className="w-5 h-5 mr-3" />
-                        <span>Forecasting</span>
+                    
+                    {/* Analytics Dropdown */}
+                    <div>
+                        <button 
+                            onClick={() => setIsAnalyticsOpen(!isAnalyticsOpen)}
+                            className="w-full flex items-center justify-between mt-2 py-3 px-6 rounded-lg transition-colors font-medium text-sm text-gray-300 hover:bg-[#0048aa] hover:text-white border-l-4 border-transparent"
+                        >
+                            <div className="flex items-center">
+                                <TrendingUp className="w-5 h-5 mr-3" />
+                                <span>Analytics</span>
+                            </div>
+                            {isAnalyticsOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                        </button>
+                        
+                        {isAnalyticsOpen && (
+                            <div className="ml-8 mt-2 space-y-2">
+                                <NavLink to="/admin/forecast" className={navLinkClass}>
+                                    <TrendingUp className="w-5 h-5 mr-3" />
+                                    <span>Forecasting</span>
+                                </NavLink>
+                                <NavLink to="/admin/reports" className={navLinkClass}>
+                                    <FileText className="w-5 h-5 mr-3" />
+                                    <span>Reports & Exports</span>
+                                </NavLink>
+                                <NavLink to="/admin/alerts" className={navLinkClass}>
+                                    <AlertTriangle className="w-5 h-5 mr-3" />
+                                    <span>Alerts</span>
+                                </NavLink>
+                            </div>
+                        )}
+                    </div>
+
+                    <NavLink to="/admin/room-bookings" className={navLinkClass}>
+                        <Calendar className="w-5 h-5 mr-3" />
+                        <span>Room Bookings</span>
                     </NavLink>
-                    <NavLink to="/admin/reports" className={navLinkClass}>
-                        <FileText className="w-5 h-5 mr-3" />
-                        <span>Reports & Exports</span>
+                    <NavLink to="/admin/transport" className={navLinkClass}>
+                        <Car className="w-5 h-5 mr-3" />
+                        <span>Guest Transport</span>
                     </NavLink>
-                    <NavLink to="/admin/alerts" className={navLinkClass}>
-                        <AlertTriangle className="w-5 h-5 mr-3" />
-                        <span>Alerts</span>
+                    <NavLink to="/admin/event-bookings" className={navLinkClass}>
+                        <CalendarCheck className="w-5 h-5 mr-3" />
+                        <span>Event Bookings</span>
+                    </NavLink>
+                    <NavLink to="/admin/payments" className={navLinkClass}>
+                        <CreditCard className="w-5 h-5 mr-3" />
+                        <span>Payments</span>
                     </NavLink>
                     <NavLink to="/admin/bi" className={navLinkClass}>
                         <MessageSquare className="w-5 h-5 mr-3" />
                         <span>Conversational BI</span>
                     </NavLink>
-                    <NavLink to="/hotels/search" className={navLinkClass}>
-                        <Building className="w-5 h-5 mr-3" />
-                        <span>Book Hotel</span>
-                    </NavLink>
-                    <NavLink to="/my-trips" className={navLinkClass}>
-                        <MapPin className="w-5 h-5 mr-3" />
-                        <span>My Trips</span>
+                    <NavLink to="#" className={navLinkClass}>
+                        <Bot className="w-5 h-5 mr-3" />
+                        <span>Chatbot</span>
                     </NavLink>
                 </nav>
             </div>
