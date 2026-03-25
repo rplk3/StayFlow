@@ -4,8 +4,11 @@ import { AuthProvider } from './context/AuthContext';
 import AdminLayout from './layouts/AdminLayout';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
+import AdminAuthPage from './pages/AdminAuthPage';
 import UserAccountLayout from './layouts/UserAccountLayout';
 import MyAccount from './pages/MyAccount';
+import AdminAccount from './pages/AdminAccount';
+import AdminManagement from './pages/AdminManagement';
 import Dashboard from './modules/performanceAnalytics/pages/Dashboard';
 import Forecasting from './modules/performanceAnalytics/pages/Forecasting';
 import Alerts from './modules/performanceAnalytics/pages/Alerts';
@@ -28,6 +31,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/register" element={<AuthPage />} />
+          <Route path="/admin-login" element={<AdminAuthPage />} />
+          <Route path="/admin-register" element={<AdminAuthPage />} />
           <Route path="/hotels/search" element={<SearchPage />} />
         <Route path="/hotels/results" element={<SearchResults />} />
         <Route path="/hotels/:id" element={<HotelDetails />} />
@@ -47,6 +52,8 @@ function App() {
           <Route path="alerts" element={<Alerts />} />
           <Route path="bi" element={<ConversationalBI />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="account" element={<AdminAccount />} />
+          <Route path="manage-admins" element={<AdminManagement />} />
           
           {/* Admin Placeholder Routes */}
           <Route path="room-bookings" element={<div className="p-8 text-xl">Room Bookings Management (Coming Soon)</div>} />

@@ -78,13 +78,35 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const adminRegister = async (userData) => {
+        try {
+            const res = await axios.post('http://localhost:5000/api/auth/admin-register', userData);
+            return { success: true, message: res.data.message };
+        } catch (error) {
+            console.error('Admin Registration Error:', error.response?.data || error);
+            const errorMsg = error.response?.data?.message || 'Admin registration failed';
+            return { success: false, message: errorMsg };
+        }
+    };
+
+    const adminLogin = async (email, password) => {
+        try {
+            const res = await axios.post('http://localhost:5000/api/auth/admin-login', { email, password });
+            setToken(res.data.token);
+            setUser(res.data);
+            return { success: true };
+        } catch (error) {
+            return { success: false, message: error.response?.data?.message || 'Admin login failed' };
+        }
+    };
+
     const logout = () => {
         setToken(null);
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, token, register, login, logout, updateProfile }}>
+        <AuthContext.Provider value={{ user, loading, token, register, login, logout, updateProfile, adminRegister, adminLogin }}>
             {!loading && children}
         </AuthContext.Provider>
     );

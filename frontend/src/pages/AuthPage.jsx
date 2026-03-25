@@ -38,11 +38,7 @@ const AuthPage = () => {
         setError('');
         const res = await login(loginData.email, loginData.password);
         if (res.success) {
-            if (loginData.email === 'adminportal@gmail.com' || loginData.email === 'admin@stayflow.com') {
-                navigate('/admin/dashboard');
-            } else {
-                navigate('/');
-            }
+            navigate('/');
         } else {
             setError(res.message);
         }
@@ -152,6 +148,14 @@ const AuthPage = () => {
                         <a href="#" className="text-sm my-4 text-[#0071C2] hover:underline">Forgot your password?</a>
                         
                         <button type="submit" className={btnStyle}>Sign In</button>
+                        
+                        <button 
+                            type="button"
+                            onClick={() => navigate('/admin-login')}
+                            className="mt-4 text-xs text-gray-500 hover:text-[#003B95] transition-colors underline underline-offset-4"
+                        >
+                            Are you an Admin?
+                        </button>
                     </form>
                 </div>
 

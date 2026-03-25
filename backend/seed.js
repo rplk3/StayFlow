@@ -32,7 +32,8 @@ const seedDatabase = async () => {
             lastName: 'User',
             email: adminEmail,
             password: 'Admin@123',
-            role: 'admin'
+            role: 'admin',
+            adminStatus: 'approved'
         });
 
         console.log('Seeding hotels and locations...');
