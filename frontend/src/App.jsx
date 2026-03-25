@@ -9,6 +9,7 @@ import UserAccountLayout from './layouts/UserAccountLayout';
 import MyAccount from './pages/MyAccount';
 import AdminAccount from './pages/AdminAccount';
 import AdminManagement from './pages/AdminManagement';
+import HotelManagement from './pages/HotelManagement';
 import Dashboard from './modules/performanceAnalytics/pages/Dashboard';
 import Forecasting from './modules/performanceAnalytics/pages/Forecasting';
 import Alerts from './modules/performanceAnalytics/pages/Alerts';
@@ -56,10 +57,11 @@ function App() {
           <Route path="manage-admins" element={<AdminManagement />} />
           
           {/* Admin Placeholder Routes */}
-          <Route path="room-bookings" element={<div className="p-8 text-xl">Room Bookings Management (Coming Soon)</div>} />
+          <Route path="hotels" element={<HotelManagement />} />
           <Route path="transport" element={<div className="p-8 text-xl">Guest Transport Management (Coming Soon)</div>} />
           <Route path="event-bookings" element={<div className="p-8 text-xl">Event Bookings Management (Coming Soon)</div>} />
           <Route path="payments" element={<div className="p-8 text-xl">Payments Management (Coming Soon)</div>} />
+          <Route path="chatbot" element={<div className="p-8 text-xl">Chatbot (Coming Soon)</div>} />
         </Route>
       </Routes>
     </Router>

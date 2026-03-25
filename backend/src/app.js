@@ -6,6 +6,7 @@ const analyticsRoutes = require('./modules/performanceAnalytics/routes/analytics
 const reportRoutes = require('./modules/performanceAnalytics/routes/reportRoutes');
 
 const hotelRoutes = require('./modules/hotelRoom/routes/hotelRoutes');
+const adminHotelRoutes = require('./modules/hotelRoom/routes/adminHotelRoutes');
 const bookingRoutes = require('./modules/hotelRoom/routes/bookingRoutes');
 const authRoutes = require('./modules/auth/routes/authRoutes');
 
@@ -20,6 +21,7 @@ app.use(morgan('dev'));
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/hotels', hotelRoutes);
+app.use('/api/admin/hotels', adminHotelRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/auth', authRoutes);
 

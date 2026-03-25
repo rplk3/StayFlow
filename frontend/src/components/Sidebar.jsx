@@ -22,7 +22,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
     return (
         <>
-            <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-primary text-white transform transition-transform duration-300 ease-in-out border-r border-[#002b6b] shadow-lg ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:inset-0 flex flex-col`}>
+            <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-primary text-white transform transition-transform duration-300 ease-in-out border-r border-[#002b6b] shadow-lg flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`} style={{ minWidth: isOpen ? '16rem' : '0' }}>
                 <div className="flex items-center justify-center mt-8 mb-6 pb-6 border-b border-[#0048aa] mx-4">
                     <div className="flex items-center">
                         <div className="w-8 h-8 bg-white rounded flex items-center justify-center mr-3 shadow-sm">
@@ -65,13 +65,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                     <AlertTriangle className="w-5 h-5 mr-3" />
                                     <span>Alerts</span>
                                 </NavLink>
+                                <NavLink to="/admin/bi" className={navLinkClass}>
+                                    <MessageSquare className="w-5 h-5 mr-3" />
+                                    <span>Conversational BI</span>
+                                </NavLink>
                             </div>
                         )}
                     </div>
 
-                    <NavLink to="/admin/room-bookings" className={navLinkClass}>
+                    <NavLink to="/admin/hotels" className={navLinkClass}>
                         <Calendar className="w-5 h-5 mr-3" />
-                        <span>Room Bookings</span>
+                        <span>Hotel Management</span>
                     </NavLink>
                     <NavLink to="/admin/transport" className={navLinkClass}>
                         <Car className="w-5 h-5 mr-3" />
@@ -85,11 +89,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         <CreditCard className="w-5 h-5 mr-3" />
                         <span>Payments</span>
                     </NavLink>
-                    <NavLink to="/admin/bi" className={navLinkClass}>
-                        <MessageSquare className="w-5 h-5 mr-3" />
-                        <span>Conversational BI</span>
-                    </NavLink>
-                    <NavLink to="#" className={navLinkClass}>
+                    <NavLink to="/admin/chatbot" className={navLinkClass}>
                         <Bot className="w-5 h-5 mr-3" />
                         <span>Chatbot</span>
                     </NavLink>
