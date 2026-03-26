@@ -16,3 +16,4 @@ export const getMyTrips = (userId) => axios.get(`${BOOKINGS_URL}/my-trips`, { pa
 // Transport
 export const estimateTransportCost = (data) => axios.post(`${TRANSPORT_URL}/estimate`, data);
 export const createTransport = (data) => axios.post(TRANSPORT_URL, data);
+export const getUserTransports = (userId) => axios.get(`${TRANSPORT_URL}/user/${userId}`);

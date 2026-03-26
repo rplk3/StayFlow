@@ -11,6 +11,7 @@ import AdminAccount from './pages/AdminAccount';
 import AdminManagement from './pages/AdminManagement';
 import HotelManagement from './pages/HotelManagement';
 import RoomManagement from './pages/RoomManagement';
+import TransportManagement from './pages/TransportManagement';
 import Dashboard from './modules/performanceAnalytics/pages/Dashboard';
 import Forecasting from './modules/performanceAnalytics/pages/Forecasting';
 import Alerts from './modules/performanceAnalytics/pages/Alerts';
@@ -60,7 +61,7 @@ function App() {
           {/* Admin Placeholder Routes */}
           <Route path="hotels" element={<HotelManagement />} />
           <Route path="rooms" element={<RoomManagement />} />
-          <Route path="transport" element={<div className="p-8 text-xl">Guest Transport Management (Coming Soon)</div>} />
+          <Route path="transport" element={<TransportManagement />} />
           <Route path="event-bookings" element={<div className="p-8 text-xl">Event Bookings Management (Coming Soon)</div>} />
           <Route path="payments" element={<div className="p-8 text-xl">Payments Management (Coming Soon)</div>} />
           <Route path="chatbot" element={<div className="p-8 text-xl">Chatbot (Coming Soon)</div>} />

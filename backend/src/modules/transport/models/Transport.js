@@ -20,15 +20,28 @@ const transportSchema = new mongoose.Schema({
         required: true
     },
     passengerCount: { type: Number, default: 1 },
-    estimatedDistance: { type: Number }, // in km
+    estimatedDistance: { type: Number },
     estimatedCost: { type: Number, required: true },
     specialRequests: { type: String },
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'in-transit', 'completed', 'cancelled'],
+        enum: ['pending', 'confirmed', 'rejected', 'in-transit', 'completed', 'cancelled'],
         default: 'pending'
+    },
+    // Admin fields
+    adminNotes: { type: String },
+    rejectionReason: { type: String },
+    approvedBy: { type: String },
+    approvedAt: { type: Date },
+    // Forwarding to transport company
+    forwardedToCompany: {
+        companyName: { type: String },
+        reference: { type: String },
+        notes: { type: String },
+        forwardedAt: { type: Date }
     },
     createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Transport', transportSchema);
+
