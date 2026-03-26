@@ -10,6 +10,7 @@ const adminHotelRoutes = require('./modules/hotelRoom/routes/adminHotelRoutes');
 const adminRoomRoutes = require('./modules/hotelRoom/routes/adminRoomRoutes');
 const bookingRoutes = require('./modules/hotelRoom/routes/bookingRoutes');
 const transportRoutes = require('./modules/transport/routes/transportRoutes');
+const eventHallRoutes = require('./modules/eventHall/routes/eventHallRoutes');
 const authRoutes = require('./modules/auth/routes/authRoutes');
 
 const app = express();
@@ -27,6 +28,7 @@ app.use('/api/admin/hotels', adminHotelRoutes);
 app.use('/api/admin/rooms', adminRoomRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/transport', transportRoutes);
+app.use('/api/event-halls', eventHallRoutes);
 app.use('/api/auth', authRoutes);
 
 // Health check
