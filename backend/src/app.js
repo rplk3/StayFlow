@@ -7,7 +7,9 @@ const reportRoutes = require('./modules/performanceAnalytics/routes/reportRoutes
 
 const hotelRoutes = require('./modules/hotelRoom/routes/hotelRoutes');
 const adminHotelRoutes = require('./modules/hotelRoom/routes/adminHotelRoutes');
+const adminRoomRoutes = require('./modules/hotelRoom/routes/adminRoomRoutes');
 const bookingRoutes = require('./modules/hotelRoom/routes/bookingRoutes');
+const transportRoutes = require('./modules/transport/routes/transportRoutes');
 const authRoutes = require('./modules/auth/routes/authRoutes');
 
 const app = express();
@@ -22,6 +24,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/hotels', hotelRoutes);
 app.use('/api/admin/hotels', adminHotelRoutes);
+app.use('/api/admin/rooms', adminRoomRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/auth', authRoutes);
 

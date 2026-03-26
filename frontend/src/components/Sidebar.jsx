@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, TrendingUp, AlertTriangle, MessageSquare, FileText, ChevronDown, ChevronRight, Calendar, Car, CalendarCheck, CreditCard, Bot, User, ShieldCheck, LogOut } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, AlertTriangle, MessageSquare, FileText, ChevronDown, ChevronRight, Calendar, Car, CalendarCheck, CreditCard, Bot, User, ShieldCheck, LogOut, DoorOpen } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,7 +22,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
     return (
         <>
-            <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-primary text-white transform transition-transform duration-300 ease-in-out border-r border-[#002b6b] shadow-lg flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`} style={{ minWidth: isOpen ? '16rem' : '0' }}>
+            <div className="w-64 h-full bg-primary text-white border-r border-[#002b6b] shadow-lg flex flex-col flex-shrink-0">
                 <div className="flex items-center justify-center mt-8 mb-6 pb-6 border-b border-[#0048aa] mx-4">
                     <div className="flex items-center">
                         <div className="w-8 h-8 bg-white rounded flex items-center justify-center mr-3 shadow-sm">
@@ -76,6 +76,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <NavLink to="/admin/hotels" className={navLinkClass}>
                         <Calendar className="w-5 h-5 mr-3" />
                         <span>Hotel Management</span>
+                    </NavLink>
+                    <NavLink to="/admin/rooms" className={navLinkClass}>
+                        <DoorOpen className="w-5 h-5 mr-3" />
+                        <span>Room Management</span>
                     </NavLink>
                     <NavLink to="/admin/transport" className={navLinkClass}>
                         <Car className="w-5 h-5 mr-3" />

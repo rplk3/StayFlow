@@ -1,15 +1,15 @@
 import React from 'react';
-import { Menu, User, Bell } from 'lucide-react';
+import { Menu, User, Bell, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const Topbar = ({ toggleSidebar }) => {
+const Topbar = ({ toggleSidebar, isSidebarOpen }) => {
     const { user } = useAuth();
 
     return (
         <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 shadow-sm z-10">
             <div className="flex items-center">
-                <button onClick={toggleSidebar} className="text-gray-500 hover:text-gray-700 focus:outline-none transition-colors">
-                    <Menu className="w-6 h-6" />
+                <button onClick={toggleSidebar} className="text-gray-500 hover:text-gray-700 focus:outline-none transition-colors p-1 rounded-lg hover:bg-gray-100" title={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}>
+                    {isSidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeft className="w-5 h-5" />}
                 </button>
                 <h2 className="text-xl font-semibold text-textPrimary hidden md:block ml-4">System Overview</h2>
             </div>
