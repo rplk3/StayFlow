@@ -26,6 +26,7 @@ app.use('/api/hotels', hotelRoutes);
 app.use('/api/admin/hotels', adminHotelRoutes);
 app.use('/api/admin/rooms', adminRoomRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/transport', transportRoutes);
 app.use('/api/auth', authRoutes);
 
 // Health check
