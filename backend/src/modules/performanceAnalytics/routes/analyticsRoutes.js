@@ -18,4 +18,7 @@ router.post('/check-anomalies', analyticsController.checkAnomalies);
 router.get('/alerts', analyticsController.getAlerts);
 router.patch('/alerts/:id/resolve', analyticsController.resolveAlert);
 
+// Conversational BI Chatbot
+router.post('/chat', analyticsController.handleChatQuery);
+
 module.exports = router;

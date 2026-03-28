@@ -1,14 +1,13 @@
 import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Map, LogOut } from 'lucide-react';
+import { User, Map, LogOut, PartyPopper, CreditCard } from 'lucide-react';
 
 const UserAccountLayout = () => {
     const { logout, user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Prevent direct access if not logged in
     React.useEffect(() => {
         if (!user && location.pathname !== '/login') {
             navigate('/login');
@@ -25,56 +24,62 @@ const UserAccountLayout = () => {
     const navItems = [
         { name: 'My Account', path: '/my-account', icon: User },
         { name: 'My Trips', path: '/my-trips', icon: Map },
+        { name: 'My Event Bookings', path: '/my-event-bookings', icon: PartyPopper },
+        { name: 'My Payments', path: '/my-payments', icon: CreditCard },
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Minimal Header */}
-            <header className="bg-[#003B95] text-white py-4 shadow-md sticky top-0 z-50">
-                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                     <div className="text-2xl font-bold cursor-pointer" onClick={() => navigate('/')}>StayFlow</div>
-                     <span className="font-medium text-white shadow-sm px-4 py-2 border border-white rounded bg-white bg-opacity-10">
-                         Hi, {user.firstName}
-                     </span>
-                 </div>
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            {/* Header */}
+            <header className="bg-[#003B95] text-white py-3 shadow-md sticky top-0 z-50 flex-shrink-0">
+                <div className="px-6 flex justify-between items-center">
+                    <div className="text-xl font-bold cursor-pointer" onClick={() => navigate('/')}>StayFlow</div>
+                    <span className="font-medium text-white text-sm px-4 py-1.5 border border-white/30 rounded-lg bg-white/10">
+                        Hi, {user.firstName}
+                    </span>
+                </div>
             </header>
-            
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-8">
-                {/* Sidebar */}
-                <div className="w-full md:w-72 flex-shrink-0 bg-white shadow rounded-xl p-6 border border-gray-100 self-start">
-                    <nav className="space-y-3">
+
+            <div className="flex flex-1 overflow-hidden">
+                {/* Sidebar — full height, left-aligned */}
+                <aside className="w-56 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col">
+                    <div className="px-5 pt-6 pb-4 border-b border-gray-100">
+                        <h2 className="text-lg font-bold text-[#003B95]">StayFlow</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">User Profile</p>
+                    </div>
+
+                    <nav className="flex-1 px-3 py-4 space-y-1">
                         {navItems.map((item) => {
                             const Icon = item.icon;
-                            // Match base path to highlight correctly
-                            const isActive = location.pathname.startsWith(item.path);
+                            const isActive = location.pathname === item.path;
                             return (
                                 <Link
                                     key={item.name}
                                     to={item.path}
-                                    className={`flex items-center px-4 py-3.5 rounded-lg transition-all duration-200 ${isActive ? 'bg-[#0071C2] text-white shadow-md transform scale-[1.02]' : 'text-gray-700 hover:bg-gray-50 hover:text-[#003B95]'}`}
+                                    className={`flex items-center px-3 py-2.5 rounded-lg transition-all text-sm font-medium ${isActive ? 'bg-[#003B95] text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-[#003B95]'}`}
                                 >
-                                    <Icon size={22} className="mr-4" />
-                                    <span className="font-semibold text-sm uppercase tracking-wider">{item.name}</span>
+                                    <Icon size={18} className="mr-3 flex-shrink-0" />
+                                    <span>{item.name}</span>
                                 </Link>
                             );
                         })}
                     </nav>
 
-                    <div className="my-6 border-b border-gray-200"></div>
-                    
-                    <button 
-                        onClick={handleLogout}
-                        className="flex w-full items-center px-4 py-3.5 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-all duration-200"
-                    >
-                        <LogOut size={22} className="mr-4" />
-                        <span className="font-semibold text-sm uppercase tracking-wider">Sign Out</span>
-                    </button>
-                </div>
+                    <div className="px-3 pb-6 border-t border-gray-100 pt-3">
+                        <button
+                            onClick={handleLogout}
+                            className="flex w-full items-center px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-all text-sm font-medium"
+                        >
+                            <LogOut size={18} className="mr-3" />
+                            <span>Sign Out</span>
+                        </button>
+                    </div>
+                </aside>
 
-                {/* Main Content Area */}
-                <div className="flex-1 bg-white shadow rounded-xl p-8 md:p-10 border border-gray-100">
+                {/* Main Content */}
+                <main className="flex-1 overflow-y-auto p-8">
                     <Outlet />
-                </div>
+                </main>
             </div>
         </div>
     );

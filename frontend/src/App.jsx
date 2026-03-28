@@ -25,6 +25,9 @@ import Checkout from './modules/hotelRoom/pages/Checkout';
 import MyTrips from './modules/hotelRoom/pages/MyTrips';
 import EventHalls from './pages/EventHalls';
 import EventHallManagement from './pages/EventHallManagement';
+import MyEventBookings from './modules/eventHall/pages/MyEventBookings';
+import MyPayments from './modules/payment/pages/MyPayments';
+import PaymentManagement from './pages/PaymentManagement';
 
 
 function App() {
@@ -48,6 +51,8 @@ function App() {
         <Route element={<UserAccountLayout />}>
           <Route path="/my-account" element={<MyAccount />} />
           <Route path="/my-trips" element={<MyTrips />} />
+          <Route path="/my-event-bookings" element={<MyEventBookings />} />
+          <Route path="/my-payments" element={<MyPayments />} />
         </Route>
 
         {/* Admin Routes */}
@@ -66,7 +71,7 @@ function App() {
           <Route path="rooms" element={<RoomManagement />} />
           <Route path="transport" element={<TransportManagement />} />
           <Route path="event-bookings" element={<EventHallManagement />} />
-          <Route path="payments" element={<div className="p-8 text-xl">Payments Management (Coming Soon)</div>} />
+          <Route path="payments" element={<PaymentManagement />} />
           <Route path="chatbot" element={<div className="p-8 text-xl">Chatbot (Coming Soon)</div>} />
         </Route>
       </Routes>

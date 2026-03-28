@@ -12,6 +12,7 @@ const bookingRoutes = require('./modules/hotelRoom/routes/bookingRoutes');
 const transportRoutes = require('./modules/transport/routes/transportRoutes');
 const eventHallRoutes = require('./modules/eventHall/routes/eventHallRoutes');
 const authRoutes = require('./modules/auth/routes/authRoutes');
+const paymentRoutes = require('./modules/payment/routes/paymentRoutes');
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/transport', transportRoutes);
 app.use('/api/event-halls', eventHallRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

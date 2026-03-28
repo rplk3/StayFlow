@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Search, Users, Clock, Calendar, MapPin, Star, CheckCircle, XCircle, AlertCircle, ArrowRight, ArrowLeft, CreditCard, Shield, Lock, Sparkles, X, ChevronDown, RefreshCw, PartyPopper } from 'lucide-react';
+import { Search, Users, Clock, Calendar, MapPin, CheckCircle, XCircle, AlertCircle, ArrowRight, ArrowLeft, Sparkles, RefreshCw, PartyPopper } from 'lucide-react';
+import PaymentGateway from '../modules/payment/components/PaymentGateway';
 
 const API = 'http://localhost:5000/api/event-halls';
 const userId = 'USER_123';
@@ -10,7 +11,7 @@ const eventTypes = ['Wedding', 'Conference', 'Birthday', 'Corporate', 'Seminar',
 
 const EventHalls = () => {
     const navigate = useNavigate();
-    const [tab, setTab] = useState('browse'); // browse | checkout | myBookings
+    const [tab, setTab] = useState('browse'); // browse | checkout
     const [halls, setHalls] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
@@ -27,10 +28,6 @@ const EventHalls = () => {
     const [error, setError] = useState('');
     const [formLoading, setFormLoading] = useState(false);
 
-    // My Bookings
-    const [myBookings, setMyBookings] = useState([]);
-    const [cancellingId, setCancellingId] = useState(null);
-
     useEffect(() => { fetchHalls(); }, []);
 
     const fetchHalls = async () => {
@@ -40,15 +37,6 @@ const EventHalls = () => {
             if (searchText) params.search = searchText;
             const res = await axios.get(API, { params });
             setHalls(res.data);
-        } catch (err) { console.error(err); }
-        finally { setLoading(false); }
-    };
-
-    const fetchMyBookings = async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(`${API}/bookings/user/${userId}`);
-            setMyBookings(res.data);
         } catch (err) { console.error(err); }
         finally { setLoading(false); }
     };
@@ -106,35 +94,16 @@ const EventHalls = () => {
         finally { setFormLoading(false); }
     };
 
-    // Step 2 → 3: confirm payment
-    const handleConfirmPayment = async () => {
+    // Payment success handler
+    const handlePaymentSuccess = async (paymentResult) => {
         try {
-            setFormLoading(true);
             const res = await axios.post(`${API}/bookings/${holdId}/checkout`, { paymentToken: 'tok_mock123' });
             setBookingCode(res.data.booking.bookingCode);
             setCheckoutStep(3);
-        } catch (err) { setError(err.response?.data?.message || 'Payment failed'); }
-        finally { setFormLoading(false); }
-    };
-
-    const handleCancelBooking = async (id) => {
-        if (!window.confirm('Are you sure you want to cancel this booking?')) return;
-        try {
-            setCancellingId(id);
-            await axios.post(`${API}/bookings/${id}/cancel`, { reason: 'User cancelled' });
-            fetchMyBookings();
-        } catch (err) { alert(err.response?.data?.message || 'Cancellation failed'); }
-        finally { setCancellingId(null); }
+        } catch (err) { setError(err.response?.data?.message || 'Booking confirmation failed'); }
     };
 
     const inputClass = "w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm bg-gray-50";
-
-    const statusBadge = (status) => {
-        const c = { HOLD: 'bg-yellow-100 text-yellow-700', PENDING: 'bg-blue-100 text-blue-700', APPROVED: 'bg-green-100 text-green-700', REJECTED: 'bg-red-100 text-red-700', CANCELLED: 'bg-gray-100 text-gray-600', COMPLETED: 'bg-purple-100 text-purple-700' };
-        return <span className={`px-3 py-1 rounded-full text-xs font-bold ${c[status] || 'bg-gray-100'}`}>{status}</span>;
-    };
-
-    // ========= RENDER =========
 
     // Step indicator for checkout
     const StepIndicator = () => (
@@ -169,7 +138,7 @@ const EventHalls = () => {
                         <p className="text-3xl font-extrabold text-purple-700 tracking-wider">{bookingCode}</p>
                     </div>
                     <div className="flex gap-3 justify-center">
-                        <button onClick={() => { setTab('myBookings'); fetchMyBookings(); setCheckoutStep(0); }} className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-200">View My Bookings</button>
+                        <button onClick={() => navigate('/my-event-bookings')} className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-200">View My Event Bookings</button>
                         <button onClick={() => { setTab('browse'); setCheckoutStep(0); }} className="border-2 border-gray-200 text-gray-600 px-6 py-3.5 rounded-xl font-semibold hover:bg-gray-50 transition">Browse Halls</button>
                     </div>
                 </div>
@@ -183,16 +152,8 @@ const EventHalls = () => {
             <div className="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-8 px-4">
                 <div className="max-w-6xl mx-auto">
                     <button onClick={() => navigate('/')} className="text-purple-200 hover:text-white text-sm mb-3 flex items-center gap-1"><ArrowLeft size={14} /> Back to Home</button>
-                    <h1 className="text-4xl font-extrabold mb-2">🎉 Event Halls</h1>
+                    <h1 className="text-4xl font-extrabold mb-2"> Event Halls</h1>
                     <p className="text-purple-200 text-lg">Find and book the perfect venue for your special occasion</p>
-                    <div className="flex gap-2 mt-6">
-                        {['browse', 'myBookings'].map(t => (
-                            <button key={t} onClick={() => { setTab(t); if (t === 'myBookings') fetchMyBookings(); setCheckoutStep(0); }}
-                                className={`px-6 py-2.5 rounded-lg font-semibold text-sm transition ${tab === t || (tab === 'checkout' && t === 'browse') ? 'bg-white text-purple-700' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>
-                                {t === 'browse' ? '🏛️ Browse Halls' : '📋 My Bookings'}
-                            </button>
-                        ))}
-                    </div>
                 </div>
             </div>
 
@@ -325,32 +286,20 @@ const EventHalls = () => {
 
                                 {checkoutStep === 2 && (
                                     <>
-                                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4">
-                                                <h2 className="text-lg font-bold text-white flex items-center gap-2"><CreditCard size={20} /> Payment Information</h2>
-                                            </div>
-                                            <div className="p-6 space-y-5">
-                                                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-5 rounded-xl border border-purple-100">
-                                                    <div className="flex items-center justify-between">
-                                                        <div><p className="text-sm text-purple-600 font-medium">Total Amount</p></div>
-                                                        <p className="text-3xl font-extrabold text-purple-700">Rs. {quote?.totalAmount?.toLocaleString()}</p>
-                                                    </div>
-                                                </div>
-                                                <div><label className="block text-sm font-semibold text-gray-700 mb-1.5">Card Number</label><input type="text" placeholder="4111 1111 1111 1111" className={inputClass} /></div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div><label className="block text-sm font-semibold text-gray-700 mb-1.5">Expiry</label><input type="text" placeholder="MM / YY" className={inputClass} /></div>
-                                                    <div><label className="block text-sm font-semibold text-gray-700 mb-1.5">CVC</label><input type="text" placeholder="123" className={inputClass} /></div>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-xs text-gray-400"><Lock size={14} /> Your payment information is encrypted and secure</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <button onClick={() => setCheckoutStep(1)} className="flex items-center gap-2 px-6 py-4 rounded-xl border-2 border-gray-200 text-gray-600 font-semibold hover:bg-gray-50"><ArrowLeft size={18} /> Back</button>
-                                            <button onClick={handleConfirmPayment} disabled={formLoading}
-                                                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-700 hover:to-teal-700 transition-all disabled:opacity-50 shadow-lg shadow-emerald-200">
-                                                <Shield size={20} /> {formLoading ? 'Processing...' : 'Pay & Submit Booking'}
-                                            </button>
-                                        </div>
+                                        <button onClick={() => setCheckoutStep(1)} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition mb-2">
+                                            <ArrowLeft size={16} /> Back to Details
+                                        </button>
+                                        <PaymentGateway
+                                            bookingId={holdId}
+                                            bookingType="event"
+                                            userId={userId}
+                                            amount={quote?.hallCharge || 0}
+                                            taxAmount={quote?.taxesFees || 0}
+                                            serviceCharge={0}
+                                            totalAmount={quote?.totalAmount || 0}
+                                            onSuccess={handlePaymentSuccess}
+                                            onFailure={() => { }}
+                                        />
                                     </>
                                 )}
                             </div>
@@ -384,49 +333,6 @@ const EventHalls = () => {
                                 </div>
                             </div>
                         </div>
-                    </>
-                )}
-
-                {/* ===== MY BOOKINGS TAB ===== */}
-                {tab === 'myBookings' && (
-                    <>
-                        {loading ? (
-                            <div className="flex items-center justify-center py-16"><RefreshCw className="animate-spin w-8 h-8 text-purple-500" /></div>
-                        ) : myBookings.length === 0 ? (
-                            <div className="text-center py-16 bg-white rounded-2xl"><PartyPopper className="w-16 h-16 text-gray-300 mx-auto mb-4" /><h3 className="text-xl text-gray-500 mb-2">No event bookings yet</h3></div>
-                        ) : (
-                            <div className="space-y-4">
-                                {myBookings.map(b => (
-                                    <div key={b._id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                            <div>
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <h3 className="text-lg font-bold text-gray-900">{b.hallId?.name || 'Hall'}</h3>
-                                                    {statusBadge(b.status)}
-                                                </div>
-                                                <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                                                    <span className="flex items-center gap-1"><Calendar size={14} /> {new Date(b.eventDate).toLocaleDateString()}</span>
-                                                    <span className="flex items-center gap-1"><Clock size={14} /> {b.startTime} – {b.endTime}</span>
-                                                    <span className="flex items-center gap-1"><Users size={14} /> {b.guestCount} guests</span>
-                                                    <span className="font-semibold text-purple-700">Rs. {b.pricing?.totalAmount?.toLocaleString()}</span>
-                                                </div>
-                                                <p className="text-xs text-gray-400 mt-1 font-mono">#{b.bookingCode} • {b.eventType}</p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                {['HOLD', 'PENDING', 'APPROVED'].includes(b.status) && (
-                                                    <button onClick={() => handleCancelBooking(b._id)} disabled={cancellingId === b._id}
-                                                        className="px-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-50 disabled:opacity-50 transition">
-                                                        {cancellingId === b._id ? 'Cancelling...' : 'Cancel'}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {b.rejectedReason && <div className="mt-3 p-3 bg-red-50 rounded-lg text-red-700 text-xs"><span className="font-semibold">Rejected:</span> {b.rejectedReason}</div>}
-                                        {b.confirmationNote && <div className="mt-3 p-3 bg-green-50 rounded-lg text-green-700 text-xs"><span className="font-semibold">Confirmation:</span> {b.confirmationNote}</div>}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
                     </>
                 )}
             </div>

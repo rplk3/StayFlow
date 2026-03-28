@@ -28,9 +28,7 @@ const BotChat = () => {
         setIsLoading(true);
 
         try {
-            // For demo, if API fails, give mock answer
-            const res = await queryAnalytics(userMsg)
-                .catch(() => ({ data: { answer: "Mock Answer: Revenue is 1.5M LKR (API unavailable)" } }));
+            const res = await queryAnalytics(userMsg);
             setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: res.data.answer }]);
         } catch (error) {
             setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: "Sorry, I encountered an error." }]);

@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { validateAndQuote, createHold, checkoutBooking, createTransport } from '../services/bookingApi';
 import { CheckCircle, AlertCircle, CreditCard, User, Shield, MapPin, ArrowRight, ArrowLeft, Car, Sparkles, Lock, Calendar, Moon } from 'lucide-react';
 import TransportSection from '../../transport/components/TransportSection';
+import PaymentGateway from '../../payment/components/PaymentGateway';
 
 const Checkout = () => {
     const [searchParams] = useSearchParams();
@@ -96,8 +97,7 @@ const Checkout = () => {
         }
     };
 
-    const handleConfirmBooking = async (e) => {
-        e.preventDefault();
+    const handlePaymentSuccess = async (paymentResult) => {
         try {
             setLoading(true);
             const checkoutRes = await checkoutBooking(holdId, { paymentToken: 'tok_mock123' });
@@ -281,58 +281,20 @@ const Checkout = () => {
 
                     {step === 2 && (
                         <>
-                            {/* Payment Card */}
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4 flex items-center gap-3">
-                                    <CreditCard size={20} className="text-white" />
-                                    <h2 className="text-lg font-bold text-white">Payment Information</h2>
-                                </div>
-                                <div className="p-6 space-y-5">
-                                    {/* Amount Banner */}
-                                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-100">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-sm text-blue-600 font-medium">Amount to Charge Now</p>
-                                                <p className="text-sm text-blue-400 mt-0.5">Including room & transport</p>
-                                            </div>
-                                            <p className="text-3xl font-extrabold text-blue-700">Rs. {grandTotal.toLocaleString()}</p>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">Card Number</label>
-                                        <input required type="text" placeholder="4111 1111 1111 1111" className={inputClass} />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Expiry Date</label>
-                                            <input required type="text" placeholder="MM / YY" className={inputClass} />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">CVC</label>
-                                            <input required type="text" placeholder="123" className={inputClass} />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
-                                        <Lock size={14} /> Your payment information is encrypted and secure
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-3">
-                                <button onClick={() => setStep(1)} className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl border-2 border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition">
-                                    <ArrowLeft size={18} /> Back
-                                </button>
-                                <button
-                                    onClick={handleConfirmBooking}
-                                    disabled={loading}
-                                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-700 hover:to-teal-700 transition-all disabled:opacity-50 shadow-lg shadow-emerald-200 hover:shadow-xl hover:-translate-y-0.5"
-                                >
-                                    <Shield size={20} /> {loading ? 'Processing...' : (quote?.dueNow > 0 ? 'Pay & Confirm' : 'Confirm Guarantee')}
-                                </button>
-                            </div>
+                            <button onClick={() => setStep(1)} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition mb-2">
+                                <ArrowLeft size={16} /> Back to Details
+                            </button>
+                            <PaymentGateway
+                                bookingId={holdId}
+                                bookingType="room"
+                                userId="USER_123"
+                                amount={quote?.roomTotal || 0}
+                                taxAmount={quote?.taxesFees || 0}
+                                serviceCharge={transportData.enabled ? transportData.estimatedCost : 0}
+                                totalAmount={grandTotal}
+                                onSuccess={handlePaymentSuccess}
+                                onFailure={() => {}}
+                            />
                         </>
                     )}
                 </div>

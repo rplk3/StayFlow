@@ -2,6 +2,7 @@ const analyticsService = require('../services/analyticsService');
 const forecastingService = require('../services/forecastingService');
 const anomalyService = require('../services/anomalyService');
 const Alert = require('../models/Alert');
+const { GoogleGenAI } = require('@google/genai');
 
 /**
  * POST /api/analytics/rebuild-daily
@@ -106,3 +107,57 @@ exports.resolveAlert = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+/**
+ * POST /api/analytics/chat
+ * GenAI conversational endpoint powered by Gemini API
+ */
+exports.handleChatQuery = async (req, res) => {
+    try {
+        const { message } = req.body;
+        if (!message) {
+            return res.status(400).json({ answer: "Please provide a message." });
+        }
+
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return res.json({ answer: "Gemini API key is not configured in the backend." });
+        }
+
+        // Fetch current live metrics to give context to Gemini
+        const data = await analyticsService.getDashboardData(); // get last 30 days
+        
+        const contextData = `
+        Current System Data (Last 30 days):
+        Total Revenue: Rs. ${data.totalRevenue}
+        Total Bookings: ${data.totalBookings}
+        Average Occupancy Rate: ${data.avgOccupancy}%
+        Active Alerts Count: ${data.activeAlertsCount}
+        `;
+
+        const systemInstruction = `You are a helpful Performance Analytics Assistant for the StayFlow hotel management system.
+Your only job is to answer questions related to the system's performance metrics, bookings, revenue, occupancy, and alerts based on the provided "Current System Data". 
+If the user asks a question COMPLETELY UNRELATED to the hotel's performance analytics, revenue, or bookings (such as "How to plant a tree", "What is the capital of France", etc.), you MUST refuse to answer and state that you can only answer questions related to performance analytics and bookings. Be concise and natural in your answers.`;
+
+        const ai = new GoogleGenAI({ apiKey: apiKey });
+        
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: [
+                { role: 'user', parts: [{ text: `${contextData}\n\nUser Question: ${message}` }] }
+            ],
+            config: {
+                systemInstruction: systemInstruction,
+                temperature: 0.2
+            }
+        });
+
+        const reply = response.text || "I'm sorry, I couldn't generate an answer.";
+        res.json({ answer: reply });
+
+    } catch (error) {
+        console.error('Error generating chat response:', error);
+        res.status(500).json({ answer: "Sorry, I encountered an internal error while processing your request." });
+    }
+};
+

@@ -1,53 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { getMyTrips, cancelBooking } from '../services/bookingApi';
-import { Calendar, MapPin, Users, RefreshCw, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
+import { Calendar, Clock, Users, MapPin, RefreshCw, PartyPopper } from 'lucide-react';
 
+const API = 'http://localhost:5000/api/event-halls';
 const PAYMENT_API = 'http://localhost:5000/api/payments';
+const userId = 'USER_123';
 
-const MyTrips = () => {
-    const [trips, setTrips] = useState([]);
+const MyEventBookings = () => {
+    const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [cancellingId, setCancellingId] = useState(null);
     const [payments, setPayments] = useState({});
-    const userId = 'USER_123';
 
-    useEffect(() => { fetchTrips(); }, []);
+    useEffect(() => { fetchBookings(); }, []);
 
-    const fetchTrips = async () => {
+    const fetchBookings = async () => {
         try {
             setLoading(true);
-            const res = await getMyTrips(userId);
-            setTrips(res.data);
-            // fetch payment info
-            for (const t of res.data) {
+            const res = await axios.get(`${API}/bookings/user/${userId}`);
+            setBookings(res.data);
+            for (const b of res.data) {
                 try {
-                    const pRes = await axios.get(`${PAYMENT_API}/booking/${t._id}`);
-                    setPayments(prev => ({ ...prev, [t._id]: pRes.data }));
+                    const pRes = await axios.get(`${PAYMENT_API}/booking/${b._id}`);
+                    setPayments(prev => ({ ...prev, [b._id]: pRes.data }));
                 } catch (e) { /* no payment */ }
             }
-        } catch (err) {
-            console.error("Failed to fetch trips", err);
-        } finally {
-            setLoading(false);
-        }
+        } catch (err) { console.error(err); }
+        finally { setLoading(false); }
     };
 
     const handleCancel = async (id) => {
-        if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+        if (!window.confirm('Are you sure you want to cancel this booking?')) return;
         try {
             setCancellingId(id);
-            await cancelBooking(id);
-            await fetchTrips();
-        } catch (err) {
-            alert(err.response?.data?.error || "Cancellation failed");
-        } finally {
-            setCancellingId(null);
-        }
+            await axios.post(`${API}/bookings/${id}/cancel`, { reason: 'User cancelled' });
+            fetchBookings();
+        } catch (err) { alert(err.response?.data?.message || 'Cancellation failed'); }
+        finally { setCancellingId(null); }
     };
 
-    const handleRefundRequest = async (tripId) => {
-        const paymentInfo = payments[tripId];
+    const handleRefundRequest = async (bookingId) => {
+        const paymentInfo = payments[bookingId];
         if (!paymentInfo?.payment) { alert('No payment record found for this booking.'); return; }
 
         const confirmed = window.confirm(
@@ -60,50 +53,51 @@ const MyTrips = () => {
                 refundReason: 'Customer requested refund after cancellation'
             });
             alert('Refund request submitted successfully.');
-            fetchTrips();
+            fetchBookings();
         } catch (err) {
             alert(err.response?.data?.message || 'Refund request failed');
         }
     };
 
     const statusConfig = {
-        CONFIRMED: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Upcoming' },
-        CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelled' },
-        HOLD: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending' },
-        NO_SHOW: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'No Show' },
-        COMPLETED: { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' }
+        HOLD: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'On Hold' },
+        PENDING: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Pending' },
+        APPROVED: { bg: 'bg-green-100', text: 'text-green-700', label: 'Approved' },
+        REJECTED: { bg: 'bg-red-100', text: 'text-red-700', label: 'Rejected' },
+        CANCELLED: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Cancelled' },
+        COMPLETED: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Completed' }
     };
 
-    if (loading) return <div className="p-10 text-center flex items-center justify-center text-gray-600"><RefreshCw className="animate-spin mr-2" /> Loading your trips...</div>;
+    if (loading) return <div className="p-10 text-center flex items-center justify-center text-gray-600"><RefreshCw className="animate-spin mr-2" /> Loading event bookings...</div>;
 
     return (
         <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">My Trips</h1>
-            <p className="text-gray-500 text-sm mb-6">View and manage your room bookings</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">My Event Bookings</h1>
+            <p className="text-gray-500 text-sm mb-6">View and manage your event hall bookings</p>
 
-            {trips.length === 0 ? (
+            {bookings.length === 0 ? (
                 <div className="bg-gray-50 p-10 rounded-xl text-center border border-gray-200">
-                    <MapPin className="mx-auto text-gray-300 mb-3" size={40} />
-                    <h2 className="text-lg text-gray-600 mb-1">No trips found</h2>
-                    <p className="text-gray-400 text-sm">You haven't booked anything yet.</p>
+                    <PartyPopper className="mx-auto text-gray-300 mb-3" size={40} />
+                    <h2 className="text-lg text-gray-600 mb-1">No event bookings yet</h2>
+                    <p className="text-gray-400 text-sm">Book an event hall to get started.</p>
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {trips.map(trip => {
-                        const st = statusConfig[trip.status] || statusConfig.HOLD;
-                        const paymentInfo = payments[trip._id];
-                        const canCancel = ['CONFIRMED', 'HOLD'].includes(trip.status);
-                        const canRefund = trip.status === 'CANCELLED' && paymentInfo?.payment?.paymentStatus === 'paid' && !paymentInfo?.refund;
+                    {bookings.map(b => {
+                        const st = statusConfig[b.status] || statusConfig.HOLD;
+                        const paymentInfo = payments[b._id];
+                        const canCancel = ['HOLD', 'PENDING', 'APPROVED'].includes(b.status);
+                        const canRefund = b.status === 'CANCELLED' && paymentInfo?.payment?.paymentStatus === 'paid' && !paymentInfo?.refund;
 
                         return (
-                            <div key={trip._id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-sm transition">
+                            <div key={b._id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-sm transition">
                                 <div className="flex">
                                     {/* Image */}
-                                    <div className="w-64 flex-shrink-0 bg-gray-100 relative hidden md:block">
-                                        {trip.hotelId?.images?.[0] ? (
-                                            <img src={trip.hotelId.images[0]} alt="Hotel" className="w-full h-full object-cover" />
+                                    <div className="w-64 flex-shrink-0 bg-gradient-to-br from-purple-100 to-indigo-100 relative hidden md:block">
+                                        {b.hallId?.images?.[0] ? (
+                                            <img src={b.hallId.images[0]} alt="Hall" className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-300"><MapPin size={36} /></div>
+                                            <div className="w-full h-full flex items-center justify-center text-purple-300"><PartyPopper size={36} /></div>
                                         )}
                                     </div>
 
@@ -111,10 +105,10 @@ const MyTrips = () => {
                                     <div className="flex-1 p-5">
                                         <div className="flex justify-between items-start mb-3">
                                             <div>
-                                                <h3 className="text-lg font-bold text-gray-900">{trip.hotelId?.name || 'Hotel'}</h3>
-                                                {trip.hotelId?.location && (
+                                                <h3 className="text-lg font-bold text-gray-900">{b.hallId?.name || 'Hall'}</h3>
+                                                {b.hallId?.location && (
                                                     <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
-                                                        <MapPin size={13} /> {trip.hotelId.location}
+                                                        <MapPin size={13} /> {b.hallId.location}
                                                     </p>
                                                 )}
                                             </div>
@@ -123,40 +117,40 @@ const MyTrips = () => {
 
                                         <div className="flex flex-wrap gap-6 text-sm mb-3">
                                             <div>
-                                                <p className="text-gray-400 text-xs">Check-in</p>
-                                                <p className="font-semibold flex items-center gap-1"><Calendar size={13} /> {new Date(trip.checkInDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                                <p className="text-gray-400 text-xs">Event Date</p>
+                                                <p className="font-semibold flex items-center gap-1"><Calendar size={13} /> {new Date(b.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                             </div>
                                             <div>
-                                                <p className="text-gray-400 text-xs">Check-out</p>
-                                                <p className="font-semibold flex items-center gap-1"><Calendar size={13} /> {new Date(trip.checkOutDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                                <p className="text-gray-400 text-xs">Time</p>
+                                                <p className="font-semibold flex items-center gap-1"><Clock size={13} /> {b.startTime} – {b.endTime}</p>
                                             </div>
                                             <div>
                                                 <p className="text-gray-400 text-xs">Guests</p>
-                                                <p className="font-semibold flex items-center gap-1"><Users size={13} /> {trip.guests} guest{trip.guests > 1 ? 's' : ''}</p>
+                                                <p className="font-semibold flex items-center gap-1"><Users size={13} /> {b.guestCount} guest{b.guestCount > 1 ? 's' : ''}</p>
                                             </div>
                                         </div>
 
                                         <div className="text-sm mb-3">
-                                            <span className="text-gray-400 text-xs">Room Type</span>
-                                            <p className="font-semibold">{trip.roomId?.roomType || 'Standard'}</p>
+                                            <span className="text-gray-400 text-xs">Event Type</span>
+                                            <p className="font-semibold">{b.eventType}</p>
                                         </div>
 
                                         <div className="flex items-center justify-between">
-                                            <p className="text-xs text-gray-400">Booking Ref: <span className="font-mono font-semibold text-gray-600">{trip.bookingCode}</span></p>
+                                            <p className="text-xs text-gray-400">Booking Ref: <span className="font-mono font-semibold text-gray-600">{b.bookingCode}</span></p>
 
                                             <div className="flex gap-2">
                                                 {canCancel && (
                                                     <button
-                                                        onClick={() => handleCancel(trip._id)}
-                                                        disabled={cancellingId === trip._id}
+                                                        onClick={() => handleCancel(b._id)}
+                                                        disabled={cancellingId === b._id}
                                                         className="px-4 py-1.5 border border-red-200 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-50 disabled:opacity-50 transition"
                                                     >
-                                                        {cancellingId === trip._id ? 'Cancelling...' : 'Cancel Booking'}
+                                                        {cancellingId === b._id ? 'Cancelling...' : 'Cancel Booking'}
                                                     </button>
                                                 )}
                                                 {canRefund && (
                                                     <button
-                                                        onClick={() => handleRefundRequest(trip._id)}
+                                                        onClick={() => handleRefundRequest(b._id)}
                                                         className="px-4 py-1.5 border border-orange-200 text-orange-600 rounded-lg text-xs font-semibold hover:bg-orange-50 transition"
                                                     >
                                                         Request Refund
@@ -184,4 +178,4 @@ const MyTrips = () => {
     );
 };
 
-export default MyTrips;
+export default MyEventBookings;
