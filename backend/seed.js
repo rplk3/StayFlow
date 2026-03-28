@@ -7,6 +7,7 @@ const Alert = require('./models/Alert');
 const Hotel = require('./models/Hotel');
 const Room = require('./src/modules/hotelRoom/models/Room');
 const User = require('./src/modules/auth/models/User');
+const EventHall = require('./src/modules/eventHall/models/EventHall');
 
 const roomTypes = ['Standard', 'Deluxe', 'Suite', 'Penthouse'];
 const statuses = ['confirmed', 'cancelled', 'completed'];
@@ -42,6 +43,7 @@ const seedDatabase = async () => {
         await Alert.deleteMany({});
         await Hotel.deleteMany({});
         await Room.deleteMany({});
+        await EventHall.deleteMany({});
 
         console.log('Seeding new dummy data...');
         
@@ -147,6 +149,17 @@ const seedDatabase = async () => {
             description: 'Refund amount exceeded 50,000 LKR.',
             severity: 'high'
         });
+
+        // Seed Event Halls
+        console.log('Seeding event halls...');
+        const eventHalls = [
+            { name: 'Grand Ballroom', description: 'Elegant grand ballroom with crystal chandeliers, perfect for weddings and galas.', location: 'Colombo', capacity: { min: 50, max: 500 }, facilities: ['Stage', 'Sound System', 'Projector', 'AC', 'Lighting', 'Bridal Room', 'Parking'], pricePerHour: 15000, pricePerDay: 80000, eventTypes: ['Wedding', 'Corporate', 'Gala', 'Exhibition'], images: ['https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800'], status: 'active' },
+            { name: 'Lakeside Pavilion', description: 'Open-air pavilion overlooking the Kandy Lake, ideal for intimate gatherings.', location: 'Kandy', capacity: { min: 20, max: 150 }, facilities: ['Lake View', 'Open Air', 'Sound System', 'Lighting', 'Parking'], pricePerHour: 8000, pricePerDay: 45000, eventTypes: ['Birthday', 'Wedding', 'Seminar', 'Other'], images: ['https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=800'], status: 'active' },
+            { name: 'Crystal Banquet Hall', description: 'Modern banquet hall with floor-to-ceiling windows and contemporary décor.', location: 'Galle', capacity: { min: 30, max: 300 }, facilities: ['Projector', 'Sound System', 'AC', 'WiFi', 'Catering Kitchen', 'Parking'], pricePerHour: 12000, pricePerDay: 65000, eventTypes: ['Conference', 'Corporate', 'Wedding', 'Exhibition'], images: ['https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&q=80&w=800'], status: 'active' },
+            { name: 'Royal Conference Center', description: 'State-of-the-art conference facility with tiered seating and AV equipment.', location: 'Colombo', capacity: { min: 10, max: 200 }, facilities: ['Projector', 'Sound System', 'Video Conferencing', 'AC', 'WiFi', 'Whiteboard', 'Breakout Rooms'], pricePerHour: 10000, pricePerDay: 55000, eventTypes: ['Conference', 'Seminar', 'Corporate', 'Workshop'], images: ['https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&q=80&w=800'], status: 'active' },
+            { name: 'Garden Terrace', description: 'Beautiful garden venue with tropical landscaping, ideal for outdoor events.', location: 'Negombo', capacity: { min: 30, max: 250 }, facilities: ['Garden', 'Open Air', 'Tent', 'Lighting', 'Sound System', 'BBQ Area', 'Parking'], pricePerHour: 9000, pricePerDay: 50000, eventTypes: ['Wedding', 'Birthday', 'Corporate', 'Other'], images: ['https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&q=80&w=800'], status: 'active' },
+        ];
+        for (const eh of eventHalls) { await EventHall.create(eh); }
 
         console.log('Database seeding complete!');
         process.exit(0);

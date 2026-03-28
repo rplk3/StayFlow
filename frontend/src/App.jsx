@@ -23,6 +23,8 @@ import SearchResults from './modules/hotelRoom/pages/SearchResults';
 import HotelDetails from './modules/hotelRoom/pages/HotelDetails';
 import Checkout from './modules/hotelRoom/pages/Checkout';
 import MyTrips from './modules/hotelRoom/pages/MyTrips';
+import EventHalls from './pages/EventHalls';
+import EventHallManagement from './pages/EventHallManagement';
 
 
 function App() {
@@ -40,6 +42,7 @@ function App() {
         <Route path="/hotels/results" element={<SearchResults />} />
         <Route path="/hotels/:id" element={<HotelDetails />} />
         <Route path="/hotels/checkout" element={<Checkout />} />
+        <Route path="/event-halls" element={<EventHalls />} />
         
         {/* User Account Routes */}
         <Route element={<UserAccountLayout />}>
@@ -62,7 +65,7 @@ function App() {
           <Route path="hotels" element={<HotelManagement />} />
           <Route path="rooms" element={<RoomManagement />} />
           <Route path="transport" element={<TransportManagement />} />
-          <Route path="event-bookings" element={<div className="p-8 text-xl">Event Bookings Management (Coming Soon)</div>} />
+          <Route path="event-bookings" element={<EventHallManagement />} />
           <Route path="payments" element={<div className="p-8 text-xl">Payments Management (Coming Soon)</div>} />
           <Route path="chatbot" element={<div className="p-8 text-xl">Chatbot (Coming Soon)</div>} />
         </Route>

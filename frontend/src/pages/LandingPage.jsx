@@ -173,6 +173,19 @@ const LandingPage = () => {
                     </div>
                 </section>
 
+                {/* Event Hall CTA */}
+                <section>
+                    <div onClick={() => navigate('/event-halls')} className="cursor-pointer group bg-gradient-to-r from-purple-600 to-indigo-700 rounded-2xl p-8 flex items-center justify-between shadow-lg hover:shadow-xl transition-all hover:from-purple-700 hover:to-indigo-800">
+                        <div className="text-white">
+                            <h2 className="text-2xl font-bold mb-2">🎉 Book an Event Hall</h2>
+                            <p className="text-purple-200 text-sm max-w-lg">Host your dream wedding, conference, or birthday. Browse our venues and reserve the perfect hall for your special occasion.</p>
+                        </div>
+                        <button className="bg-white text-purple-700 px-6 py-3 rounded-xl font-bold text-sm hover:bg-purple-50 transition shrink-0 group-hover:scale-105">
+                            Browse Halls →
+                        </button>
+                    </div>
+                </section>
+
                 {/* Trending Destinations */}
                 <section>
                     <h2 className="text-2xl font-bold mb-4">Trending destinations</h2>
