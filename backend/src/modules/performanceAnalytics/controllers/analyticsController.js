@@ -126,7 +126,7 @@ exports.handleChatQuery = async (req, res) => {
 
         // Fetch current live metrics to give context to Gemini
         const data = await analyticsService.getDashboardData(); // get last 30 days
-        
+
         const contextData = `
         Current System Data (Last 30 days):
         Total Revenue: Rs. ${data.totalRevenue}
@@ -135,12 +135,12 @@ exports.handleChatQuery = async (req, res) => {
         Active Alerts Count: ${data.activeAlertsCount}
         `;
 
-        const systemInstruction = `You are a helpful Performance Analytics Assistant for the StayFlow hotel management system.
+        const systemInstruction = `You are a helpful Admin Assistant for the StayFlow hotel management system.
 Your only job is to answer questions related to the system's performance metrics, bookings, revenue, occupancy, and alerts based on the provided "Current System Data". 
 If the user asks a question COMPLETELY UNRELATED to the hotel's performance analytics, revenue, or bookings (such as "How to plant a tree", "What is the capital of France", etc.), you MUST refuse to answer and state that you can only answer questions related to performance analytics and bookings. Be concise and natural in your answers.`;
 
         const ai = new GoogleGenAI({ apiKey: apiKey });
-        
+
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: [
