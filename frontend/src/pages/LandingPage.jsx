@@ -15,7 +15,7 @@ const C = {
 
 /* ───────── 9 Trending Destinations ───────── */
 const destinations = [
-    { name: 'Colombo', flag: '🇱🇰', tag: '3 properties', img: 'https://images.unsplash.com/photo-1544413660-299165566b1d?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Colombo', flag: '🇱🇰', tag: '3 properties', img: 'https://media.istockphoto.com/id/2203368799/photo/a-vibrant-blend-of-culture-history-and-modernity.webp?a=1&b=1&s=612x612&w=0&k=20&c=2L4aQVKOrpRqw-u9yOI4LjBePnJafTobZlDLticUuOQ=' },
     { name: 'Kandy', flag: '🇱🇰', tag: '2 properties', img: 'https://images.unsplash.com/photo-1562698013-ac13558052cd?q=80&w=810&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { name: 'Galle', flag: '🇱🇰', tag: '2 properties', img: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&q=80&w=800' },
     { name: 'Nuwara Eliya', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1619974643633-12acfdcedd16?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bnV3YXJhJTIwZWxpeWF8ZW58MHx8MHx8fDA%3D' },
