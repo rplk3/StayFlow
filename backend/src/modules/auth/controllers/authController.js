@@ -46,7 +46,16 @@ exports.login = async (req, res) => {
 
         const user = await User.findOne({ email });
 
-        if (user && (await user.matchPassword(password))) {
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Prevent admin accounts from logging in through the user login
+        if (user.role === 'admin') {
+            return res.status(401).json({ message: 'This is an admin account. Please use the admin login portal.' });
+        }
+
+        if (await user.matchPassword(password)) {
             res.json({
                 _id: user.id,
                 firstName: user.firstName,

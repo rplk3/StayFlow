@@ -111,12 +111,12 @@ const EventHalls = () => {
             {[{ n: 1, l: 'Event Details' }, { n: 2, l: 'Payment' }, { n: 3, l: 'Confirmation' }].map((s, i) => (
                 <React.Fragment key={s.n}>
                     <div className="flex flex-col items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${checkoutStep >= s.n ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-200' : 'bg-gray-200 text-gray-500'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${checkoutStep >= s.n ? 'text-white shadow-lg shadow-blue-200' : 'bg-gray-200 text-gray-500'}`} style={checkoutStep >= s.n ? { background: 'linear-gradient(135deg, #01497C, #2A6F97)' } : {}}>
                             {checkoutStep > s.n ? <CheckCircle size={18} /> : s.n}
                         </div>
-                        <span className={`text-xs mt-2 font-medium whitespace-nowrap ${checkoutStep >= s.n ? 'text-purple-700' : 'text-gray-400'}`}>{s.l}</span>
+                        <span className={`text-xs mt-2 font-medium whitespace-nowrap ${checkoutStep >= s.n ? 'text-[#01497C]' : 'text-gray-400'}`}>{s.l}</span>
                     </div>
-                    {i < 2 && <div className={`w-16 md:w-24 h-0.5 mx-2 mt-[-16px] rounded-full transition-all ${checkoutStep > s.n ? 'bg-purple-500' : 'bg-gray-200'}`} />}
+                    {i < 2 && <div className={`w-16 md:w-24 h-0.5 mx-2 mt-[-16px] rounded-full transition-all ${checkoutStep > s.n ? 'bg-[#2A6F97]' : 'bg-gray-200'}`} />}
                 </React.Fragment>
             ))}
         </div>
@@ -127,18 +127,18 @@ const EventHalls = () => {
         return (
             <div className="max-w-2xl mx-auto p-6 md:p-12 mt-8">
                 <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-10 text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-500"></div>
+                    <div className="absolute top-0 left-0 right-0 h-2" style={{ background: 'linear-gradient(to right, #468FAF, #2A6F97, #01497C)' }}></div>
                     <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-200">
                         <CheckCircle size={40} className="text-white" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Event Booking Submitted!</h1>
                     <p className="text-gray-500 mb-2">Your booking is pending admin approval</p>
-                    <div className="bg-purple-50 rounded-2xl p-6 mb-6 border border-purple-100">
-                        <p className="text-sm text-purple-600 font-medium mb-1">Booking Code</p>
-                        <p className="text-3xl font-extrabold text-purple-700 tracking-wider">{bookingCode}</p>
+                    <div className="rounded-2xl p-6 mb-6 border" style={{ background: '#A9D6E520', borderColor: '#89C2D9' }}>
+                        <p className="text-sm font-medium mb-1" style={{ color: '#2A6F97' }}>Booking Code</p>
+                        <p className="text-3xl font-extrabold tracking-wider" style={{ color: '#01497C' }}>{bookingCode}</p>
                     </div>
                     <div className="flex gap-3 justify-center">
-                        <button onClick={() => navigate('/my-event-bookings')} className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-200">View My Event Bookings</button>
+                        <button onClick={() => navigate('/my-event-bookings')} className="text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 hover:opacity-90" style={{ background: 'linear-gradient(135deg, #01497C, #2A6F97)' }}>View My Event Bookings</button>
                         <button onClick={() => { setTab('browse'); setCheckoutStep(0); }} className="border-2 border-gray-200 text-gray-600 px-6 py-3.5 rounded-xl font-semibold hover:bg-gray-50 transition">Browse Halls</button>
                     </div>
                 </div>
@@ -149,11 +149,11 @@ const EventHalls = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-8 px-4">
+            <div className="text-white py-8 px-4" style={{ background: 'linear-gradient(135deg, #013A63, #01497C)' }}>
                 <div className="max-w-6xl mx-auto">
-                    <button onClick={() => navigate('/')} className="text-purple-200 hover:text-white text-sm mb-3 flex items-center gap-1"><ArrowLeft size={14} /> Back to Home</button>
+                    <button onClick={() => navigate('/')} className="hover:text-white text-sm mb-3 flex items-center gap-1" style={{ color: '#89C2D9' }}><ArrowLeft size={14} /> Back to Home</button>
                     <h1 className="text-4xl font-extrabold mb-2"> Event Halls</h1>
-                    <p className="text-purple-200 text-lg">Find and book the perfect venue for your special occasion</p>
+                    <p className="text-lg" style={{ color: '#89C2D9' }}>Find and book the perfect venue for your special occasion</p>
                 </div>
             </div>
 
@@ -165,26 +165,26 @@ const EventHalls = () => {
                         <form onSubmit={handleSearch} className="flex gap-3 mb-8">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input type="text" placeholder="Search halls by name..." value={searchText} onChange={(e) => setSearchText(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 outline-none" />
+                                <input type="text" placeholder="Search halls by name..." value={searchText} onChange={(e) => setSearchText(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#2A6F97] outline-none" />
                             </div>
-                            <button type="submit" className="px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition">Search</button>
+                            <button type="submit" className="px-6 py-3 text-white rounded-xl font-semibold transition hover:opacity-90" style={{ background: '#01497C' }}>Search</button>
                         </form>
 
                         {loading ? (
-                            <div className="flex items-center justify-center py-16"><RefreshCw className="animate-spin w-8 h-8 text-purple-500" /></div>
+                            <div className="flex items-center justify-center py-16"><RefreshCw className="animate-spin w-8 h-8" style={{ color: '#2A6F97' }} /></div>
                         ) : halls.length === 0 ? (
                             <div className="text-center py-16"><PartyPopper className="w-16 h-16 text-gray-300 mx-auto mb-4" /><h3 className="text-xl text-gray-500">No event halls available</h3></div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {halls.map(hall => (
                                     <div key={hall._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all group">
-                                        <div className="h-48 bg-gradient-to-br from-purple-200 to-indigo-200 relative overflow-hidden">
+                                        <div className="h-48 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #89C2D9, #A9D6E5)' }}>
                                             {hall.images?.[0] ? (
                                                 <img src={hall.images[0]} alt={hall.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-purple-400"><PartyPopper size={48} /></div>
+                                                <div className="w-full h-full flex items-center justify-center" style={{ color: '#2C7DA0' }}><PartyPopper size={48} /></div>
                                             )}
-                                            <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full text-xs font-bold text-purple-700 shadow">Rs. {hall.pricePerHour?.toLocaleString()}/hr</div>
+                                            <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full text-xs font-bold shadow" style={{ color: '#01497C' }}>Rs. {hall.pricePerHour?.toLocaleString()}/hr</div>
                                         </div>
                                         <div className="p-5">
                                             <h3 className="text-lg font-bold text-gray-900 mb-1">{hall.name}</h3>
@@ -195,11 +195,11 @@ const EventHalls = () => {
                                             </div>
                                             {hall.facilities?.length > 0 && (
                                                 <div className="flex flex-wrap gap-1 mb-4">
-                                                    {hall.facilities.slice(0, 4).map((f, i) => <span key={i} className="px-2 py-0.5 bg-purple-50 text-purple-700 text-[10px] font-semibold rounded-full">{f}</span>)}
+                                                    {hall.facilities.slice(0, 4).map((f, i) => <span key={i} className="px-2 py-0.5 text-[10px] font-semibold rounded-full" style={{ background: '#A9D6E520', color: '#01497C' }}>{f}</span>)}
                                                     {hall.facilities.length > 4 && <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-semibold rounded-full">+{hall.facilities.length - 4}</span>}
                                                 </div>
                                             )}
-                                            <button onClick={() => startBooking(hall)} className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold text-sm hover:from-purple-700 hover:to-indigo-700 transition-all shadow-sm">Book Now</button>
+                                            <button onClick={() => startBooking(hall)} className="w-full py-2.5 text-white rounded-xl font-semibold text-sm transition-all shadow-sm hover:opacity-90" style={{ background: 'linear-gradient(135deg, #01497C, #2A6F97)' }}>Book Now</button>
                                         </div>
                                     </div>
                                 ))}
@@ -221,7 +221,7 @@ const EventHalls = () => {
                                     <>
                                         {/* Event Details */}
                                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4">
+                                            <div className="px-6 py-4" style={{ background: 'linear-gradient(135deg, #01497C, #2A6F97)' }}>
                                                 <h2 className="text-lg font-bold text-white flex items-center gap-2"><Calendar size={20} /> Event Details</h2>
                                             </div>
                                             <div className="p-6 space-y-4">
@@ -278,7 +278,8 @@ const EventHalls = () => {
                                         </div>
 
                                         <button onClick={handleContinueToPayment} disabled={!availability?.available || !quote || formLoading}
-                                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 shadow-lg shadow-purple-200">
+                                            className="w-full flex items-center justify-center gap-2 text-white py-4 rounded-xl font-bold text-lg transition-all disabled:opacity-50 shadow-lg shadow-blue-200 hover:opacity-90"
+                                            style={{ background: 'linear-gradient(135deg, #01497C, #2A6F97)' }}>
                                             {formLoading ? 'Processing...' : 'Continue to Payment'} <ArrowRight size={20} />
                                         </button>
                                     </>
@@ -325,7 +326,7 @@ const EventHalls = () => {
                                                 <div className="flex justify-between"><span className="text-gray-500">Taxes & Fees</span><span className="font-semibold">Rs. {quote.taxesFees?.toLocaleString()}</span></div>
                                                 <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-200">
                                                     <span className="text-base font-bold text-gray-900">Total</span>
-                                                    <span className="text-2xl font-extrabold text-purple-700">Rs. {quote.totalAmount?.toLocaleString()}</span>
+                                                    <span className="text-2xl font-extrabold" style={{ color: '#01497C' }}>Rs. {quote.totalAmount?.toLocaleString()}</span>
                                                 </div>
                                             </div>
                                         )}
