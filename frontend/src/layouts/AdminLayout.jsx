@@ -9,8 +9,8 @@ const AdminLayout = () => {
     const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
 
     return (
-        <div className="flex h-screen bg-background font-sans overflow-hidden">
-            {/* Sidebar wrapper — this div participates in flexbox and transitions width */}
+        <div className="flex h-screen font-sans overflow-hidden" style={{ background: '#0f1117' }}>
+            {/* Sidebar wrapper */}
             <div
                 className="transition-all duration-300 ease-in-out flex-shrink-0 overflow-hidden"
                 style={{ width: isSidebarOpen ? '16rem' : '0' }}
@@ -21,7 +21,7 @@ const AdminLayout = () => {
             <div className="flex-1 flex flex-col overflow-hidden w-full">
                 <Topbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-6">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto p-6" style={{ background: '#0f1117' }}>
                     <Outlet />
                 </main>
             </div>

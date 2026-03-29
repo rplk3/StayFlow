@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle, RefreshCw, ShieldAlert, ShieldCheck, Filter } from 'lucide-react';
+import { AlertCircle, CheckCircle, RefreshCw, ShieldAlert, ShieldCheck, Circle, CircleCheck } from 'lucide-react';
 import { getAlerts, checkAnomalies, resolveAlert } from '../../../services/api';
 
+const dk = { card: '#1a1d27', elevated: '#252830', border: '#2d3039', text: '#f1f5f9', textSec: '#94a3b8' };
+
 const severityConfig = {
-    HIGH: { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700', badge: 'bg-red-100 text-red-800' },
-    MEDIUM: { bg: 'bg-amber-50', border: 'border-amber-400', text: 'text-amber-700', badge: 'bg-amber-100 text-amber-800' },
-    LOW: { bg: 'bg-blue-50', border: 'border-blue-400', text: 'text-blue-600', badge: 'bg-blue-100 text-blue-800' }
+    HIGH: { bg: '#ef444412', border: '#ef4444', text: '#fca5a5', badge: { bg: '#ef444420', color: '#f87171' } },
+    MEDIUM: { bg: '#f59e0b12', border: '#f59e0b', text: '#fcd34d', badge: { bg: '#f59e0b20', color: '#fbbf24' } },
+    LOW: { bg: '#3b82f612', border: '#3b82f6', text: '#93c5fd', badge: { bg: '#3b82f620', color: '#60a5fa' } }
 };
 
 const typeLabels = {
@@ -66,14 +68,15 @@ const Alerts = () => {
         <div className="space-y-6 animate-fade-in pb-12">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-textPrimary">Anomaly Detection & Alerts</h1>
-                    <p className="text-textSecondary text-sm mt-1">Rule-based alerts for revenue leaks, drops, and high cancellations.</p>
+                    <h1 className="text-2xl font-bold" style={{ color: dk.text }}>Anomaly Detection & Alerts</h1>
+                    <p className="text-sm mt-1" style={{ color: dk.textSec }}>Rule-based alerts for revenue leaks, drops, and high cancellations.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleCheckAnomalies}
                         disabled={checking}
-                        className="flex items-center bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                        className="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-50 text-white"
+                        style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
                     >
                         <ShieldAlert className={`w-4 h-4 mr-2 ${checking ? 'animate-pulse' : ''}`} />
                         {checking ? 'Scanning...' : 'Run Anomaly Check'}
@@ -81,18 +84,24 @@ const Alerts = () => {
                 </div>
             </div>
 
-            {/* Status Filter Tabs */}
+            {/* Status Filter Tabs — icons instead of emojis */}
             <div className="flex gap-2">
-                {['ACTIVE', 'RESOLVED', ''].map((status) => (
+                {[
+                    { status: 'ACTIVE', label: 'Active', icon: Circle, color: '#ef4444' },
+                    { status: 'RESOLVED', label: 'Resolved', icon: CircleCheck, color: '#10b981' },
+                    { status: '', label: 'All', icon: null, color: null }
+                ].map(({ status, label, icon: Icon, color }) => (
                     <button
                         key={status || 'all'}
                         onClick={() => setStatusFilter(status)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${statusFilter === status
-                                ? 'bg-primary text-white shadow-sm'
-                                : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                            }`}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border"
+                        style={statusFilter === status
+                            ? { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white', borderColor: 'transparent' }
+                            : { background: dk.elevated, borderColor: dk.border, color: dk.textSec }
+                        }
                     >
-                        {status === '' ? 'All' : status === 'ACTIVE' ? '🔴 Active' : '✅ Resolved'}
+                        {Icon && <Icon className="w-3.5 h-3.5" style={statusFilter !== status && color ? { color } : {}} />}
+                        {label}
                     </button>
                 ))}
             </div>
@@ -101,13 +110,13 @@ const Alerts = () => {
             <div className="space-y-4">
                 {loading ? (
                     <div className="flex justify-center items-center h-48">
-                        <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+                        <RefreshCw className="w-8 h-8 animate-spin text-indigo-500" />
                     </div>
                 ) : alerts.length === 0 ? (
-                    <div className="bg-card rounded-xl shadow-soft p-12 text-center border border-gray-100">
-                        <ShieldCheck className="w-16 h-16 text-accent mx-auto mb-4 opacity-60" />
-                        <h3 className="text-lg font-semibold text-textPrimary">All Clear!</h3>
-                        <p className="text-textSecondary text-sm mt-2">
+                    <div className="rounded-xl p-12 text-center border" style={{ background: dk.card, borderColor: dk.border }}>
+                        <ShieldCheck className="w-16 h-16 mx-auto mb-4 opacity-60 text-emerald-500" />
+                        <h3 className="text-lg font-semibold" style={{ color: dk.text }}>All Clear!</h3>
+                        <p className="text-sm mt-2" style={{ color: dk.textSec }}>
                             {statusFilter === 'ACTIVE' ? 'No active anomalies detected.' : 'No alerts found for this filter.'}
                         </p>
                     </div>
@@ -117,27 +126,30 @@ const Alerts = () => {
                         return (
                             <div
                                 key={alert._id}
-                                className={`${config.bg} rounded-xl p-5 border-l-4 ${config.border} shadow-sm transition-all hover:shadow-md`}
+                                className="rounded-xl p-5 border-l-4 transition-all hover:translate-x-0.5"
+                                style={{ background: config.bg, borderLeftColor: config.border }}
                             >
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start gap-3 flex-1">
-                                        <AlertCircle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${config.text}`} />
+                                        <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: config.border }} />
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                <h4 className={`font-semibold text-sm ${config.text}`}>
+                                                <h4 className="font-semibold text-sm" style={{ color: config.text }}>
                                                     {typeLabels[alert.type] || alert.type}
                                                 </h4>
-                                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.badge}`}>
+                                                <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                                                    style={{ background: config.badge.bg, color: config.badge.color }}>
                                                     {alert.severity}
                                                 </span>
                                                 {alert.status === 'RESOLVED' && (
-                                                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-800">
+                                                    <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                                                        style={{ background: '#10b98120', color: '#34d399' }}>
                                                         RESOLVED
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className={`text-sm ${config.text} opacity-80 mt-1`}>{alert.description}</p>
-                                            <p className="text-xs text-gray-500 mt-2">
+                                            <p className="text-sm opacity-80 mt-1" style={{ color: config.text }}>{alert.description}</p>
+                                            <p className="text-xs mt-2" style={{ color: dk.textSec }}>
                                                 {new Date(alert.createdAt).toLocaleString()}
                                             </p>
                                         </div>
@@ -147,7 +159,8 @@ const Alerts = () => {
                                         <button
                                             onClick={() => handleResolve(alert._id)}
                                             disabled={resolvingId === alert._id}
-                                            className="ml-4 flex items-center gap-1 bg-white/80 border border-gray-200 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-700 hover:bg-white transition-colors shadow-sm disabled:opacity-50 flex-shrink-0"
+                                            className="ml-4 flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-50 flex-shrink-0 border"
+                                            style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }}
                                         >
                                             <CheckCircle className="w-3.5 h-3.5" />
                                             {resolvingId === alert._id ? 'Resolving...' : 'Resolve'}

@@ -13,26 +13,25 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         navigate('/admin-login');
     };
 
-    // Style for inactive and active states
     const navLinkClass = ({ isActive }) =>
-        `flex items-center mt-2 py-3 px-6 rounded-lg transition-colors font-medium text-sm ` +
+        `flex items-center mt-1 py-2.5 px-4 rounded-lg transition-all font-medium text-sm ` +
         (isActive
-            ? "bg-[#0071c2] text-white border-l-4 border-accent shadow-sm"
-            : "text-gray-300 hover:bg-[#0048aa] hover:text-white border-l-4 border-transparent");
+            ? "bg-white/10 text-white border-l-3 border-indigo-400 shadow-sm"
+            : "text-gray-400 hover:bg-white/5 hover:text-gray-200 border-l-3 border-transparent");
 
     return (
         <>
-            <div className="w-64 h-full bg-primary text-white border-r border-[#002b6b] shadow-lg flex flex-col flex-shrink-0">
-                <div className="flex items-center justify-center mt-8 mb-6 pb-6 border-b border-[#0048aa] mx-4">
+            <div className="w-64 h-full text-white border-r flex flex-col flex-shrink-0" style={{ background: '#141620', borderColor: '#2d3039' }}>
+                <div className="flex items-center justify-center mt-8 mb-6 pb-6 border-b mx-4" style={{ borderColor: '#2d3039' }}>
                     <div className="flex items-center">
-                        <div className="w-8 h-8 bg-white rounded flex items-center justify-center mr-3 shadow-sm">
-                            <TrendingUp className="w-5 h-5 text-primary" />
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3 shadow-sm" style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+                            <TrendingUp className="w-5 h-5 text-white" />
                         </div>
-                        <span className="text-lg font-bold font-sans tracking-wide">StayFlow Admin</span>
+                        <span className="text-lg font-bold font-sans tracking-wide text-white">StayFlow Admin</span>
                     </div>
                 </div>
 
-                <nav className="mt-4 px-4 space-y-2 flex-1 overflow-y-auto pb-4">
+                <nav className="mt-2 px-3 space-y-1 flex-1 overflow-y-auto pb-4">
                     <NavLink to="/admin/dashboard" className={navLinkClass} end>
                         <LayoutDashboard className="w-5 h-5 mr-3" />
                         <span>Dashboard</span>
@@ -42,7 +41,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <div>
                         <button 
                             onClick={() => setIsAnalyticsOpen(!isAnalyticsOpen)}
-                            className="w-full flex items-center justify-between mt-2 py-3 px-6 rounded-lg transition-colors font-medium text-sm text-gray-300 hover:bg-[#0048aa] hover:text-white border-l-4 border-transparent"
+                            className="w-full flex items-center justify-between mt-1 py-2.5 px-4 rounded-lg transition-all font-medium text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200"
                         >
                             <div className="flex items-center">
                                 <TrendingUp className="w-5 h-5 mr-3" />
@@ -52,25 +51,29 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         </button>
                         
                         {isAnalyticsOpen && (
-                            <div className="ml-8 mt-2 space-y-2">
+                            <div className="ml-4 mt-1 space-y-1 border-l pl-2" style={{ borderColor: '#2d3039' }}>
                                 <NavLink to="/admin/forecast" className={navLinkClass}>
-                                    <TrendingUp className="w-5 h-5 mr-3" />
+                                    <TrendingUp className="w-4 h-4 mr-3" />
                                     <span>Forecasting</span>
                                 </NavLink>
                                 <NavLink to="/admin/reports" className={navLinkClass}>
-                                    <FileText className="w-5 h-5 mr-3" />
+                                    <FileText className="w-4 h-4 mr-3" />
                                     <span>Reports & Exports</span>
                                 </NavLink>
                                 <NavLink to="/admin/alerts" className={navLinkClass}>
-                                    <AlertTriangle className="w-5 h-5 mr-3" />
+                                    <AlertTriangle className="w-4 h-4 mr-3" />
                                     <span>Alerts</span>
                                 </NavLink>
                                 <NavLink to="/admin/bi" className={navLinkClass}>
-                                    <MessageSquare className="w-5 h-5 mr-3" />
+                                    <MessageSquare className="w-4 h-4 mr-3" />
                                     <span>Conversational BI</span>
                                 </NavLink>
                             </div>
                         )}
+                    </div>
+
+                    <div className="pt-3 mt-3 border-t" style={{ borderColor: '#2d3039' }}>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-4 mb-2">Management</p>
                     </div>
 
                     <NavLink to="/admin/hotels" className={navLinkClass}>
@@ -99,8 +102,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </NavLink>
                 </nav>
 
-                {/* Bottom Section: Account & Logout */}
-                <div className="px-4 pb-6 border-t border-[#0048aa] pt-4 space-y-2">
+                {/* Bottom Section */}
+                <div className="px-3 pb-6 border-t pt-4 space-y-1" style={{ borderColor: '#2d3039' }}>
                     <NavLink to="/admin/account" className={navLinkClass}>
                         <User className="w-5 h-5 mr-3" />
                         <span>My Account</span>
@@ -111,7 +114,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </NavLink>
                     <button 
                         onClick={handleLogout}
-                        className="w-full flex items-center mt-2 py-3 px-6 rounded-lg transition-colors font-medium text-sm text-red-300 hover:bg-red-900 hover:bg-opacity-40 hover:text-red-200 border-l-4 border-transparent"
+                        className="w-full flex items-center mt-1 py-2.5 px-4 rounded-lg transition-all font-medium text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300"
                     >
                         <LogOut className="w-5 h-5 mr-3" />
                         <span>Sign Out</span>

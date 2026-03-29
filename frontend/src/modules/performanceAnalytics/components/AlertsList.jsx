@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { getAlerts, checkAnomalies } from '../../../services/api';
 
+const dk = { card: '#1a1d27', elevated: '#252830', border: '#2d3039', text: '#f1f5f9', textSec: '#94a3b8' };
+
 const AlertsList = () => {
     const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [checking, setChecking] = useState(false);
 
-    // Use mock alerts if API fails during demo
     const mockAlerts = [
         { _id: '1', type: 'Revenue Leak Detected', description: 'Found 3 high refund operations exceeding 50,000 LKR in the last 24h.', severity: 'high', createdAt: new Date().toISOString() },
         { _id: '2', type: 'Occupancy Target Missed', description: 'Occupancy dropped below 40% yesterday.', severity: 'medium', createdAt: new Date(Date.now() - 86400000).toISOString() }
@@ -35,7 +36,6 @@ const AlertsList = () => {
             await checkAnomalies();
             fetchAlerts();
         } catch (e) {
-            // Simulate checking for demo if backend fails
             setTimeout(() => {
                 setAlerts((prev) => [{
                     _id: Date.now().toString(),
@@ -46,22 +46,21 @@ const AlertsList = () => {
                 }, ...prev]);
                 setChecking(false);
             }, 1000);
-        } finally {
-            // setChecking(false); in try block handles normal case
         }
     };
 
     return (
-        <div className="bg-card rounded-xl p-6 shadow-soft h-[500px] flex flex-col">
+        <div className="rounded-xl p-6 flex flex-col h-[500px] border" style={{ background: dk.card, borderColor: dk.border }}>
             <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold flex items-center">
-                    <AlertCircle className="text-danger w-6 h-6 mr-2" />
+                <h3 className="text-lg font-bold flex items-center" style={{ color: dk.text }}>
+                    <AlertCircle className="w-6 h-6 mr-2 text-red-400" />
                     Active Alerts
                 </h3>
                 <button
                     onClick={handleCheckAnomalies}
                     disabled={checking}
-                    className="flex items-center text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 px-3 rounded-lg transition-colors"
+                    className="flex items-center text-sm py-1.5 px-3 rounded-lg transition-colors border"
+                    style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }}
                 >
                     <RefreshCw className={`w-4 h-4 mr-2 ${checking ? 'animate-spin' : ''}`} />
                     Check Anomalies
@@ -70,20 +69,21 @@ const AlertsList = () => {
 
             <div className="flex-1 overflow-y-auto space-y-4">
                 {loading ? (
-                    <div className="flex justify-center items-center h-full"><RefreshCw className="animate-spin text-gray-400 w-8 h-8" /></div>
+                    <div className="flex justify-center items-center h-full"><RefreshCw className="animate-spin w-8 h-8 text-indigo-500" /></div>
                 ) : alerts.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center text-gray-400 h-full">
+                    <div className="flex flex-col items-center justify-center h-full" style={{ color: dk.textSec }}>
                         <CheckCircle className="w-12 h-12 mb-2" />
                         <p>No active anomalies found.</p>
                     </div>
                 ) : (
                     alerts.map(alert => (
-                        <div key={alert._id} className="p-4 rounded-lg border-l-4 border-danger bg-red-50 flex items-start">
-                            <AlertCircle className="text-danger w-5 h-5 mr-3 mt-0.5 flex-shrink-0" />
+                        <div key={alert._id} className="p-4 rounded-lg border-l-4 flex items-start"
+                            style={{ background: '#ef444412', borderLeftColor: '#ef4444' }}>
+                            <AlertCircle className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-red-400" />
                             <div>
-                                <h4 className="font-semibold text-danger text-sm">{alert.type}</h4>
-                                <p className="text-xs text-red-700 mt-1">{alert.description}</p>
-                                <p className="text-xs text-gray-500 mt-2">{new Date(alert.createdAt).toLocaleString()}</p>
+                                <h4 className="font-semibold text-sm text-red-400">{alert.type}</h4>
+                                <p className="text-xs mt-1" style={{ color: '#fca5a5' }}>{alert.description}</p>
+                                <p className="text-xs mt-2" style={{ color: dk.textSec }}>{new Date(alert.createdAt).toLocaleString()}</p>
                             </div>
                         </div>
                     ))

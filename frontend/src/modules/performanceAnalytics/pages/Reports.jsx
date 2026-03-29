@@ -1,17 +1,33 @@
 import React, { useState } from 'react';
-import { Download, FileText, Calendar, Filter, RefreshCw, BarChart3, TrendingUp } from 'lucide-react';
+import { Download, FileText, Calendar, Filter, RefreshCw, BarChart3, TrendingUp, DollarSign, Hotel, ClipboardList, ShieldAlert } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateReport, getReportPdfUrl } from '../../../services/api';
 
+const dk = { bg: '#0f1117', card: '#1a1d27', elevated: '#252830', border: '#2d3039', text: '#f1f5f9', textSec: '#94a3b8', grid: '#2d3039' };
+
 const reportTypes = [
-    { value: 'revenue', label: 'Revenue Report', icon: '💰' },
-    { value: 'occupancy', label: 'Occupancy Report', icon: '🏨' },
-    { value: 'bookings', label: 'Bookings Report', icon: '📋' },
-    { value: 'alerts', label: 'Alerts Report', icon: '🚨' }
+    { value: 'revenue', label: 'Revenue Report', icon: DollarSign, color: '#10b981' },
+    { value: 'occupancy', label: 'Occupancy Report', icon: Hotel, color: '#6366f1' },
+    { value: 'bookings', label: 'Bookings Report', icon: ClipboardList, color: '#3b82f6' },
+    { value: 'alerts', label: 'Alerts Report', icon: ShieldAlert, color: '#ef4444' }
 ];
+
+const DarkTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    return (
+        <div className="rounded-lg px-4 py-3 shadow-xl border text-sm" style={{ background: dk.elevated, borderColor: dk.border }}>
+            <p className="text-xs font-medium mb-1" style={{ color: dk.textSec }}>{label}</p>
+            {payload.map((p, i) => (
+                <p key={i} className="font-bold" style={{ color: p.color }}>{Number(p.value).toLocaleString()}</p>
+            ))}
+        </div>
+    );
+};
 
 const Reports = () => {
     const [reportType, setReportType] = useState('revenue');
+    const today = new Date().toISOString().split('T')[0];
+    const minDate = (() => { const d = new Date(); d.setDate(d.getDate() - 90); return d.toISOString().split('T')[0]; })();
     const [from, setFrom] = useState(() => {
         const d = new Date();
         d.setDate(d.getDate() - 30);
@@ -54,65 +70,71 @@ const Reports = () => {
         return Object.keys(reportData.tableRows[0]);
     };
 
+    const currentType = reportTypes.find(r => r.value === reportType);
+
     return (
         <div className="space-y-6 animate-fade-in pb-12">
             <div>
-                <h1 className="text-2xl font-bold text-textPrimary">Reports & Exports</h1>
-                <p className="text-textSecondary text-sm mt-1">Generate data-driven reports with preview and PDF download.</p>
+                <h1 className="text-2xl font-bold" style={{ color: dk.text }}>Reports & Exports</h1>
+                <p className="text-sm mt-1" style={{ color: dk.textSec }}>Generate data-driven reports with preview and PDF download.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Configuration Panel */}
-                <div className="bg-card rounded-xl shadow-soft border border-gray-100 p-6">
-                    <h3 className="text-sm font-semibold text-textPrimary uppercase tracking-wider mb-4">
+                <div className="rounded-xl border p-6" style={{ background: dk.card, borderColor: dk.border }}>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: dk.textSec }}>
                         Report Configuration
                     </h3>
 
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-textSecondary mb-1.5 flex items-center">
+                            <label className="text-sm font-medium mb-1.5 flex items-center" style={{ color: dk.textSec }}>
                                 <FileText className="w-4 h-4 mr-2" /> Report Type
                             </label>
-                            <select
-                                value={reportType}
-                                onChange={(e) => setReportType(e.target.value)}
-                                className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5 shadow-sm"
-                            >
-                                {reportTypes.map(rt => (
-                                    <option key={rt.value} value={rt.value}>{rt.icon} {rt.label}</option>
-                                ))}
-                            </select>
+                            {/* Report type cards */}
+                            <div className="space-y-2 mt-2">
+                                {reportTypes.map(rt => {
+                                    const Icon = rt.icon;
+                                    const selected = reportType === rt.value;
+                                    return (
+                                        <button key={rt.value} onClick={() => setReportType(rt.value)}
+                                            className="w-full flex items-center gap-3 p-3 rounded-lg text-left text-sm font-medium transition-all border"
+                                            style={{
+                                                background: selected ? `${rt.color}15` : dk.elevated,
+                                                borderColor: selected ? rt.color : dk.border,
+                                                color: selected ? rt.color : dk.text
+                                            }}>
+                                            <Icon className="w-4 h-4" />
+                                            {rt.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-textSecondary mb-1.5 flex items-center">
+                            <label className="block text-sm font-medium mb-1.5 flex items-center" style={{ color: dk.textSec }}>
                                 <Calendar className="w-4 h-4 mr-2" /> From Date
                             </label>
-                            <input
-                                type="date"
-                                value={from}
+                            <input type="date" value={from} min={minDate} max={to || today}
                                 onChange={(e) => setFrom(e.target.value)}
-                                className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5 shadow-sm"
-                            />
+                                className="w-full text-sm rounded-lg p-2.5 outline-none border focus:ring-2 focus:ring-indigo-500"
+                                style={{ background: dk.elevated, borderColor: dk.border, color: dk.text, colorScheme: 'dark' }} />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-textSecondary mb-1.5 flex items-center">
+                            <label className="block text-sm font-medium mb-1.5 flex items-center" style={{ color: dk.textSec }}>
                                 <Calendar className="w-4 h-4 mr-2" /> To Date
                             </label>
-                            <input
-                                type="date"
-                                value={to}
+                            <input type="date" value={to} min={from || minDate} max={today}
                                 onChange={(e) => setTo(e.target.value)}
-                                className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5 shadow-sm"
-                            />
+                                className="w-full text-sm rounded-lg p-2.5 outline-none border focus:ring-2 focus:ring-indigo-500"
+                                style={{ background: dk.elevated, borderColor: dk.border, color: dk.text, colorScheme: 'dark' }} />
                         </div>
 
-                        <button
-                            onClick={handleGenerate}
-                            disabled={loading}
-                            className="w-full flex items-center justify-center bg-secondary hover:bg-secondary/90 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm disabled:opacity-50"
-                        >
+                        <button onClick={handleGenerate} disabled={loading}
+                            className="w-full flex items-center justify-center text-white font-semibold py-2.5 px-4 rounded-lg transition-all disabled:opacity-50"
+                            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
                             {loading ? (
                                 <span className="flex items-center"><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Generating...</span>
                             ) : (
@@ -121,10 +143,9 @@ const Reports = () => {
                         </button>
 
                         {reportData && (
-                            <button
-                                onClick={handleDownloadPDF}
-                                className="w-full flex items-center justify-center bg-accent hover:bg-accent/90 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm"
-                            >
+                            <button onClick={handleDownloadPDF}
+                                className="w-full flex items-center justify-center font-semibold py-2.5 px-4 rounded-lg transition-all text-white"
+                                style={{ background: '#10b981' }}>
                                 <Download className="w-4 h-4 mr-2" /> Download PDF
                             </button>
                         )}
@@ -134,38 +155,38 @@ const Reports = () => {
                 {/* Preview Panel */}
                 <div className="lg:col-span-2 space-y-6">
                     {error && (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
+                        <div className="rounded-xl p-4 text-sm border" style={{ background: '#ef444415', borderColor: '#ef4444', color: '#fca5a5' }}>
                             {error}
                         </div>
                     )}
 
                     {!reportData && !loading && (
-                        <div className="bg-card rounded-xl shadow-soft border border-gray-100 p-12 text-center">
-                            <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-textPrimary">Select & Generate</h3>
-                            <p className="text-textSecondary text-sm mt-2">Choose a report type and date range, then click Generate to see the preview.</p>
+                        <div className="rounded-xl border p-12 text-center" style={{ background: dk.card, borderColor: dk.border }}>
+                            <FileText className="w-16 h-16 mx-auto mb-4" style={{ color: dk.border }} />
+                            <h3 className="text-lg font-semibold" style={{ color: dk.text }}>Select & Generate</h3>
+                            <p className="text-sm mt-2" style={{ color: dk.textSec }}>Choose a report type and date range, then click Generate to see the preview.</p>
                         </div>
                     )}
 
                     {loading && (
-                        <div className="bg-card rounded-xl shadow-soft border border-gray-100 p-12 text-center">
-                            <RefreshCw className="w-10 h-10 text-primary mx-auto mb-4 animate-spin" />
-                            <p className="text-textSecondary text-sm">Generating report...</p>
+                        <div className="rounded-xl border p-12 text-center" style={{ background: dk.card, borderColor: dk.border }}>
+                            <RefreshCw className="w-10 h-10 mx-auto mb-4 animate-spin text-indigo-500" />
+                            <p className="text-sm" style={{ color: dk.textSec }}>Generating report...</p>
                         </div>
                     )}
 
                     {reportData && !loading && (
                         <>
                             {/* Summary Cards */}
-                            <div className="bg-card rounded-xl shadow-soft border border-gray-100 p-6">
-                                <h3 className="text-sm font-semibold text-textPrimary uppercase tracking-wider mb-4 flex items-center">
-                                    <TrendingUp className="w-4 h-4 mr-2 text-primary" /> Summary
+                            <div className="rounded-xl border p-6" style={{ background: dk.card, borderColor: dk.border }}>
+                                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 flex items-center" style={{ color: dk.textSec }}>
+                                    <TrendingUp className="w-4 h-4 mr-2 text-indigo-400" /> Summary
                                 </h3>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     {getSummaryItems().map((item, idx) => (
-                                        <div key={idx} className="bg-gray-50 rounded-lg p-3">
-                                            <p className="text-xs text-textSecondary font-medium">{item.label}</p>
-                                            <p className="text-lg font-bold text-textPrimary mt-1">{item.value}</p>
+                                        <div key={idx} className="rounded-lg p-3 border" style={{ background: dk.elevated, borderColor: dk.border }}>
+                                            <p className="text-xs font-medium" style={{ color: dk.textSec }}>{item.label}</p>
+                                            <p className="text-lg font-bold mt-1" style={{ color: dk.text }}>{item.value}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -173,24 +194,22 @@ const Reports = () => {
 
                             {/* Chart */}
                             {reportData.chartSeries?.length > 0 && (
-                                <div className="bg-card rounded-xl shadow-soft border border-gray-100 p-6">
-                                    <h3 className="text-sm font-semibold text-textPrimary uppercase tracking-wider mb-4">
-                                        Trend Chart
-                                    </h3>
+                                <div className="rounded-xl border p-6" style={{ background: dk.card, borderColor: dk.border }}>
+                                    <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: dk.textSec }}>Trend Chart</h3>
                                     <div className="h-56">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <AreaChart data={reportData.chartSeries}>
                                                 <defs>
                                                     <linearGradient id="reportChartGrad" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2} />
-                                                        <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                                     </linearGradient>
                                                 </defs>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                                <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#6B7280' }} tickMargin={8} minTickGap={30} />
-                                                <YAxis tick={{ fontSize: 10, fill: '#6B7280' }} width={50} />
-                                                <Tooltip contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                                                <Area type="monotone" dataKey="value" stroke="#3B82F6" strokeWidth={2} fill="url(#reportChartGrad)" />
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={dk.grid} />
+                                                <XAxis dataKey="date" tick={{ fontSize: 10, fill: dk.textSec }} tickMargin={8} minTickGap={30} />
+                                                <YAxis tick={{ fontSize: 10, fill: dk.textSec }} width={50} />
+                                                <Tooltip content={<DarkTooltip />} />
+                                                <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={2} fill="url(#reportChartGrad)" />
                                             </AreaChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -199,18 +218,18 @@ const Reports = () => {
 
                             {/* Data Table */}
                             {reportData.tableRows?.length > 0 && (
-                                <div className="bg-card rounded-xl shadow-soft border border-gray-100 overflow-hidden">
-                                    <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                                        <h3 className="text-sm font-semibold text-textPrimary uppercase tracking-wider flex items-center">
-                                            <Filter className="w-4 h-4 mr-2 text-primary" /> Data Preview
+                                <div className="rounded-xl border overflow-hidden" style={{ background: dk.card, borderColor: dk.border }}>
+                                    <div className="p-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${dk.border}` }}>
+                                        <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center" style={{ color: dk.textSec }}>
+                                            <Filter className="w-4 h-4 mr-2 text-indigo-400" /> Data Preview
                                         </h3>
-                                        <span className="text-xs bg-blue-100 text-primary px-2 py-1 rounded-full font-medium">
+                                        <span className="text-xs px-2 py-1 rounded-full font-medium" style={{ background: '#6366f115', color: '#818cf8' }}>
                                             {reportData.tableRows.length} rows
                                         </span>
                                     </div>
                                     <div className="overflow-x-auto max-h-96">
                                         <table className="w-full text-sm text-left">
-                                            <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                                            <thead className="text-xs uppercase sticky top-0" style={{ background: dk.elevated, color: dk.textSec }}>
                                                 <tr>
                                                     {getTableHeaders().map(h => (
                                                         <th key={h} scope="col" className="px-4 py-3 font-semibold">
@@ -221,9 +240,11 @@ const Reports = () => {
                                             </thead>
                                             <tbody>
                                                 {reportData.tableRows.map((row, idx) => (
-                                                    <tr key={idx} className="border-b hover:bg-gray-50 transition-colors">
+                                                    <tr key={idx} className="transition-colors" style={{ borderBottom: `1px solid ${dk.border}` }}
+                                                        onMouseEnter={(e) => e.currentTarget.style.background = dk.elevated}
+                                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                                                         {getTableHeaders().map(h => (
-                                                            <td key={h} className="px-4 py-3 text-gray-700">
+                                                            <td key={h} className="px-4 py-3" style={{ color: dk.text }}>
                                                                 {typeof row[h] === 'number' ? row[h].toLocaleString() : row[h]}
                                                             </td>
                                                         ))}

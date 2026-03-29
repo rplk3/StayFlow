@@ -1,7 +1,7 @@
 /**
  * Anomaly Detection Service
  * 
- * Rule-based anomaly detection for Progress 1.
+ * Rule-based anomaly detection 
  * Creates Alert records when rules are triggered.
  * Idempotent: checks if similar alert already exists today before creating.
  */
@@ -23,7 +23,6 @@ async function checkAndCreateAlerts() {
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
-
     const createdAlerts = [];
 
     // ---- RULE 1: High refund amounts (REVENUE_LEAK) ----

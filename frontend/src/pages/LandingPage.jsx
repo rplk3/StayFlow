@@ -270,7 +270,7 @@ const LandingPage = () => {
                         style={{ background: `linear-gradient(135deg, ${C[800]}, ${C[600]})` }}
                     >
                         <div className="text-white">
-                            <h2 className="text-2xl font-bold mb-2">🎉 Book an Event Hall</h2>
+                            <h2 className="text-2xl font-bold mb-2"> Book an Event Hall</h2>
                             <p className="text-sm max-w-lg" style={{ color: C[100] }}>
                                 Host your dream wedding, conference, or birthday. Browse our venues and reserve the perfect hall for your special occasion.
                             </p>
