@@ -16,13 +16,13 @@ const C = {
 /* ───────── 9 Trending Destinations ───────── */
 const destinations = [
     { name: 'Colombo', flag: '🇱🇰', tag: '3 properties', img: 'https://images.unsplash.com/photo-1544413660-299165566b1d?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Kandy', flag: '🇱🇰', tag: '2 properties', img: 'https://images.unsplash.com/photo-1588636402741-dd6052f520b7?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Kandy', flag: '🇱🇰', tag: '2 properties', img: 'https://images.unsplash.com/photo-1562698013-ac13558052cd?q=80&w=810&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { name: 'Galle', flag: '🇱🇰', tag: '2 properties', img: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Nuwara Eliya', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1586523969204-fb71cabc9389?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Ella', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1580889240911-7a0c9be06544?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Udawalawe', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1535338454528-1b5c8bb46e5e?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Nuwara Eliya', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1619974643633-12acfdcedd16?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bnV3YXJhJTIwZWxpeWF8ZW58MHx8MHx8fDA%3D' },
+    { name: 'Ella', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1566766189268-ecac9118f2b7?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { name: 'Udawalawe', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1559038211-894339d3e99f?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { name: 'Negombo', flag: '🇱🇰', tag: 'Beaches', img: 'https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Sigiriya', flag: '🇱🇰', tag: 'Heritage', img: 'https://images.unsplash.com/photo-1586523835081-7e399d2782b9?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Sigiriya', flag: '🇱🇰', tag: 'Heritage', img: 'https://images.unsplash.com/photo-1588598198321-9735fd52455b?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { name: 'Trincomalee', flag: '🇱🇰', tag: 'Coastal', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800' },
 ];
 
