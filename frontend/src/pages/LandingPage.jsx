@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { MapPin, ChevronDown, Plus, Minus, Users, Building2, Phone, Mail, Globe, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import CustomDatePicker from '../components/CustomDatePicker';
 import heroImg from '../assets/hero_background.png';
+import Swal from 'sweetalert2';
 
 /* ───────── Color palette (from coolors) ───────── */
 const C = {
@@ -71,7 +72,7 @@ const LandingPage = () => {
 
     const handleSearch = () => {
         if (!destination || !dateRange.checkIn || !dateRange.checkOut) {
-            alert('Please fill out all search fields (Destination, Check-in, Check-out).');
+            Swal.fire({ title: 'Validation Error', text: 'Please fill out all search fields (Destination, Check-in, Check-out).', icon: 'warning' });
             return;
         }
         const searchParams = new URLSearchParams({ destination, checkIn: dateRange.checkIn, checkOut: dateRange.checkOut, guests: totalGuests });

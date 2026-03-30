@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CreditCard, Download, RefreshCw } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const API = 'http://localhost:5000/api/payments';
 const userId = 'USER_123';
@@ -32,7 +33,7 @@ const MyPayments = () => {
             link.remove();
             window.URL.revokeObjectURL(url);
         } catch (err) {
-            alert('Failed to download invoice');
+            Swal.fire('Error', 'Failed to download invoice', 'error');
         }
     };
 

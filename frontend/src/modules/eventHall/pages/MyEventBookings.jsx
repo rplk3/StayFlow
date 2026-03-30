@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Calendar, Clock, Users, MapPin, RefreshCw, PartyPopper } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const API = 'http://localhost:5000/api/event-halls';
 const PAYMENT_API = 'http://localhost:5000/api/payments';
@@ -30,32 +31,56 @@ const MyEventBookings = () => {
     };
 
     const handleCancel = async (id) => {
-        if (!window.confirm('Are you sure you want to cancel this booking?')) return;
+        const result = await Swal.fire({
+            title: 'Cancel Booking?',
+            text: 'Are you sure you want to cancel this booking?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#3b82f6',
+            confirmButtonText: 'Yes, cancel it!'
+        });
+        if (!result.isConfirmed) return;
+
         try {
             setCancellingId(id);
             await axios.post(`${API}/bookings/${id}/cancel`, { reason: 'User cancelled' });
+            Swal.fire('Cancelled!', 'Your booking has been cancelled.', 'success');
             fetchBookings();
-        } catch (err) { alert(err.response?.data?.message || 'Cancellation failed'); }
-        finally { setCancellingId(null); }
+        } catch (err) { 
+            Swal.fire('Error', err.response?.data?.message || 'Cancellation failed', 'error'); 
+        } finally { 
+            setCancellingId(null); 
+        }
     };
 
     const handleRefundRequest = async (bookingId) => {
         const paymentInfo = payments[bookingId];
-        if (!paymentInfo?.payment) { alert('No payment record found for this booking.'); return; }
+        if (!paymentInfo?.payment) { 
+            Swal.fire('No Payment', 'No payment record found for this booking.', 'info'); 
+            return; 
+        }
 
-        const confirmed = window.confirm(
-            "Note: You are only eligible for a refund if you cancelled the booking before the booking date.\n\nDo you want to proceed with the refund request?"
-        );
-        if (!confirmed) return;
+        const result = await Swal.fire({
+            title: 'Request Refund?',
+            text: "Note: You are only eligible for a refund if you cancelled the booking before the booking date. Do you want to proceed?",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, request refund'
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
             await axios.post(`${PAYMENT_API}/${paymentInfo.payment._id}/refund`, {
                 refundReason: 'Customer requested refund after cancellation'
             });
-            alert('Refund request submitted successfully.');
+            Swal.fire('Submitted', 'Refund request submitted successfully.', 'success');
             fetchBookings();
         } catch (err) {
-            alert(err.response?.data?.message || 'Refund request failed');
+            Swal.fire('Error', err.response?.data?.message || 'Refund request failed', 'error');
         }
     };
 
