@@ -24,25 +24,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 </div>
 
                 <nav className="mt-4 px-4 space-y-2">
-                    <NavLink to="/" className={navLinkClass} end>
-                        <LayoutDashboard className="w-5 h-5 mr-3" />
-                        <span>Dashboard</span>
-                    </NavLink>
-                    <NavLink to="/forecast" className={navLinkClass}>
-                        <TrendingUp className="w-5 h-5 mr-3" />
-                        <span>Forecasting</span>
-                    </NavLink>
-                    <NavLink to="/reports" className={navLinkClass}>
-                        <FileText className="w-5 h-5 mr-3" />
-                        <span>Reports & Exports</span>
-                    </NavLink>
-                    <NavLink to="/alerts" className={navLinkClass}>
-                        <AlertTriangle className="w-5 h-5 mr-3" />
-                        <span>Alerts</span>
-                    </NavLink>
+                    
                     <NavLink to="/bi" className={navLinkClass}>
                         <MessageSquare className="w-5 h-5 mr-3" />
-                        <span>Conversational BI</span>
+                        <span>Customer Support</span>
                     </NavLink>
                 </nav>
             </div>

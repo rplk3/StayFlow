@@ -39,7 +39,15 @@ export const generateReport = (type, from, to) =>
 export const getReportPdfUrl = (type, from, to) =>
     `${REPORTS_URL}/pdf?type=${encodeURIComponent(type)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
 
-// ---- Conversational BI (legacy) ----
+// ---- Conversational BI ----
 
-export const queryAnalytics = (question) =>
-    axios.post(`${ANALYTICS_URL}/query`, { question });
+export const queryAnalytics = (data) => {
+    if (data instanceof FormData) {
+        return axios.post(`${API_BASE}/chat/query`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    }
+    return axios.post(`${API_BASE}/chat/query`, { question: data });
+};
