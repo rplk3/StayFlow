@@ -9,6 +9,9 @@ const AlertsList = () => {
 
      const [checking, setChecking] = useState(true);
 
+     const [checking, setChecking] = useState(true);
+
+
     // Use mock alerts if API fails during demo
     const mockAlerts = [
         { _id: '1', type: 'Revenue Leak Detected', description: 'Found 3 high refund operations exceeding 50,000 LKR in the last 24h.', severity: 'high', createdAt: new Date().toISOString() },
