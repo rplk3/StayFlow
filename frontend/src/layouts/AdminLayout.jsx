@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
+import { useAuth } from '../context/AuthContext';
+import { getAdminRole, isAuthorizedForRoute } from '../utils/roleHelpers';
 
 const AdminLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const { user } = useAuth();
+    const location = useLocation();
 
     const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+
+    // Check Route Authorization
+    const role = getAdminRole(user?.email);
+    if (!isAuthorizedForRoute(role, location.pathname)) {
+        return <Navigate to="/admin/dashboard" replace />;
+    }
 
     return (
         <div className="flex h-screen font-sans overflow-hidden" style={{ background: '#0f1117' }}>

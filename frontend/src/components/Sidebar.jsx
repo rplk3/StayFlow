@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { LayoutDashboard, TrendingUp, AlertTriangle, MessageSquare, FileText, ChevronDown, ChevronRight, Calendar, Car, CalendarCheck, CreditCard, Bot, User, ShieldCheck, LogOut, DoorOpen } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getAdminRole } from '../utils/roleHelpers';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
     const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -18,6 +19,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         (isActive
             ? "bg-white/10 text-white border-l-3 border-indigo-400 shadow-sm"
             : "text-gray-400 hover:bg-white/5 hover:text-gray-200 border-l-3 border-transparent");
+
+    const role = getAdminRole(user?.email);
+    const isSuper = role === 'super';
+    
+    // Visibility flags
+    const showAnalytics = isSuper || role === 'analytics';
+    const showHotels = isSuper || role === 'hotel' || role === 'hotels';
+    const showRooms = isSuper || role === 'room' || role === 'rooms';
+    const showTransport = isSuper || role === 'transport';
+    const showEvents = isSuper || role === 'event' || role === 'events';
+    const showPayments = isSuper || role === 'payment' || role === 'payments';
 
     return (
         <>
@@ -38,68 +50,90 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </NavLink>
                     
                     {/* Analytics Dropdown */}
-                    <div>
-                        <button 
-                            onClick={() => setIsAnalyticsOpen(!isAnalyticsOpen)}
-                            className="w-full flex items-center justify-between mt-1 py-2.5 px-4 rounded-lg transition-all font-medium text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200"
-                        >
-                            <div className="flex items-center">
-                                <TrendingUp className="w-5 h-5 mr-3" />
-                                <span>Analytics</span>
-                            </div>
-                            {isAnalyticsOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                        </button>
-                        
-                        {isAnalyticsOpen && (
-                            <div className="ml-4 mt-1 space-y-1 border-l pl-2" style={{ borderColor: '#2d3039' }}>
-                                <NavLink to="/admin/forecast" className={navLinkClass}>
-                                    <TrendingUp className="w-4 h-4 mr-3" />
-                                    <span>Forecasting</span>
-                                </NavLink>
-                                <NavLink to="/admin/reports" className={navLinkClass}>
-                                    <FileText className="w-4 h-4 mr-3" />
-                                    <span>Reports & Exports</span>
-                                </NavLink>
-                                <NavLink to="/admin/alerts" className={navLinkClass}>
-                                    <AlertTriangle className="w-4 h-4 mr-3" />
-                                    <span>Alerts</span>
-                                </NavLink>
-                                <NavLink to="/admin/bi" className={navLinkClass}>
-                                    <MessageSquare className="w-4 h-4 mr-3" />
-                                    <span>Conversational BI</span>
-                                </NavLink>
-                            </div>
-                        )}
-                    </div>
+                    {showAnalytics && (
+                        <div>
+                            <button 
+                                onClick={() => setIsAnalyticsOpen(!isAnalyticsOpen)}
+                                className="w-full flex items-center justify-between mt-1 py-2.5 px-4 rounded-lg transition-all font-medium text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200"
+                            >
+                                <div className="flex items-center">
+                                    <TrendingUp className="w-5 h-5 mr-3" />
+                                    <span>Analytics</span>
+                                </div>
+                                {isAnalyticsOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                            </button>
+                            
+                            {isAnalyticsOpen && (
+                                <div className="ml-4 mt-1 space-y-1 border-l pl-2" style={{ borderColor: '#2d3039' }}>
+                                    <NavLink to="/admin/forecast" className={navLinkClass}>
+                                        <TrendingUp className="w-4 h-4 mr-3" />
+                                        <span>Forecasting</span>
+                                    </NavLink>
+                                    <NavLink to="/admin/reports" className={navLinkClass}>
+                                        <FileText className="w-4 h-4 mr-3" />
+                                        <span>Reports & Exports</span>
+                                    </NavLink>
+                                    <NavLink to="/admin/alerts" className={navLinkClass}>
+                                        <AlertTriangle className="w-4 h-4 mr-3" />
+                                        <span>Alerts</span>
+                                    </NavLink>
+                                    <NavLink to="/admin/bi" className={navLinkClass}>
+                                        <MessageSquare className="w-4 h-4 mr-3" />
+                                        <span>Conversational BI</span>
+                                    </NavLink>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                    <div className="pt-3 mt-3 border-t" style={{ borderColor: '#2d3039' }}>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-4 mb-2">Management</p>
-                    </div>
+                    {(!isSuper && role !== 'analytics') ? null : (
+                        <div className="pt-3 mt-3 border-t" style={{ borderColor: '#2d3039' }}>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-4 mb-2">Management</p>
+                        </div>
+                    )}
+                    
+                    {(isSuper && showHotels && showRooms && showTransport && showEvents && showPayments) ? null : (
+                         <div className="pt-3 mt-3 border-t" style={{ borderColor: '#2d3039', display: !isSuper && role !== 'analytics' ? 'block' : 'none' }}>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-4 mb-2">Assigned Section</p>
+                        </div>
+                    )}
 
-                    <NavLink to="/admin/hotels" className={navLinkClass}>
-                        <Calendar className="w-5 h-5 mr-3" />
-                        <span>Hotel Management</span>
-                    </NavLink>
-                    <NavLink to="/admin/rooms" className={navLinkClass}>
-                        <DoorOpen className="w-5 h-5 mr-3" />
-                        <span>Room Management</span>
-                    </NavLink>
-                    <NavLink to="/admin/transport" className={navLinkClass}>
-                        <Car className="w-5 h-5 mr-3" />
-                        <span>Guest Transport</span>
-                    </NavLink>
-                    <NavLink to="/admin/event-bookings" className={navLinkClass}>
-                        <CalendarCheck className="w-5 h-5 mr-3" />
-                        <span>Event Bookings</span>
-                    </NavLink>
-                    <NavLink to="/admin/payments" className={navLinkClass}>
-                        <CreditCard className="w-5 h-5 mr-3" />
-                        <span>Payments</span>
-                    </NavLink>
-                    <NavLink to="/admin/chatbot" className={navLinkClass}>
-                        <Bot className="w-5 h-5 mr-3" />
-                        <span>Chatbot</span>
-                    </NavLink>
+                    {showHotels && (
+                        <NavLink to="/admin/hotels" className={navLinkClass}>
+                            <Calendar className="w-5 h-5 mr-3" />
+                            <span>Hotel Management</span>
+                        </NavLink>
+                    )}
+                    {showRooms && (
+                        <NavLink to="/admin/rooms" className={navLinkClass}>
+                            <DoorOpen className="w-5 h-5 mr-3" />
+                            <span>Room Management</span>
+                        </NavLink>
+                    )}
+                    {showTransport && (
+                        <NavLink to="/admin/transport" className={navLinkClass}>
+                            <Car className="w-5 h-5 mr-3" />
+                            <span>Guest Transport</span>
+                        </NavLink>
+                    )}
+                    {showEvents && (
+                        <NavLink to="/admin/event-bookings" className={navLinkClass}>
+                            <CalendarCheck className="w-5 h-5 mr-3" />
+                            <span>Event Bookings</span>
+                        </NavLink>
+                    )}
+                    {showPayments && (
+                        <NavLink to="/admin/payments" className={navLinkClass}>
+                            <CreditCard className="w-5 h-5 mr-3" />
+                            <span>Payments</span>
+                        </NavLink>
+                    )}
+                    {isSuper && (
+                        <NavLink to="/admin/chatbot" className={navLinkClass}>
+                            <Bot className="w-5 h-5 mr-3" />
+                            <span>Chatbot</span>
+                        </NavLink>
+                    )}
                 </nav>
 
                 {/* Bottom Section */}
@@ -108,10 +142,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         <User className="w-5 h-5 mr-3" />
                         <span>My Account</span>
                     </NavLink>
-                    <NavLink to="/admin/manage-admins" className={navLinkClass}>
-                        <ShieldCheck className="w-5 h-5 mr-3" />
-                        <span>Manage Admins</span>
-                    </NavLink>
+                    {isSuper && (
+                        <NavLink to="/admin/manage-admins" className={navLinkClass}>
+                            <ShieldCheck className="w-5 h-5 mr-3" />
+                            <span>Manage Admins</span>
+                        </NavLink>
+                    )}
                     <button 
                         onClick={handleLogout}
                         className="w-full flex items-center mt-1 py-2.5 px-4 rounded-lg transition-all font-medium text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300"

@@ -1,6 +1,12 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const isSuperAdmin = (email) => {
+    if(!email) return false;
+    const namePart = email.split('@')[0].toLowerCase();
+    return namePart === 'admin' || namePart === 'superadmin' || namePart === 'stayflow';
+};
+
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET || 'stayflow_super_secret', { expiresIn: '30d' });
 };
@@ -210,8 +216,8 @@ exports.loginAdmin = async (req, res) => {
 // @access  Private (Super Admin only)
 exports.getPendingAdmins = async (req, res) => {
     try {
-        // Verify the requester is an approved admin
-        if (req.user.role !== 'admin' || req.user.adminStatus !== 'approved') {
+        // Verify the requester is an approved Super Admin
+        if (req.user.role !== 'admin' || req.user.adminStatus !== 'approved' || !isSuperAdmin(req.user.email)) {
             return res.status(403).json({ message: 'Not authorized. Super Admin access required.' });
         }
 
@@ -228,8 +234,8 @@ exports.getPendingAdmins = async (req, res) => {
 // @access  Private (Super Admin only)
 exports.approveAdmin = async (req, res) => {
     try {
-        // Verify the requester is an approved admin
-        if (req.user.role !== 'admin' || req.user.adminStatus !== 'approved') {
+        // Verify the requester is an approved Super Admin
+        if (req.user.role !== 'admin' || req.user.adminStatus !== 'approved' || !isSuperAdmin(req.user.email)) {
             return res.status(403).json({ message: 'Not authorized. Super Admin access required.' });
         }
 

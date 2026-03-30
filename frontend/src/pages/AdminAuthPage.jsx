@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getAdminRole, getAssignedSectionPath } from '../utils/roleHelpers';
 import './AuthPage.css';
 
 const AdminAuthPage = () => {
@@ -37,7 +38,9 @@ const AdminAuthPage = () => {
         setError('');
         const res = await adminLogin(loginData.email, loginData.password);
         if (res.success) {
-            navigate('/admin/dashboard');
+            const role = getAdminRole(loginData.email);
+            const redirectPath = getAssignedSectionPath(role);
+            navigate(redirectPath);
         } else {
             setError(res.message);
         }
