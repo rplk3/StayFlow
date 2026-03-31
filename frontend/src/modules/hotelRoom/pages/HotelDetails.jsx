@@ -34,8 +34,8 @@ const HotelDetails = () => {
     const guests = parseInt(searchParams.get('guests')) || 2;
 
     useEffect(() => {
-        getHotelDetails(id).then(res => setData(res.data)).catch(console.error);
-    }, [id]);
+        getHotelDetails(id, checkIn, checkOut).then(res => setData(res.data)).catch(console.error);
+    }, [id, checkIn, checkOut]);
 
     if (!data) return (
         <div className="min-h-screen bg-gray-50 flex flex-col pt-12">
@@ -50,7 +50,7 @@ const HotelDetails = () => {
     );
 
     const { hotel, rooms, ratePlans } = data;
-    const availableRooms = rooms.filter(r => r.capacity >= guests);
+    const validCapacityRooms = rooms.filter(r => r.capacity >= guests);
 
     const handleSelectRate = (roomId, ratePlanId) => {
         const query = new URLSearchParams({ hotelId: id, roomId, ratePlanId, checkIn, checkOut, guests });
@@ -146,23 +146,28 @@ const HotelDetails = () => {
                 </h2>
                 
                 <div className="space-y-6">
-                    {availableRooms.map(room => (
-                        <div key={room._id} className="bg-white border text-left border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col lg:flex-row transition hover:border-blue-300">
+                    {validCapacityRooms.map(room => (
+                        <div key={room._id} className={`bg-white border text-left rounded-2xl overflow-hidden shadow-sm flex flex-col lg:flex-row transition ${room.availableCount > 0 ? 'border-gray-200 hover:border-blue-300' : 'border-red-200 opacity-80'}`}>
                             
                             {/* Room Info Side */}
                             <div className="p-6 lg:w-1/3 bg-gray-50 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-gray-200 relative">
                                 <div className="absolute top-0 right-0 p-4">
                                     <Users size={20} className="text-blue-400 opacity-20" />
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 mb-1 leading-tight">{room.roomType}</h3>
-                                <p className="text-sm font-semibold flex items-center mb-5 text-gray-600 bg-white w-max px-2.5 py-1 rounded-md border border-gray-200 shadow-sm mt-3">
-                                    <Users size={14} className="mr-1.5 text-blue-600" /> Fits up to {room.capacity}
-                                </p>
-                                
-                                <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-bold">Room Highlights</p>
+                                <h3 className="text-2xl font-black text-gray-900 mb-2 leading-tight">{room.roomType}</h3>
+                                {room.description && <p className="text-sm text-gray-600 mb-4 leading-relaxed">{room.description}</p>}
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm">Room {room.roomNumber || 'TBA'}</span>
+                                    {room.floor && <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm">Floor {room.floor}</span>}
+                                    <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm flex items-center gap-1"><Users size={12} className="text-blue-500" /> {room.capacity} Guests</span>
+                                    <span className={`text-xs font-bold px-2 py-1 rounded shadow-sm ${room.availableCount > 0 ? 'bg-green-100 text-green-800 border-green-200 border' : 'bg-red-100 text-red-800 border-red-200 border'}`}>
+                                        {room.availableCount > 0 ? `${room.availableCount} / ${room.totalRooms} Rooms Available` : 'Sold Out for Dates'}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-bold">Amenities</p>
                                 <div className="flex flex-wrap gap-2">
                                     {(room.amenities || []).map(am => (
-                                        <span key={am} className="bg-white px-2.5 py-1 text-[11px] border border-gray-200 rounded-md font-bold text-gray-700 flex items-center shadow-sm">
+                                        <span key={am} className="bg-white px-2 py-0.5 text-[11px] border border-gray-200 rounded font-bold text-gray-700 flex items-center shadow-sm">
                                             {getAmenityIcon(am)} {am}
                                         </span>
                                     ))}
@@ -192,10 +197,11 @@ const HotelDetails = () => {
                                                 <p className="text-xs text-gray-500 font-medium mb-4 uppercase tracking-wider">Per night</p>
                                                 <button 
                                                     onClick={() => handleSelectRate(room._id, rp._id)}
-                                                    className="pl-6 pr-4 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-all group-hover:-translate-y-0.5 w-full flex items-center justify-between gap-3"
-                                                    style={{ background: `linear-gradient(135deg, ${C[600]}, ${C[500]})` }}
+                                                    disabled={room.availableCount <= 0}
+                                                    className={`pl-6 pr-4 py-2.5 rounded-xl font-bold text-white text-sm transition-all w-full flex items-center justify-between gap-3 ${room.availableCount > 0 ? 'shadow-md group-hover:-translate-y-0.5 hover:opacity-90' : 'opacity-50 cursor-not-allowed'}`}
+                                                    style={{ background: room.availableCount > 0 ? `linear-gradient(135deg, ${C[600]}, ${C[500]})` : '#9ca3af' }}
                                                 >
-                                                    Reserve <span className="bg-white/20 p-1 rounded-lg"><ArrowRight size={14} /></span>
+                                                    {room.availableCount > 0 ? 'Reserve' : 'Sold Out'} <span className="bg-white/20 p-1 rounded-lg"><ArrowRight size={14} /></span>
                                                 </button>
                                             </div>
                                         </div>
@@ -204,11 +210,11 @@ const HotelDetails = () => {
                             </div>
                         </div>
                     ))}
-                    {availableRooms.length === 0 && (
+                    {validCapacityRooms.length === 0 && (
                         <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
                             <Shield size={48} className="mx-auto text-gray-300 mb-4" />
-                            <h3 className="text-xl font-bold text-gray-800 mb-2">No rooms available</h3>
-                            <p className="text-gray-500 max-w-md mx-auto">We couldn't find any rooms at this property matching your criteria of {guests} guests. Please try searching for a different hotel.</p>
+                            <h3 className="text-xl font-bold text-gray-800 mb-2">No rooms found</h3>
+                            <p className="text-gray-500 max-w-md mx-auto">We couldn't find any rooms at this property matching your criteria of {guests} guests. Please try selecting a different configuration.</p>
                         </div>
                     )}
                 </div>

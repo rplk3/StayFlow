@@ -79,7 +79,7 @@ async function seedDatabase() {
                 name: "Standard Rate",
                 paymentType: "PAY_LATER",
                 priceMultiplier: 1.0,
-                cancellationPolicy: { isRefundable: true, freeCancellationDaysPrior: 3, penaltyPercentage: 100 },
+                cancellationPolicy: { isRefundable: true, freeCancellationDaysPrior: 1, penaltyPercentage: 100 },
                 includesBreakfast: false
             });
             ratePlans.push({

@@ -6,7 +6,7 @@ const BOOKINGS_URL = `${API_BASE}/bookings`;
 const TRANSPORT_URL = `${API_BASE}/transport`;
 
 export const searchHotels = (params) => axios.get(`${HOTELS_URL}/search`, { params });
-export const getHotelDetails = (id) => axios.get(`${HOTELS_URL}/${id}`);
+export const getHotelDetails = (id, checkIn, checkOut) => axios.get(`${HOTELS_URL}/${id}`, { params: { checkIn, checkOut } });
 export const validateAndQuote = (quoteData) => axios.post(`${BOOKINGS_URL}/validate-quote`, quoteData);
 export const createHold = (holdData) => axios.post(`${BOOKINGS_URL}/hold`, holdData);
 export const checkoutBooking = (id, paymentData) => axios.post(`${BOOKINGS_URL}/${id}/checkout`, paymentData);
