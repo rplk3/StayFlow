@@ -15,6 +15,7 @@ const BotChat = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef(null);
+    const finalTranscriptRef = useRef('');
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -47,17 +48,32 @@ const BotChat = () => {
                 }
             }
 
+            // Store final transcript for auto-send
+            if (finalTranscript) {
+                finalTranscriptRef.current = finalTranscript;
+            }
+
             // Show interim results in real-time, lock in final
             setInput(finalTranscript || interimTranscript);
         };
 
         recognition.onend = () => {
             setIsListening(false);
+            // Auto-send if we got a valid final transcript
+            const transcript = finalTranscriptRef.current.trim();
+            if (transcript) {
+                finalTranscriptRef.current = '';
+                // Small delay to allow state update, then auto-send
+                setTimeout(() => {
+                    sendMessage(transcript);
+                }, 100);
+            }
         };
 
         recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
             setIsListening(false);
+            finalTranscriptRef.current = '';
         };
 
         recognitionRef.current = recognition;
@@ -77,20 +93,21 @@ const BotChat = () => {
         }
 
         if (isListening) {
+            finalTranscriptRef.current = input.trim(); // capture whatever is in input
             recognitionRef.current?.stop();
-            setIsListening(false);
         } else {
             setInput('');
+            finalTranscriptRef.current = '';
             recognitionRef.current?.start();
             setIsListening(true);
         }
     };
 
-    const handleSend = async (e) => {
-        e.preventDefault();
-        if (!input.trim()) return;
+    // Core send function (used by form submit and auto-send)
+    const sendMessage = async (messageText) => {
+        const userMsg = messageText.trim();
+        if (!userMsg) return;
 
-        const userMsg = input.trim();
         setMessages(prev => [...prev, { id: Date.now(), sender: 'user', text: userMsg }]);
         setInput('');
         setIsLoading(true);
@@ -99,10 +116,21 @@ const BotChat = () => {
             const res = await queryAnalytics(userMsg);
             setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: res.data.answer }]);
         } catch (error) {
-            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: "Sorry, I encountered an error." }]);
+            // Show actual backend error if available
+            const errMsg = error.response?.data?.answer
+                || error.response?.data?.error
+                || error.message
+                || 'Sorry, I encountered an error processing your request.';
+            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: errMsg }]);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleSend = async (e) => {
+        e.preventDefault();
+        if (!input.trim()) return;
+        sendMessage(input);
     };
 
     const quickQuestions = [

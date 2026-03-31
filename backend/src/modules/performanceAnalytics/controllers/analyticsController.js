@@ -119,21 +119,25 @@ exports.handleChatQuery = async (req, res) => {
             return res.status(400).json({ answer: "Please provide a message." });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = process.env.GEMINI_API_KEY?.trim();
         if (!apiKey) {
-            return res.json({ answer: "Gemini API key is not configured in the backend." });
+            return res.json({ answer: "Gemini API key is not configured in the backend. Please set GEMINI_API_KEY in your .env file." });
         }
 
-        // Fetch current live metrics to give context to Gemini
-        const data = await analyticsService.getDashboardData(); // get last 30 days
-
-        const contextData = `
-        Current System Data (Last 30 days):
-        Total Revenue: Rs. ${data.totalRevenue}
-        Total Bookings: ${data.totalBookings}
-        Average Occupancy Rate: ${data.avgOccupancy}%
-        Active Alerts Count: ${data.activeAlertsCount}
-        `;
+        // Fetch current live metrics — handle failure gracefully
+        let contextData = 'No analytics data available at the moment.';
+        try {
+            const data = await analyticsService.getDashboardData();
+            contextData = `
+            Current System Data (Last 30 days):
+            Total Revenue: Rs. ${data.totalRevenue || 0}
+            Total Bookings: ${data.totalBookings || 0}
+            Average Occupancy Rate: ${data.avgOccupancy || 0}%
+            Active Alerts Count: ${data.activeAlertsCount || 0}
+            `;
+        } catch (dataErr) {
+            console.warn('Could not fetch dashboard data for chat context:', dataErr.message);
+        }
 
         const systemInstruction = `You are a helpful Admin Assistant for the StayFlow hotel management system.
 Your only job is to answer questions related to the system's performance metrics, bookings, revenue, occupancy, and alerts based on the provided "Current System Data". 
@@ -142,7 +146,7 @@ If the user asks a question COMPLETELY UNRELATED to the hotel's performance anal
         const ai = new GoogleGenAI({ apiKey: apiKey });
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-2.0-flash',
             contents: [
                 { role: 'user', parts: [{ text: `${contextData}\n\nUser Question: ${message}` }] }
             ],
@@ -156,8 +160,19 @@ If the user asks a question COMPLETELY UNRELATED to the hotel's performance anal
         res.json({ answer: reply });
 
     } catch (error) {
-        console.error('Error generating chat response:', error);
-        res.status(500).json({ answer: "Sorry, I encountered an internal error while processing your request." });
+        console.error('Error generating chat response:', error.message || error);
+
+        // Check for rate limit (429) errors
+        const errMsg = (error.message || '').toLowerCase();
+        if (errMsg.includes('429') || errMsg.includes('quota') || errMsg.includes('rate') || errMsg.includes('resource_exhausted')) {
+            return res.status(429).json({
+                answer: ' The AI service is temporarily rate-limited. The free tier API quota has been exceeded. Please wait about a minute and try again.',
+                retryable: true
+            });
+        }
+
+        const errorDetail = error.message || 'Unknown error';
+        res.status(500).json({ answer: `I'm having trouble connecting to the AI service. Error: ${errorDetail}` });
     }
 };
 
