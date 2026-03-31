@@ -3,6 +3,7 @@ import { getMyTrips, cancelBooking } from '../services/bookingApi';
 import { Calendar, MapPin, Users, RefreshCw, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useAuth } from '../../../context/AuthContext';
 const PAYMENT_API = 'http://localhost:5000/api/payments';
 
 const MyTrips = () => {
@@ -10,9 +11,16 @@ const MyTrips = () => {
     const [loading, setLoading] = useState(true);
     const [cancellingId, setCancellingId] = useState(null);
     const [payments, setPayments] = useState({});
-    const userId = 'USER_123';
+    const { user } = useAuth();
+    const userId = user ? user.email : 'USER_123';
 
-    useEffect(() => { fetchTrips(); }, []);
+    useEffect(() => { 
+        if (user) {
+            fetchTrips(); 
+        } else {
+            setLoading(false);
+        }
+    }, [user]);
 
     const fetchTrips = async () => {
         try {

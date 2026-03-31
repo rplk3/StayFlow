@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { validateAndQuote, createHold, checkoutBooking, createTransport } from '../services/bookingApi';
+import { useAuth } from '../../../context/AuthContext';
 import { CheckCircle, AlertCircle, User, MapPin, ArrowRight, ArrowLeft, Car, Lock, Calendar, Moon, ChevronDown, Phone, Tag, Download, Mail, UserPlus } from 'lucide-react';
 import jsPDF from 'jspdf';
 import TransportSection from '../../transport/components/TransportSection';
@@ -35,6 +36,7 @@ const countries = [
 const Checkout = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
     
     const urlParams = {
         hotelId: searchParams.get('hotelId'),
@@ -144,7 +146,7 @@ const Checkout = () => {
         try {
             setLoading(true);
             const holdRes = await createHold({
-                userId: 'USER_123',
+                userId: user ? user.email : guestDetails.email,
                 hotelId: urlParams.hotelId,
                 roomId: urlParams.roomId,
                 ratePlanId: urlParams.ratePlanId,
@@ -593,7 +595,7 @@ const Checkout = () => {
                             <PaymentGateway
                                 bookingId={holdId}
                                 bookingType="room"
-                                userId="USER_123"
+                                userId={user ? user.email : guestDetails.email}
                                 amount={quote?.roomTotal || 0}
                                 taxAmount={quote?.taxesFees || 0}
                                 serviceCharge={transportData.enabled ? transportData.estimatedCost : 0}

@@ -2,18 +2,27 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Calendar, Clock, Users, MapPin, RefreshCw, PartyPopper } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { useAuth } from '../../../context/AuthContext';
 
 const API = 'http://localhost:5000/api/event-halls';
 const PAYMENT_API = 'http://localhost:5000/api/payments';
-const userId = 'USER_123';
 
 const MyEventBookings = () => {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [cancellingId, setCancellingId] = useState(null);
     const [payments, setPayments] = useState({});
+    
+    const { user } = useAuth();
+    const userId = user ? user.email : 'USER_123';
 
-    useEffect(() => { fetchBookings(); }, []);
+    useEffect(() => { 
+        if (user) {
+            fetchBookings(); 
+        } else {
+            setLoading(false);
+        }
+    }, [user]);
 
     const fetchBookings = async () => {
         try {

@@ -6,9 +6,9 @@ import PaymentGateway from '../modules/payment/components/PaymentGateway';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import jsPDF from 'jspdf';
+import { useAuth } from '../context/AuthContext';
 
 const API = 'http://localhost:5000/api/event-halls';
-const userId = 'USER_123';
 
 /* ───────── Color palette (matching LandingPage) ───────── */
 const C = {
@@ -40,6 +40,7 @@ const countries = [
 
 const EventHalls = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [tab, setTab] = useState('browse');
     const [halls, setHalls] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -162,7 +163,7 @@ const EventHalls = () => {
             setFormLoading(true);
             setError('');
             const res = await axios.post(`${API}/bookings/hold`, {
-                hallId: selectedHall._id, userId,
+                hallId: selectedHall._id, userId: user ? user.email : guestDetails.email,
                 guestDetails: { ...guestDetails, phone: `${selectedCountry.dial} ${guestDetails.phone}` },
                 eventType: bookingForm.eventType, eventDate: formatDateForApi(bookingForm.eventDate),
                 startTime: bookingForm.startTime, endTime: bookingForm.endTime,
@@ -657,7 +658,7 @@ const EventHalls = () => {
                                         <PaymentGateway
                                             bookingId={holdId}
                                             bookingType="event"
-                                            userId={userId}
+                                            userId={user ? user.email : guestDetails.email}
                                             amount={quote?.hallCharge || 0}
                                             taxAmount={quote?.taxesFees || 0}
                                             serviceCharge={0}
