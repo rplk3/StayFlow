@@ -10,6 +10,7 @@ const MyAccount = () => {
         lastName: '',
         email: '',
         phone: '',
+        phoneCode: '+94',
         country: ''
     });
 
@@ -22,7 +23,8 @@ const MyAccount = () => {
                 firstName: user.firstName || '',
                 lastName: user.lastName || '',
                 email: user.email || '',
-                phone: user.phone || '',
+                phone: user.phone ? user.phone.replace(/^\+\d+\s?/, '') : '',
+                phoneCode: user.phone && user.phone.match(/^\+(\d+)/) ? `+${user.phone.match(/^\+(\d+)/)[1]}` : '+94',
                 country: user.country || ''
             });
         }
@@ -32,7 +34,8 @@ const MyAccount = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleEdit = () => {
+    const handleEdit = (e) => {
+        if (e) e.preventDefault();
         setIsEditing(true);
         setStatus({ type: null, message: '' });
     };
@@ -41,10 +44,15 @@ const MyAccount = () => {
         e.preventDefault();
         setStatus({ type: null, message: '' });
 
+        if (formData.phone && !/^\d{9,10}$/.test(formData.phone.replace(/\s/g, ''))) {
+            setStatus({ type: 'error', message: 'Please enter a valid phone number (9-10 digits without country code).' });
+            return;
+        }
+
         const res = await updateProfile({
             firstName: formData.firstName,
             lastName: formData.lastName,
-            phone: formData.phone,
+            phone: formData.phone ? `${formData.phoneCode} ${formData.phone}` : '',
             country: formData.country
         });
 
@@ -64,7 +72,8 @@ const MyAccount = () => {
                 firstName: user.firstName || '',
                 lastName: user.lastName || '',
                 email: user.email || '',
-                phone: user.phone || '',
+                phone: user.phone ? user.phone.replace(/^\+\d+\s?/, '') : '',
+                phoneCode: user.phone && user.phone.match(/^\+(\d+)/) ? `+${user.phone.match(/^\+(\d+)/)[1]}` : '+94',
                 country: user.country || ''
             });
         }
@@ -120,23 +129,44 @@ const MyAccount = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
-                            <input
-                                type="tel" name="phone"
-                                value={formData.phone} onChange={handleChange}
-                                disabled={!isEditing}
-                                placeholder="+94 77 123 4567"
-                                className={isEditing ? inputEditable : inputReadOnly}
-                            />
+                            <div className="flex gap-2">
+                                <select 
+                                    name="phoneCode" 
+                                    value={formData.phoneCode} 
+                                    onChange={handleChange} 
+                                    disabled={!isEditing}
+                                    className={`w-1/3 ${isEditing ? inputEditable : inputReadOnly}`}
+                                >
+                                    <option value="+94">+94 (LK)</option>
+                                    <option value="+1">+1 (US)</option>
+                                    <option value="+44">+44 (UK)</option>
+                                    <option value="+61">+61 (AU)</option>
+                                    <option value="+91">+91 (IN)</option>
+                                </select>
+                                <input
+                                    type="tel" name="phone"
+                                    value={formData.phone} onChange={handleChange}
+                                    disabled={!isEditing}
+                                    placeholder="77 123 4567"
+                                    className={`w-2/3 ${isEditing ? inputEditable : inputReadOnly}`}
+                                />
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Country</label>
-                            <input
-                                type="text" name="country"
+                            <select
+                                name="country"
                                 value={formData.country} onChange={handleChange}
                                 disabled={!isEditing}
-                                placeholder="Sri Lanka"
                                 className={isEditing ? inputEditable : inputReadOnly}
-                            />
+                            >
+                                <option value="">Select Country</option>
+                                <option value="Sri Lanka">Sri Lanka</option>
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Australia">Australia</option>
+                                <option value="India">India</option>
+                            </select>
                         </div>
                     </div>
 

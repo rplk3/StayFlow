@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getAdminRole, getAssignedSectionPath } from '../utils/roleHelpers';
 import './AuthPage.css';
@@ -73,8 +73,16 @@ const AdminAuthPage = () => {
     const btnStyle = "rounded-[20px] border border-[#feba02] bg-[#feba02] text-[#1a1a2e] text-xs font-bold py-3 px-11 tracking-[1px] uppercase transition-transform hover:scale-105 shadow hover:bg-[#e5a800] focus:outline-none";
 
     return (
-        <div className="min-h-screen flex items-center justify-center flex-col py-12 sm:px-6 lg:px-8" style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #1a1a2e 50%, #16213e 100%)' }}>
-            <div className="flex items-center gap-3 mb-8">
+        <div className="min-h-screen relative flex items-center justify-center flex-col py-12 sm:px-6 lg:px-8" style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #1a1a2e 50%, #16213e 100%)' }}>
+            <button 
+                onClick={() => navigate('/')} 
+                className="absolute top-6 left-6 flex items-center gap-2 text-gray-300 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg"
+            >
+                <ArrowLeft size={18} />
+                <span className="font-medium text-sm">Back to Home</span>
+            </button>
+
+            <div className="flex items-center gap-3 mb-8 mt-4">
                 <ShieldCheck className="w-10 h-10 text-[#feba02]" />
                 <h1 className="text-4xl font-extrabold text-white cursor-pointer" onClick={() => navigate('/')}>
                     StayFlow <span className="text-[#feba02]">Admin</span>

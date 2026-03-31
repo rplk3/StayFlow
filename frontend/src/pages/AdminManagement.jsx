@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ShieldCheck, UserCheck, Clock, AlertCircle } from 'lucide-react';
+import { ShieldCheck, UserCheck, UserMinus, Clock, AlertCircle } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const dk = { bg: '#0f1117', card: '#1a1d27', elevated: '#252830', border: '#2d3039', text: '#f1f5f9', textSec: '#94a3b8' };
@@ -70,6 +70,44 @@ const AdminManagement = () => {
         }
     };
 
+    const handleReject = async (adminId, adminName) => {
+        const result = await Swal.fire({
+            title: 'Reject Admin?',
+            text: `Are you sure you want to reject and remove ${adminName}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#3b82f6',
+            confirmButtonText: 'Yes, reject it!',
+            background: dk.card,
+            color: dk.text
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`http://localhost:5000/api/auth/reject-admin/${adminId}`);
+                Swal.fire({
+                    title: 'Rejected!',
+                    text: `${adminName}'s registration has been rejected.`,
+                    icon: 'success',
+                    background: dk.card,
+                    color: dk.text,
+                    confirmButtonColor: '#10b981'
+                });
+                setPendingAdmins(prev => prev.filter(a => a._id !== adminId));
+            } catch (err) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: err.response?.data?.message || 'Failed to reject admin',
+                    icon: 'error',
+                    background: dk.card,
+                    color: dk.text,
+                    confirmButtonColor: '#6366f1'
+                });
+            }
+        }
+    };
+
     return (
         <div className="animate-fade-in pb-12">
             <div className="flex items-center gap-3 mb-2">
@@ -122,14 +160,22 @@ const AdminManagement = () => {
                                             Pending
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                                    <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
                                         <button
                                             onClick={() => handleApprove(admin._id, `${admin.firstName} ${admin.lastName}`)}
-                                            className="inline-flex items-center px-5 py-2.5 rounded-lg text-white text-sm font-semibold transition-all hover:-translate-y-0.5 shadow-sm"
+                                            className="inline-flex items-center px-4 py-2 rounded-lg text-white text-sm font-semibold transition-all hover:-translate-y-0.5 shadow-sm"
                                             style={{ background: '#10b981' }}
                                         >
-                                            <UserCheck size={16} className="mr-2" />
+                                            <UserCheck size={16} className="mr-1.5" />
                                             Approve
+                                        </button>
+                                        <button
+                                            onClick={() => handleReject(admin._id, `${admin.firstName} ${admin.lastName}`)}
+                                            className="inline-flex items-center px-4 py-2 rounded-lg text-white text-sm font-semibold transition-all hover:-translate-y-0.5 shadow-sm"
+                                            style={{ background: '#ef4444' }}
+                                        >
+                                            <UserMinus size={16} className="mr-1.5" />
+                                            Reject
                                         </button>
                                     </td>
                                 </tr>

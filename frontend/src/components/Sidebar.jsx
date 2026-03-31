@@ -3,6 +3,7 @@ import { LayoutDashboard, TrendingUp, AlertTriangle, MessageSquare, FileText, Ch
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAdminRole } from '../utils/roleHelpers';
+import Swal from 'sweetalert2';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
     const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
@@ -10,8 +11,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        logout();
-        navigate('/admin-login');
+        Swal.fire({
+            title: 'Sign Out',
+            text: 'Are you sure you want to sign out?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#3b82f6',
+            confirmButtonText: 'Yes, sign out',
+            background: '#1a1d27',
+            color: '#f1f5f9'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                logout();
+                navigate('/admin-login');
+            }
+        });
     };
 
     const navLinkClass = ({ isActive }) =>

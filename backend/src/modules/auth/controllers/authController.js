@@ -257,3 +257,30 @@ exports.approveAdmin = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
+// @desc    Reject a pending admin
+// @route   DELETE /api/auth/reject-admin/:id
+// @access  Private (Super Admin only)
+exports.rejectAdmin = async (req, res) => {
+    try {
+        // Verify the requester is an approved Super Admin
+        if (req.user.role !== 'admin' || req.user.adminStatus !== 'approved' || !isSuperAdmin(req.user.email)) {
+            return res.status(403).json({ message: 'Not authorized. Super Admin access required.' });
+        }
+
+        const admin = await User.findById(req.params.id);
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        if (admin.role !== 'admin') {
+            return res.status(400).json({ message: 'This user is not an admin' });
+        }
+
+        await admin.deleteOne();
+
+        res.json({ message: 'Admin rejected and removed successfully' });
+    } catch (err) {
+        console.error('Reject Admin Error:', err);
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+};

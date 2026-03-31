@@ -13,5 +13,6 @@ router.post('/admin-register', authController.registerAdmin);
 router.post('/admin-login', authController.loginAdmin);
 router.get('/pending-admins', protect, authController.getPendingAdmins);
 router.put('/approve-admin/:id', protect, authController.approveAdmin);
+router.delete('/reject-admin/:id', protect, authController.rejectAdmin);
 
 module.exports = router;

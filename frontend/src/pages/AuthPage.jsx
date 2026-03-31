@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './AuthPage.css';
+import Swal from 'sweetalert2';
 
 const AuthPage = () => {
     const navigate = useNavigate();
@@ -38,7 +39,14 @@ const AuthPage = () => {
         setError('');
         const res = await login(loginData.email, loginData.password);
         if (res.success) {
-            navigate('/');
+            Swal.fire({
+                title: 'Success!',
+                text: 'Successfully logged in.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+            navigate('/my-account');
         } else {
             setError(res.message);
         }
@@ -71,8 +79,16 @@ const AuthPage = () => {
     const btnStyle = "rounded-[20px] border border-[#003B95] bg-[#003B95] text-white text-xs font-bold py-3 px-11 tracking-[1px] uppercase transition-transform hover:scale-105 shadow hover:bg-[#002f74] focus:outline-none";
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 flex-col py-12 sm:px-6 lg:px-8">
-            <h1 className="text-4xl font-extrabold text-[#003B95] mb-8 cursor-pointer" onClick={() => navigate('/')}>
+        <div className="min-h-screen relative flex items-center justify-center bg-gray-50 flex-col py-12 sm:px-6 lg:px-8">
+            <button 
+                onClick={() => navigate('/')} 
+                className="absolute top-6 left-6 flex items-center gap-2 text-gray-600 hover:text-[#003B95] transition-colors bg-white border shadow-sm hover:bg-gray-50 px-4 py-2 rounded-lg"
+            >
+                <ArrowLeft size={18} />
+                <span className="font-medium text-sm">Back to Home</span>
+            </button>
+
+            <h1 className="text-4xl font-extrabold text-[#003B95] mb-8 mt-4 cursor-pointer" onClick={() => navigate('/')}>
                 StayFlow
             </h1>
             <div className={`auth-wrapper ${isSignUp ? 'right-panel-active' : ''}`}>
