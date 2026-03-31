@@ -1,15 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Loader2, Sparkles } from 'lucide-react';
+import { Send, User, Bot, Loader2, Sparkles, Mic, MicOff } from 'lucide-react';
 import { queryAnalytics } from '../../../services/api';
 
 const dk = { card: '#1a1d27', elevated: '#252830', border: '#2d3039', text: '#f1f5f9', textSec: '#94a3b8' };
 
+// Check if browser supports SpeechRecognition
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
 const BotChat = () => {
     const [messages, setMessages] = useState([{
-        id: 1, sender: 'bot', text: 'Hello! I am your Analytics Assistant. Ask me anything like "What was the total revenue this month?"'
+        id: 1, sender: 'bot', text: 'Hello! I am your Analytics Assistant. Ask me anything like \"What was the total revenue this month?\" You can also tap the 🎙️ microphone to speak your question.'
     }]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef(null);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -19,6 +24,67 @@ const BotChat = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // ── Speech Recognition setup ──
+    useEffect(() => {
+        if (!SpeechRecognition) return;
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+
+            // Show interim results in real-time, lock in final
+            setInput(finalTranscript || interimTranscript);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+
+        return () => {
+            recognition.abort();
+        };
+    }, []);
+
+    const toggleListening = () => {
+        if (!SpeechRecognition) {
+            setMessages(prev => [...prev, {
+                id: Date.now(), sender: 'bot',
+                text: 'Sorry, speech recognition is not supported in your browser. Please use Chrome or Edge.'
+            }]);
+            return;
+        }
+
+        if (isListening) {
+            recognitionRef.current?.stop();
+            setIsListening(false);
+        } else {
+            setInput('');
+            recognitionRef.current?.start();
+            setIsListening(true);
+        }
+    };
 
     const handleSend = async (e) => {
         e.preventDefault();
@@ -135,14 +201,46 @@ const BotChat = () => {
 
             {/* Input Area */}
             <form onSubmit={handleSend} className="p-4 border-t" style={{ borderColor: dk.border }}>
-                <div className="flex items-center gap-3">
+                {/* Listening indicator */}
+                {isListening && (
+                    <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg" style={{ background: '#ef444420', border: '1px solid #ef444444' }}>
+                        <div className="relative flex items-center justify-center">
+                            <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                            <div className="absolute w-5 h-5 rounded-full bg-red-500 opacity-30 animate-ping"></div>
+                        </div>
+                        <span className="text-xs font-medium text-red-400">Listening... speak your question</span>
+                    </div>
+                )}
+                <div className="flex items-center gap-2">
+                    {/* Mic button */}
+                    <button
+                        type="button"
+                        onClick={toggleListening}
+                        className={`p-3 rounded-xl transition-all hover:scale-105 relative ${isListening ? 'ring-2 ring-red-500/50' : ''}`}
+                        style={{
+                            background: isListening
+                                ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+                                : dk.elevated,
+                            border: `1px solid ${isListening ? '#ef4444' : dk.border}`
+                        }}
+                        title={isListening ? 'Stop listening' : 'Voice input'}
+                    >
+                        {isListening ? (
+                            <MicOff className="w-5 h-5 text-white" />
+                        ) : (
+                            <Mic className="w-5 h-5" style={{ color: dk.textSec }} />
+                        )}
+                        {isListening && (
+                            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+                        )}
+                    </button>
                     <input
                         type="text"
                         value={input}
                         onChange={e => setInput(e.target.value)}
-                        placeholder="Ask a question about your data..."
+                        placeholder={isListening ? 'Listening...' : 'Ask a question about your data...'}
                         className="flex-1 px-4 py-3 rounded-xl text-sm outline-none border focus:ring-2 focus:ring-indigo-500 transition"
-                        style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }}
+                        style={{ background: dk.elevated, borderColor: isListening ? '#6366f1' : dk.border, color: dk.text }}
                     />
                     <button
                         type="submit"
