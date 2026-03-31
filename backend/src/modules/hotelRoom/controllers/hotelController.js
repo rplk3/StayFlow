@@ -19,21 +19,7 @@ exports.searchHotels = async (req, res) => {
             return res.json([]);
         }
 
-        // If guests is provided, we should ideally filter out hotels that do not have rooms with enough capacity.
-        // For simplicity, we just return hotels matching the destination, and check capacity exactly on Hotel Details page.
-        // But let's do a basic filter:
-        const hotelIds = hotels.map(h => h._id);
-        const roomQuery = { hotelId: { $in: hotelIds } };
-        if (guests) {
-            roomQuery.capacity = { $gte: parseInt(guests) };
-        }
-
-        const validRooms = await Room.find(roomQuery);
-        const validHotelIds = validRooms.map(r => r.hotelId.toString());
-
-        const filteredHotels = hotels.filter(h => validHotelIds.includes(h._id.toString()));
-
-        res.json(filteredHotels);
+        res.json(hotels);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server error during hotel search' });
