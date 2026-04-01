@@ -3,9 +3,7 @@ import { MapPin, Navigation, Car, Truck, Crown, Users, Clock, Calendar, Loader2 
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { estimateTransportCost } from '../../hotelRoom/services/bookingApi';
+
 
 // Fix leaflet default marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
