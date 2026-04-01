@@ -385,4 +385,5 @@ const EventHallManagement = () => {
     );
 };
 
+export default EventHallManagement;
 
