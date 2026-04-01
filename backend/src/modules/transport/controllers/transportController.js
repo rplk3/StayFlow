@@ -33,7 +33,14 @@ exports.estimateCost = async (req, res) => {
 };
 
 // POST /api/transport
-
+exports.createTransport = async (req, res) => {
+    try {
+        const transport = await Transport.create(req.body);
+        res.status(201).json(transport);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+};
 
 // GET /api/transport/booking/:bookingId
 exports.getTransportByBooking = async (req, res) => {
