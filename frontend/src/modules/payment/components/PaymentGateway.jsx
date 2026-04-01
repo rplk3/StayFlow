@@ -39,4 +39,16 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
         doc.setFont('helvetica', 'normal');
         doc.text('Booking Invoice', 20, 33);
 
+        // Invoice details top right
+        doc.setFontSize(9);
+        doc.text(`Date: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`, pageWidth - 20, 20, { align: 'right' });
+        if (result?.invoice?.invoiceNumber) {
+            doc.text(`Invoice #: ${result.invoice.invoiceNumber}`, pageWidth - 20, 27, { align: 'right' });
+        }
+        if (result?.payment?.transactionReference) {
+            doc.text(`Ref: ${result.payment.transactionReference}`, pageWidth - 20, 34, { align: 'right' });
+        }
+
+        let y = 58;
+
 
