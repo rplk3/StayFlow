@@ -49,7 +49,7 @@ function MapClickHandler({ onMapClick }) {
 
 const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, guestCount }) => {
     const [enabled, setEnabled] = useState(false);
-    const [expanded, setExpanded] = useState(false);
+    
     const [pickupAddress, setPickupAddress] = useState('');
     const [pickupCoords, setPickupCoords] = useState(null);
     const [pickupDate, setPickupDate] = useState(checkInDate ? new Date(checkInDate) : new Date());
