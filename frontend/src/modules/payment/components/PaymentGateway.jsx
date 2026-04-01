@@ -18,3 +18,9 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
     const [cvc, setCvc] = useState('');
     const [processing, setProcessing] = useState(false);
     const [result, setResult] = useState(null);
+
+     // ── Generate Invoice PDF ──
+    const generateInvoicePDF = () => {
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+
