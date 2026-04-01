@@ -12,7 +12,7 @@ const ConversationalBI = () => {
             </div>
 
             <div className="flex-1 w-full max-w-4xl mx-auto">
-                
+                <BotChat />
             </div>
         </div>
     );
