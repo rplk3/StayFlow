@@ -1,4 +1,4 @@
-import React from 'react';
+
 import BotChat from '../components/BotChat';
 
 const dk = { text: '#f1f5f9', textSec: '#94a3b8' };
