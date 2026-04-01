@@ -115,27 +115,7 @@ exports.getTransportById = async (req, res) => {
     }
 };
 
-// PUT /api/transport/:id/approve
-exports.approveTransport = async (req, res) => {
-    try {
-        const transport = await Transport.findById(req.params.id).populate('bookingId');
-        if (!transport) return res.status(404).json({ message: 'Transport not found' });
 
-        // Check if booking is valid
-        if (transport.bookingId && ['CANCELLED', 'NO_SHOW'].includes(transport.bookingId.status)) {
-            return res.status(400).json({ message: 'Cannot approve: linked booking is ' + transport.bookingId.status });
-        }
-
-        transport.status = 'confirmed';
-        transport.approvedBy = req.body.approvedBy || 'Admin';
-        transport.approvedAt = new Date();
-        transport.adminNotes = req.body.adminNotes || transport.adminNotes;
-        await transport.save();
-        res.json({ message: 'Transport approved', transport });
-    } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
-    }
-};
 
 // PUT /api/transport/:id/reject
 exports.rejectTransport = async (req, res) => {
