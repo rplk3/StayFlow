@@ -30,4 +30,13 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
         doc.setFillColor(1, 73, 124); // C[700]
         doc.rect(0, 40, pageWidth, 4, 'F');
 
+        // Logo/Brand
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text('StayFlow', 20, 25);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Booking Invoice', 20, 33);
+
 
