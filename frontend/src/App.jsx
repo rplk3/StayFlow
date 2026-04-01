@@ -28,6 +28,7 @@ import EventHallManagement from './pages/EventHallManagement';
 import MyEventBookings from './modules/eventHall/pages/MyEventBookings';
 import MyPayments from './modules/payment/pages/MyPayments';
 import PaymentManagement from './pages/PaymentManagement';
+import CustomerChatWidget from './components/CustomerChatWidget';
 
 
 function App() {
@@ -75,6 +76,7 @@ function App() {
           <Route path="chatbot" element={<div className="p-8 text-xl">Chatbot (Coming Soon)</div>} />
         </Route>
       </Routes>
+      <CustomerChatWidget />
     </Router>
     </AuthProvider>
   );
