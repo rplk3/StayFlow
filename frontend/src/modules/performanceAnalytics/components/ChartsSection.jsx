@@ -65,7 +65,7 @@ const ChartsSection = ({ data }) => {
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={dk.grid} />
                                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: dk.textSec }} tickMargin={10} minTickGap={40} />
-                                <YAxis tick={{ fontSize: 11, fill: dk.textSec }} tickFormatter={(v) => `${v}%`} width={55} domain={[0, 100]} />
+                                <YAxis tick={{ fontSize: 11, fill: dk.textSec }} tickFormatter={(v) => `${v}%`} width={55} domain={[0, 'auto']} />
                                 <Tooltip content={<DarkTooltip formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Occupancy']} />} />
                                 <Area type="monotone" dataKey="occupancy" stroke="#10B981" strokeWidth={2.5} fill="url(#occupancyGrad)" />
                             </AreaChart>

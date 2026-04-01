@@ -146,7 +146,7 @@ const Forecasting = () => {
                                 <BarChart data={forecast}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={dk.grid} />
                                     <XAxis dataKey="date" tick={{ fontSize: 11, fill: dk.textSec }} tickMargin={10} />
-                                    <YAxis tick={{ fontSize: 11, fill: dk.textSec }} tickFormatter={(v) => `${v}%`} width={55} domain={[0, 100]} />
+                                    <YAxis tick={{ fontSize: 11, fill: dk.textSec }} tickFormatter={(v) => `${v}%`} width={55} domain={[0, 'auto']} />
                                     <Tooltip content={<DarkTooltip formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Predicted Occupancy']} />} />
                                     <Bar dataKey="predictedOccupancy" fill="#10B981" radius={[6, 6, 0, 0]} barSize={30} />
                                 </BarChart>

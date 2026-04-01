@@ -5,6 +5,7 @@
  */
 
 const Booking = require('../../hotelRoom/models/Booking');
+const EventBooking = require('../../eventHall/models/EventBooking');
 const Payment = require('../../payment/models/Payment');
 const Room = require('../../hotelRoom/models/Room');
 const AnalyticsDaily = require('../models/AnalyticsDaily');
@@ -28,47 +29,67 @@ async function rebuildDailyAnalytics(daysBack = 60) {
     const results = [];
 
     for (let i = 0; i < daysBack; i++) {
-        const dayStart = new Date();
+        const dayStart = new Date(today);
         dayStart.setDate(today.getDate() - i);
         dayStart.setHours(0, 0, 0, 0);
 
         const dayEnd = new Date(dayStart);
         dayEnd.setHours(23, 59, 59, 999);
 
-        // Count bookings created on this day
-        const totalBookings = await Booking.countDocuments({
+        // Count hotel bookings
+        const hTotal = await Booking.countDocuments({
             createdAt: { $gte: dayStart, $lte: dayEnd }
         });
-
-        const confirmedBookings = await Booking.countDocuments({
+        const hActive = await Booking.countDocuments({
             createdAt: { $gte: dayStart, $lte: dayEnd },
-            status: 'CONFIRMED'
+            status: { $nin: ['CANCELLED', 'NO_SHOW'] }
         });
-
-        const cancelledBookings = await Booking.countDocuments({
+        const hCancelled = await Booking.countDocuments({
             createdAt: { $gte: dayStart, $lte: dayEnd },
             status: 'CANCELLED'
         });
 
-        // Revenue = sum(payments.amount) - sum(payments.refundAmount) for that day
-        const paymentAgg = await Payment.aggregate([
-            { $match: { createdAt: { $gte: dayStart, $lte: dayEnd } } },
-            {
-                $group: {
-                    _id: null,
-                    totalAmount: { $sum: '$amount' },
-                    totalRefunds: { $sum: '$refundAmount' }
-                }
-            }
+        // Count event hall bookings
+        const eTotal = await EventBooking.countDocuments({
+            createdAt: { $gte: dayStart, $lte: dayEnd }
+        });
+        const eActive = await EventBooking.countDocuments({
+            createdAt: { $gte: dayStart, $lte: dayEnd },
+            status: { $nin: ['CANCELLED', 'REJECTED'] }
+        });
+        const eCancelled = await EventBooking.countDocuments({
+            createdAt: { $gte: dayStart, $lte: dayEnd },
+            status: 'CANCELLED'
+        });
+
+        const totalBookings = hTotal + eTotal;
+        const activeBookings = hActive + eActive;
+        const cancelledBookings = hCancelled + eCancelled;
+
+        // Revenue from hotel bookings (pricing.totalAmount)
+        const hotelRev = await Booking.aggregate([
+            { $match: { createdAt: { $gte: dayStart, $lte: dayEnd }, status: { $ne: 'CANCELLED' } } },
+            { $group: { _id: null, total: { $sum: '$pricing.totalAmount' } } }
+        ]);
+        
+        // Revenue from event hall bookings (pricing.totalAmount)
+        const eventRev = await EventBooking.aggregate([
+            { $match: { createdAt: { $gte: dayStart, $lte: dayEnd }, status: { $ne: 'CANCELLED' } } },
+            { $group: { _id: null, total: { $sum: '$pricing.totalAmount' } } }
         ]);
 
-        const totalRevenue = paymentAgg.length > 0
-            ? paymentAgg[0].totalAmount - paymentAgg[0].totalRefunds
-            : 0;
+        let totalRevenue = 0;
+        if (hotelRev.length > 0) totalRevenue += hotelRev[0].total;
+        if (eventRev.length > 0) totalRevenue += eventRev[0].total;
 
-        // Occupancy = (confirmed bookings that day / total rooms) * 100
+        // Debug: log first day with data
+        if (totalBookings > 0 && i < 3) {
+            console.log(`[Analytics Debug] ${dayStart.toISOString().split('T')[0]} | bookings=${totalBookings} | activeBookings=${activeBookings} | totalRooms=${totalRoomsAllTypes} | occupancy=${((activeBookings / totalRoomsAllTypes) * 100).toFixed(2)}% | hotelRev=${JSON.stringify(hotelRev)} | eventRev=${JSON.stringify(eventRev)} | totalRevenue=${totalRevenue}`);
+        }
+
+        // Occupancy = (active bookings that day / total rooms) * 100
         const occupancyRate = Math.min(
-            (confirmedBookings / totalRoomsAllTypes) * 100,
+            (activeBookings / totalRoomsAllTypes) * 100,
             100
         );
 

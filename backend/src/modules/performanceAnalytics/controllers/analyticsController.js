@@ -10,10 +10,41 @@ const { GoogleGenAI } = require('@google/genai');
  */
 exports.rebuildDaily = async (req, res) => {
     try {
+        // Clear stale AnalyticsDaily data to prevent duplicates
+        const AnalyticsDaily = require('../models/AnalyticsDaily');
+        const Booking = require('../../hotelRoom/models/Booking');
+        const EventBooking = require('../../eventHall/models/EventBooking');
+        
+        await AnalyticsDaily.deleteMany({});
+        console.log('[Rebuild] Cleared old AnalyticsDaily records');
+        
+        // Quick diagnostic: sample pricing from both collections
+        const sampleHotel = await Booking.find({}, { pricing: 1, status: 1 }).limit(2).lean();
+        const sampleEvent = await EventBooking.find({}, { pricing: 1, status: 1 }).limit(2).lean();
+        const hotelRevAll = await Booking.aggregate([
+            { $match: { status: { $ne: 'CANCELLED' } } },
+            { $group: { _id: null, total: { $sum: '$pricing.totalAmount' }, count: { $sum: 1 } } }
+        ]);
+        const eventRevAll = await EventBooking.aggregate([
+            { $match: { status: { $ne: 'CANCELLED' } } },
+            { $group: { _id: null, total: { $sum: '$pricing.totalAmount' }, count: { $sum: 1 } } }
+        ]);
+        
+        console.log('[Debug] Hotel sample pricing:', JSON.stringify(sampleHotel));
+        console.log('[Debug] Event sample pricing:', JSON.stringify(sampleEvent));
+        console.log('[Debug] Hotel revenue agg:', JSON.stringify(hotelRevAll));
+        console.log('[Debug] Event revenue agg:', JSON.stringify(eventRevAll));
+        
         const results = await analyticsService.rebuildDailyAnalytics(60);
         res.json({
             message: `Successfully rebuilt daily analytics for ${results.length} days.`,
-            count: results.length
+            count: results.length,
+            debug: {
+                sampleHotelBookings: sampleHotel,
+                sampleEventBookings: sampleEvent,
+                hotelRevenueAgg: hotelRevAll,
+                eventRevenueAgg: eventRevAll
+            }
         });
     } catch (error) {
         console.error('Error rebuilding daily analytics:', error);
