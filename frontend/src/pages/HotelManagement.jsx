@@ -418,5 +418,5 @@ const HotelManagement = () => {
     );
 };
 
-export default HotelManagement;
+
 
