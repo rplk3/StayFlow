@@ -18,7 +18,7 @@ Customer Question: ${message}`;
 
         return res.json({ reply: response.text });
     } catch (error) {
-        console.error('Chatbot error:', error);
+        
         return res.status(500).json({ error: 'Failed to generate response' });
     }
 };
