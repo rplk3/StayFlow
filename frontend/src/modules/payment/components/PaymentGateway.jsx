@@ -11,3 +11,10 @@ const C = {
     500: '#2A6F97', 400: '#2C7DA0', 300: '#468FAF', 200: '#61A5C2',
     100: '#89C2D9', 50: '#A9D6E5',
 };
+
+const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, serviceCharge, totalAmount, onSuccess, onFailure, guestDetails, bookingCode, checkIn, checkOut }) => {
+    const [cardNumber, setCardNumber] = useState('');
+    const [expiry, setExpiry] = useState('');
+    const [cvc, setCvc] = useState('');
+    const [processing, setProcessing] = useState(false);
+    const [result, setResult] = useState(null);
