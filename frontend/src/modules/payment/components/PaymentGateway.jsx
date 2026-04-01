@@ -24,3 +24,10 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
 
+    // Header bar
+        doc.setFillColor(1, 42, 74); // C[900]
+        doc.rect(0, 0, pageWidth, 40, 'F');
+        doc.setFillColor(1, 73, 124); // C[700]
+        doc.rect(0, 40, pageWidth, 4, 'F');
+
+
