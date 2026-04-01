@@ -41,5 +41,5 @@ export const getReportPdfUrl = (type, from, to) =>
 
 // ---- Conversational BI (legacy) ----
 
-export const queryAnalytics = (question) =>
-    axios.post(`${ANALYTICS_URL}/query`, { question });
+export const queryAnalytics = (message) =>
+    axios.post(`${ANALYTICS_URL}/chat`, { message });

@@ -1,0 +1,38 @@
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: performance_analytics_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      # Map host source code to container for instant Nodemon reloading
+      - ./backend:/app
+      # Ignore node_modules so container builds its own native bindings
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: performance_analytics_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      # Map host source code for instant Vite Hot-Module Replacement (HMR)
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+      # Tell Vite to actively poll for file changes within Docker
+      - CHOKIDAR_USEPOLLING=true 
+    restart: unless-stopped
