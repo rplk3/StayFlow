@@ -1,5 +1,4 @@
-
-        const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -23,8 +22,3 @@ Customer Question: ${message}`;
         return res.status(500).json({ error: 'Failed to generate response' });
     }
 };
-
-        return res.status(500).json({ error: 'Failed to generate response' });
-    }
-};
-
