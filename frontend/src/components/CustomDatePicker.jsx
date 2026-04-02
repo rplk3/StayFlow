@@ -49,7 +49,7 @@ const CustomDatePicker = ({ dateRange, setDateRange }) => {
     return (
         <div className="relative w-full" ref={wrapperRef}>
             {/* Input Trigger */}
-            <div 
+            <div
                 className="w-full flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 cursor-pointer hover:bg-gray-100 transition-all focus-within:ring-2 focus-within:ring-blue-500"
                 onClick={() => setIsOpen(!isOpen)}
             >
@@ -67,13 +67,13 @@ const CustomDatePicker = ({ dateRange, setDateRange }) => {
                 <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 mt-3 z-50 bg-white rounded-2xl shadow-2xl border border-gray-100 w-[300px] md:w-[700px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     {/* Tabs */}
                     <div className="flex border-b border-gray-100 p-2">
-                        <button 
+                        <button
                             className={`flex-1 py-3 text-sm font-bold transition-all rounded-t-xl border-b-2 ${activeTab === 'Calendar' ? 'text-blue-600 border-blue-600' : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'}`}
                             onClick={(e) => { e.preventDefault(); setActiveTab('Calendar'); }}
                         >
                             Calendar
                         </button>
-                        <button 
+                        <button
                             className={`flex-1 py-3 text-sm font-bold transition-all rounded-t-xl border-b-2 ${activeTab === 'Flexible dates' ? 'text-blue-600 border-blue-600' : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'}`}
                             onClick={(e) => { e.preventDefault(); setActiveTab('Flexible dates'); }}
                         >

@@ -37,7 +37,7 @@ const Checkout = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-    
+
     const urlParams = {
         hotelId: searchParams.get('hotelId'),
         roomId: searchParams.get('roomId'),
@@ -348,7 +348,7 @@ const Checkout = () => {
             </div>
         );
     }
-    
+
     // Success screen
     if (step === 3) {
         return (
@@ -357,14 +357,14 @@ const Checkout = () => {
                     <div className="absolute top-0 left-0 right-0 h-2" style={{ background: `linear-gradient(90deg, ${C[500]}, ${C[300]}, ${C[100]})` }}></div>
                     <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-30" style={{ background: C[50] }}></div>
                     <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-30" style={{ background: C[100] }}></div>
-                    
+
                     <div className="relative z-10">
                         <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg" style={{ background: `linear-gradient(135deg, ${C[500]}, ${C[700]})`, boxShadow: `0 8px 24px ${C[500]}44` }}>
                             <CheckCircle size={40} className="text-white" />
                         </div>
                         <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Booking Confirmed!</h1>
                         <p className="text-gray-500 mb-4">Your reservation has been secured successfully</p>
-                        
+
                         <div className="rounded-2xl p-6 mb-5 border" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
                             <p className="text-sm font-medium mb-1" style={{ color: C[500] }}>Itinerary Code</p>
                             <p className="text-3xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</p>
@@ -622,7 +622,7 @@ const Checkout = () => {
                                         serviceCharge={transportData.enabled ? transportData.estimatedCost : 0}
                                         totalAmount={grandTotal}
                                         onSuccess={handlePaymentSuccess}
-                                        onFailure={() => {}}
+                                        onFailure={() => { }}
                                         guestDetails={guestDetails}
                                         bookingCode={bookingCode}
                                         checkIn={urlParams.checkIn}
@@ -642,7 +642,7 @@ const Checkout = () => {
                                 <Lock size={16} style={{ color: C[100] }} /> Booking Summary
                             </h3>
                         </div>
-                        
+
                         <div className="p-6">
                             {/* Dates */}
                             <div className="flex gap-4 mb-5">
@@ -655,7 +655,7 @@ const Checkout = () => {
                                     <p className="font-bold text-gray-800 text-sm mt-0.5">{urlParams.checkOut}</p>
                                 </div>
                             </div>
-                            
+
                             {quote && (
                                 <div className="space-y-3 text-sm">
                                     <div className="flex justify-between text-gray-600">
@@ -680,7 +680,7 @@ const Checkout = () => {
                                             <span className="font-semibold">Rs. {transportData.estimatedCost.toLocaleString()}</span>
                                         </div>
                                     )}
-                                    
+
                                     <div className="border-t border-gray-200 pt-4 mt-4">
                                         <div className="flex justify-between items-center">
                                             <span className="text-base font-bold text-gray-900">Grand Total</span>
