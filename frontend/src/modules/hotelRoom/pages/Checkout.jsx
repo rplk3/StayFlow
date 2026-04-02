@@ -370,6 +370,20 @@ const Checkout = () => {
                             <p className="text-3xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</p>
                         </div>
 
+                        {/* Explicit Hotel Stay confirmation to prevent confusion */}
+                        <div className="rounded-2xl p-5 mb-5 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <Moon size={18} style={{ color: C[700] }} />
+                                <span className="font-bold text-sm" style={{ color: C[900] }}>Hotel Stay Confirmed</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: C[600] }}>
+                                <div><span style={{ color: C[300] }}>Check-in:</span> {urlParams.checkIn}</div>
+                                <div><span style={{ color: C[300] }}>Check-out:</span> {urlParams.checkOut}</div>
+                                <div><span style={{ color: C[300] }}>Guests:</span> {urlParams.guests}</div>
+                                <div><span style={{ color: C[300] }}>Duration:</span> {quote?.nights} Night(s)</div>
+                            </div>
+                        </div>
+
                         {transportData.enabled && (
                             <div className="rounded-2xl p-5 mb-5 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
                                 <div className="flex items-center gap-2 mb-2">
@@ -586,27 +600,36 @@ const Checkout = () => {
 
                     {step === 2 && (
                         <>
-                            <button
-                                onClick={() => setStep(1)}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition mb-2"
-                            >
-                                <ArrowLeft size={16} /> Back to Details
-                            </button>
-                            <PaymentGateway
-                                bookingId={holdId}
-                                bookingType="room"
-                                userId={user ? user.email : guestDetails.email}
-                                amount={quote?.roomTotal || 0}
-                                taxAmount={quote?.taxesFees || 0}
-                                serviceCharge={transportData.enabled ? transportData.estimatedCost : 0}
-                                totalAmount={grandTotal}
-                                onSuccess={handlePaymentSuccess}
-                                onFailure={() => {}}
-                                guestDetails={guestDetails}
-                                bookingCode={bookingCode}
-                                checkIn={urlParams.checkIn}
-                                checkOut={urlParams.checkOut}
-                            />
+                            {loading ? (
+                                <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
+                                    <div className="w-10 h-10 border-4 rounded-full animate-spin" style={{ borderColor: C[100], borderTopColor: C[700] }}></div>
+                                    <p className="font-semibold text-gray-500">Processing payment & finalizing booking...</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => setStep(1)}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition mb-2"
+                                    >
+                                        <ArrowLeft size={16} /> Back to Details
+                                    </button>
+                                    <PaymentGateway
+                                        bookingId={holdId}
+                                        bookingType="room"
+                                        userId={user ? user.email : guestDetails.email}
+                                        amount={quote?.roomTotal || 0}
+                                        taxAmount={quote?.taxesFees || 0}
+                                        serviceCharge={transportData.enabled ? transportData.estimatedCost : 0}
+                                        totalAmount={grandTotal}
+                                        onSuccess={handlePaymentSuccess}
+                                        onFailure={() => {}}
+                                        guestDetails={guestDetails}
+                                        bookingCode={bookingCode}
+                                        checkIn={urlParams.checkIn}
+                                        checkOut={urlParams.checkOut}
+                                    />
+                                </>
+                            )}
                         </>
                     )}
                 </div>
