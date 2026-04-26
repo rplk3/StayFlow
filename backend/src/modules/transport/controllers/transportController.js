@@ -183,6 +183,25 @@ exports.completeTransport = async (req, res) => {
     }
 };
 
+// PUT /api/transport/:id/assign
+exports.assignTransport = async (req, res) => {
+    try {
+        const { driverName, vehiclePlate } = req.body;
+        if (!driverName || !vehiclePlate) return res.status(400).json({ message: 'Driver and Vehicle are required' });
+
+        const transport = await Transport.findById(req.params.id);
+        if (!transport) return res.status(404).json({ message: 'Transport not found' });
+
+        transport.assignedDriver = driverName;
+        transport.assignedVehicle = vehiclePlate;
+        transport.status = 'confirmed'; // Automatically confirm on assignment
+        await transport.save();
+        res.json({ message: 'Transport assigned successfully', transport });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+};
+
 // PUT /api/transport/:id/forward — forward to external transport company
 exports.forwardToCompany = async (req, res) => {
     try {

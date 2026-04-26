@@ -17,6 +17,7 @@ router.put('/:id/approve', tc.approveTransport);
 router.put('/:id/reject', tc.rejectTransport);
 router.put('/:id/cancel', tc.cancelTransport);
 router.put('/:id/complete', tc.completeTransport);
+router.put('/:id/assign', tc.assignTransport);
 router.put('/:id/forward', tc.forwardToCompany);
 
 module.exports = router;
