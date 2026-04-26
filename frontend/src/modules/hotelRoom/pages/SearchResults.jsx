@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchHotels } from '../services/bookingApi';
-import { Star, MapPin, Wifi, Car, Wind, Waves, Tv, Dumbbell, Utensils, Briefcase, Check, Filter, Search, Calendar, Users, ChevronRight } from 'lucide-react';
+import { Star, MapPin, Wifi, Car, Wind, Waves, Tv, Dumbbell, Utensils, Briefcase, Check, Filter, Search, Calendar, Users, ChevronRight, ArrowUpDown } from 'lucide-react';
 
 /* ───────── Color palette (from LandingPage) ───────── */
 const C = {
@@ -28,6 +28,16 @@ const SearchResults = () => {
     const navigate = useNavigate();
     const [hotels, setHotels] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState('recommended');
+
+    const sortedHotels = [...hotels].sort((a, b) => {
+        switch (sortBy) {
+            case 'price-low': return (a.rooms?.[0]?.basePrice || 0) - (b.rooms?.[0]?.basePrice || 0);
+            case 'price-high': return (b.rooms?.[0]?.basePrice || 0) - (a.rooms?.[0]?.basePrice || 0);
+            case 'star-rating': return (b.starRating || 0) - (a.starRating || 0);
+            default: return 0;
+        }
+    });
 
     const destination = searchParams.get('destination') || 'Unspecified Location';
     const checkIn = searchParams.get('checkIn');
@@ -49,7 +59,7 @@ const SearchResults = () => {
     }, [searchParams, destination, checkIn, checkOut, guests]);
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans text-gray-800 pb-20">
+        <div className="min-h-screen bg-gray-50 font-sans text-gray-800 pb-12">
             {/* Minimal Header */}
             <header style={{ background: C[900] }} className="text-white sticky top-0 z-50 shadow-md">
                 <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -119,10 +129,24 @@ const SearchResults = () => {
 
                     {/* Results Stream */}
                     <div className="flex-1">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                             <h2 className="text-2xl font-extrabold text-gray-900">
                                 {destination}: <span style={{ color: C[600] }}>{hotels.length} properties found</span>
                             </h2>
+                            <div className="flex items-center gap-2">
+                                <ArrowUpDown size={16} className="text-gray-400" />
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 focus:ring-2 outline-none cursor-pointer hover:border-gray-300 transition"
+                                    style={{ '--tw-ring-color': C[500] }}
+                                >
+                                    <option value="recommended">Recommended</option>
+                                    <option value="price-low">Price: Low → High</option>
+                                    <option value="price-high">Price: High → Low</option>
+                                    <option value="star-rating">Star Rating</option>
+                                </select>
+                            </div>
                         </div>
 
                         {loading ? (
@@ -148,7 +172,7 @@ const SearchResults = () => {
                             </div>
                         ) : (
                             <div className="space-y-5">
-                                {hotels.map(hotel => (
+                                {sortedHotels.map(hotel => (
                                     <div key={hotel._id} 
                                          onClick={() => navigate(`/hotels/${hotel._id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`)}
                                          className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col sm:flex-row cursor-pointer h-auto sm:h-56 relative">

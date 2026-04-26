@@ -281,7 +281,7 @@ const EventHalls = () => {
 
     // Step indicator for checkout
     const StepIndicator = () => (
-        <div className="flex items-center justify-center gap-0 mb-10">
+        <div className="flex items-center justify-center gap-0 mb-6">
             {[{ n: 1, l: 'Event Details' }, { n: 2, l: 'Payment' }, { n: 3, l: 'Confirmation' }].map((s, i) => (
                 <React.Fragment key={s.n}>
                     <div className="flex flex-col items-center">
@@ -312,27 +312,27 @@ const EventHalls = () => {
     // SUCCESS
     if (tab === 'checkout' && checkoutStep === 3) {
         return (
-            <div className="max-w-2xl mx-auto p-6 md:p-12 mt-8">
-                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-10 text-center relative overflow-hidden">
+            <div className="max-w-2xl mx-auto p-4 md:p-8 mt-6">
+                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 text-center relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-2" style={{ background: `linear-gradient(90deg, ${C[500]}, ${C[300]}, ${C[100]})` }}></div>
                     <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-30" style={{ background: C[50] }}></div>
                     <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-30" style={{ background: C[100] }}></div>
 
                     <div className="relative z-10">
-                        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg" style={{ background: `linear-gradient(135deg, ${C[500]}, ${C[700]})`, boxShadow: `0 8px 24px ${C[500]}44` }}>
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ background: `linear-gradient(135deg, ${C[500]}, ${C[700]})`, boxShadow: `0 8px 24px ${C[500]}44` }}>
                             <CheckCircle size={40} className="text-white" />
                         </div>
-                        <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Event Booking Submitted!</h1>
-                        <p className="text-gray-500 mb-4">Your booking is pending admin approval</p>
+                        <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Event Booking Submitted!</h1>
+                        <p className="text-gray-500 text-sm mb-3">Your booking is pending admin approval</p>
 
-                        <div className="rounded-2xl p-6 mb-5 border" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
+                        <div className="rounded-2xl p-4 mb-3 border" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
                             <p className="text-sm font-medium mb-1" style={{ color: C[500] }}>Booking Code</p>
-                            <p className="text-3xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</p>
+                            <p className="text-2xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</p>
                         </div>
 
                         {/* Email confirmation + account message */}
-                        <div className="space-y-3 mb-5">
-                            <div className="flex items-center gap-3 p-4 rounded-xl border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
+                        <div className="space-y-2 mb-3">
+                            <div className="flex items-center gap-3 p-3 rounded-xl border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: `${C[100]}44` }}>
                                     <Mail size={18} style={{ color: C[700] }} />
                                 </div>
@@ -342,7 +342,7 @@ const EventHalls = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50 text-left">
+                            <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 text-left">
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
                                     <UserPlus size={18} className="text-amber-600" />
                                 </div>
@@ -356,7 +356,7 @@ const EventHalls = () => {
                         {/* Download Invoice */}
                         <button
                             onClick={generateInvoicePDF}
-                            className="w-full flex items-center justify-center gap-2 mb-4 px-6 py-3.5 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white"
+                            className="w-full flex items-center justify-center gap-2 mb-3 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white"
                             style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
                         >
                             <Download size={18} />
@@ -447,9 +447,9 @@ const EventHalls = () => {
                 {tab === 'checkout' && checkoutStep > 0 && checkoutStep < 3 && selectedHall && (
                     <>
                         <StepIndicator />
-                        <div className="flex flex-col lg:flex-row gap-8">
+                        <div className="flex flex-col lg:flex-row gap-6">
                             {/* Left: Form */}
-                            <div className="lg:w-[62%] space-y-6">
+                            <div className="lg:w-[62%] space-y-3">
                                 {error && <div className="bg-red-50 text-red-700 p-4 border border-red-200 rounded-xl flex items-center gap-2 text-sm font-medium"><AlertCircle size={18} /> {error}</div>}
 
                                 {checkoutStep === 1 && (
@@ -682,17 +682,17 @@ const EventHalls = () => {
                                             <Lock size={16} style={{ color: C[100] }} /> Booking Summary
                                         </h3>
                                     </div>
-                                    <div className="p-6">
+                                    <div className="p-5">
                                         <h4 className="font-bold text-gray-900 mb-1">{selectedHall.name}</h4>
                                         {selectedHall.location && <p className="text-sm text-gray-500 flex items-center gap-1 mb-4"><MapPin size={14} /> {selectedHall.location}</p>}
-                                        <div className="space-y-3 text-sm border-t border-gray-100 pt-4">
+                                        <div className="space-y-2 text-sm border-t border-gray-100 pt-3">
                                             {bookingForm.eventType && <div className="flex justify-between"><span className="text-gray-500">Event</span><span className="font-semibold">{bookingForm.eventType}</span></div>}
                                             {bookingForm.eventDate && <div className="flex justify-between"><span className="text-gray-500">Date</span><span className="font-semibold">{formatDateForApi(bookingForm.eventDate)}</span></div>}
                                             <div className="flex justify-between"><span className="text-gray-500">Time</span><span className="font-semibold">{bookingForm.startTime} – {bookingForm.endTime}</span></div>
                                             <div className="flex justify-between"><span className="text-gray-500">Guests</span><span className="font-semibold">{bookingForm.guestCount}</span></div>
                                         </div>
                                         {quote && (
-                                            <div className="space-y-2 text-sm mt-4 pt-4 border-t border-gray-100">
+                                            <div className="space-y-1.5 text-sm mt-3 pt-3 border-t border-gray-100">
                                                 <div className="flex justify-between"><span className="text-gray-500">Hall Charge ({quote.durationHours}h)</span><span className="font-semibold">Rs. {quote.hallCharge?.toLocaleString()}</span></div>
                                                 <div className="flex justify-between"><span className="text-gray-500">Taxes & Fees</span><span className="font-semibold">Rs. {quote.taxesFees?.toLocaleString()}</span></div>
                                                 <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-200">
