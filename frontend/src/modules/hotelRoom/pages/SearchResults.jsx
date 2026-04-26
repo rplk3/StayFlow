@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchHotels } from '../services/bookingApi';
-import { Star, MapPin, Wifi, Car, Wind, Waves, Tv, Dumbbell, Utensils, Briefcase, Check, Filter, Search, Calendar, Users, ChevronRight, ArrowUpDown } from 'lucide-react';
+import { Star, MapPin, Wifi, Car, Wind, Waves, Tv, Dumbbell, Utensils, Briefcase, Check, Filter, Search, Calendar, Users, ChevronRight, ArrowUpDown, Map, X, GitCompareArrows, RotateCcw } from 'lucide-react';
 
 /* ───────── Color palette (from LandingPage) ───────── */
 const C = {
@@ -23,21 +23,68 @@ const getAmenityIcon = (am) => {
     return <Check size={14} className="mr-1.5 opacity-70" />;
 };
 
+/* Helper: get lowest room price for a hotel */
+const getMinPrice = (hotel) => {
+    if (!hotel.rooms || hotel.rooms.length === 0) return null;
+    return Math.min(...hotel.rooms.map(r => r.basePrice || Infinity));
+};
+
 const SearchResults = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [hotels, setHotels] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState('recommended');
+    const [showMap, setShowMap] = useState(false);
+    const [compareList, setCompareList] = useState([]);
+    const [showCompare, setShowCompare] = useState(false);
 
-    const sortedHotels = [...hotels].sort((a, b) => {
-        switch (sortBy) {
-            case 'price-low': return (a.rooms?.[0]?.basePrice || 0) - (b.rooms?.[0]?.basePrice || 0);
-            case 'price-high': return (b.rooms?.[0]?.basePrice || 0) - (a.rooms?.[0]?.basePrice || 0);
-            case 'star-rating': return (b.starRating || 0) - (a.starRating || 0);
-            default: return 0;
-        }
-    });
+    // Filter state
+    const [nameFilter, setNameFilter] = useState('');
+    const [starFilters, setStarFilters] = useState([]);
+    const [priceRange, setPriceRange] = useState([0, 50000]);
+    const [amenityFilters, setAmenityFilters] = useState([]);
+
+    // Derive max price and unique amenities from loaded hotels
+    const maxPrice = useMemo(() => {
+        if (hotels.length === 0) return 50000;
+        const prices = hotels.map(h => getMinPrice(h)).filter(p => p !== null && p !== Infinity);
+        return prices.length > 0 ? Math.max(...prices) + 1000 : 50000;
+    }, [hotels]);
+
+    const allAmenities = useMemo(() => {
+        const set = new Set();
+        hotels.forEach(h => (h.amenities || []).forEach(a => set.add(a)));
+        return [...set].sort();
+    }, [hotels]);
+
+    // Initialize price slider max when hotels load
+    useEffect(() => { if (hotels.length > 0) setPriceRange([0, maxPrice]); }, [maxPrice]);
+
+    const toggleStar = (s) => setStarFilters(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+    const toggleAmenity = (a) => setAmenityFilters(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a]);
+    const toggleCompare = (id) => setCompareList(prev => prev.includes(id) ? prev.filter(x => x !== id) : prev.length < 3 ? [...prev, id] : prev);
+    const clearFilters = () => { setNameFilter(''); setStarFilters([]); setPriceRange([0, maxPrice]); setAmenityFilters([]); };
+
+    // Filter + sort
+    const filteredSorted = useMemo(() => {
+        let list = [...hotels];
+        if (nameFilter) list = list.filter(h => h.name.toLowerCase().includes(nameFilter.toLowerCase()));
+        if (starFilters.length > 0) list = list.filter(h => starFilters.some(s => (h.starRating || 0) >= s));
+        list = list.filter(h => { const p = getMinPrice(h); return p === null || (p >= priceRange[0] && p <= priceRange[1]); });
+        if (amenityFilters.length > 0) list = list.filter(h => amenityFilters.every(a => (h.amenities || []).includes(a)));
+        list.sort((a, b) => {
+            switch (sortBy) {
+                case 'price-low': return (getMinPrice(a) || 0) - (getMinPrice(b) || 0);
+                case 'price-high': return (getMinPrice(b) || 0) - (getMinPrice(a) || 0);
+                case 'star-rating': return (b.starRating || 0) - (a.starRating || 0);
+                default: return 0;
+            }
+        });
+        return list;
+    }, [hotels, nameFilter, starFilters, priceRange, amenityFilters, sortBy]);
+
+    const compareHotels = hotels.filter(h => compareList.includes(h._id));
 
     const destination = searchParams.get('destination') || 'Unspecified Location';
     const checkIn = searchParams.get('checkIn');
