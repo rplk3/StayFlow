@@ -16,21 +16,21 @@ const C = {
 
 /* ───────── Country data for phone picker ───────── */
 const countries = [
-    { code: 'LK', name: 'Sri Lanka', dial: '+94', flag: 'https://flagcdn.com/w40/lk.png', phoneLengths: [9] },
-    { code: 'IN', name: 'India', dial: '+91', flag: 'https://flagcdn.com/w40/in.png', phoneLengths: [10] },
-    { code: 'US', name: 'United States', dial: '+1', flag: 'https://flagcdn.com/w40/us.png', phoneLengths: [10] },
-    { code: 'GB', name: 'United Kingdom', dial: '+44', flag: 'https://flagcdn.com/w40/gb.png', phoneLengths: [10, 11] },
-    { code: 'AU', name: 'Australia', dial: '+61', flag: 'https://flagcdn.com/w40/au.png', phoneLengths: [9] },
-    { code: 'AE', name: 'UAE', dial: '+971', flag: 'https://flagcdn.com/w40/ae.png', phoneLengths: [9] },
-    { code: 'SG', name: 'Singapore', dial: '+65', flag: 'https://flagcdn.com/w40/sg.png', phoneLengths: [8] },
-    { code: 'MY', name: 'Malaysia', dial: '+60', flag: 'https://flagcdn.com/w40/my.png', phoneLengths: [9, 10] },
-    { code: 'JP', name: 'Japan', dial: '+81', flag: 'https://flagcdn.com/w40/jp.png', phoneLengths: [10, 11] },
-    { code: 'DE', name: 'Germany', dial: '+49', flag: 'https://flagcdn.com/w40/de.png', phoneLengths: [10, 11] },
-    { code: 'FR', name: 'France', dial: '+33', flag: 'https://flagcdn.com/w40/fr.png', phoneLengths: [9] },
-    { code: 'CA', name: 'Canada', dial: '+1', flag: 'https://flagcdn.com/w40/ca.png', phoneLengths: [10] },
-    { code: 'NZ', name: 'New Zealand', dial: '+64', flag: 'https://flagcdn.com/w40/nz.png', phoneLengths: [8, 9] },
-    { code: 'SA', name: 'Saudi Arabia', dial: '+966', flag: 'https://flagcdn.com/w40/sa.png', phoneLengths: [9] },
-    { code: 'CN', name: 'China', dial: '+86', flag: 'https://flagcdn.com/w40/cn.png', phoneLengths: [11] },
+    { code: 'LK', name: 'Sri Lanka', dial: '+94', flag: 'https://flagcdn.com/lk.svg', phoneLengths: [9] },
+    { code: 'IN', name: 'India', dial: '+91', flag: 'https://flagcdn.com/in.svg', phoneLengths: [10] },
+    { code: 'US', name: 'United States', dial: '+1', flag: 'https://flagcdn.com/us.svg', phoneLengths: [10] },
+    { code: 'GB', name: 'United Kingdom', dial: '+44', flag: 'https://flagcdn.com/gb.svg', phoneLengths: [10, 11] },
+    { code: 'AU', name: 'Australia', dial: '+61', flag: 'https://flagcdn.com/au.svg', phoneLengths: [9] },
+    { code: 'AE', name: 'UAE', dial: '+971', flag: 'https://flagcdn.com/ae.svg', phoneLengths: [9] },
+    { code: 'SG', name: 'Singapore', dial: '+65', flag: 'https://flagcdn.com/sg.svg', phoneLengths: [8] },
+    { code: 'MY', name: 'Malaysia', dial: '+60', flag: 'https://flagcdn.com/my.svg', phoneLengths: [9, 10] },
+    { code: 'JP', name: 'Japan', dial: '+81', flag: 'https://flagcdn.com/jp.svg', phoneLengths: [10, 11] },
+    { code: 'DE', name: 'Germany', dial: '+49', flag: 'https://flagcdn.com/de.svg', phoneLengths: [10, 11] },
+    { code: 'FR', name: 'France', dial: '+33', flag: 'https://flagcdn.com/fr.svg', phoneLengths: [9] },
+    { code: 'CA', name: 'Canada', dial: '+1', flag: 'https://flagcdn.com/ca.svg', phoneLengths: [10] },
+    { code: 'NZ', name: 'New Zealand', dial: '+64', flag: 'https://flagcdn.com/nz.svg', phoneLengths: [8, 9] },
+    { code: 'SA', name: 'Saudi Arabia', dial: '+966', flag: 'https://flagcdn.com/sa.svg', phoneLengths: [9] },
+    { code: 'CN', name: 'China', dial: '+86', flag: 'https://flagcdn.com/cn.svg', phoneLengths: [11] },
 ];
 
 const Checkout = () => {
@@ -50,6 +50,7 @@ const Checkout = () => {
     const [quote, setQuote] = useState(null);
     const [couponCode, setCouponCode] = useState('');
     const [couponApplied, setCouponApplied] = useState('');
+    const [couponError, setCouponError] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [step, setStep] = useState(1);
@@ -59,6 +60,9 @@ const Checkout = () => {
     const [bookingCode, setBookingCode] = useState(null);
 
     // Validation state
+    const [submitAttempted, setSubmitAttempted] = useState(false);
+    const [firstNameError, setFirstNameError] = useState('');
+    const [lastNameError, setLastNameError] = useState('');
     const [emailError, setEmailError] = useState('');
     const [phoneError, setPhoneError] = useState('');
     const [selectedCountry, setSelectedCountry] = useState(countries[0]);
@@ -130,18 +134,53 @@ const Checkout = () => {
         if (urlParams.hotelId) loadQuote();
     }, []);
 
-    const handleApplyCoupon = () => {
-        if (couponCode) loadQuote(couponCode);
+    const handleApplyCoupon = async () => {
+        if (!couponCode) return;
+        setCouponError('');
+        try {
+            setLoading(true);
+            const res = await validateAndQuote({
+                hotelId: urlParams.hotelId,
+                roomId: urlParams.roomId,
+                ratePlanId: urlParams.ratePlanId,
+                checkInDate: urlParams.checkIn,
+                checkOutDate: urlParams.checkOut,
+                guests: urlParams.guests,
+                couponCode: couponCode
+            });
+            setQuote(res.data);
+            setCouponApplied(couponCode);
+            setCouponError('');
+        } catch (err) {
+            setCouponError(err.response?.data?.error || 'Invalid promo code');
+            setCouponApplied('');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const grandTotal = quote ? Math.round(quote.totalAmount + (transportData.enabled ? transportData.estimatedCost : 0)) : 0;
 
+    const validateFirstName = (val) => {
+        if (!val.trim()) { setFirstNameError('First name is required'); return false; }
+        setFirstNameError(''); return true;
+    };
+    const validateLastName = (val) => {
+        if (!val.trim()) { setLastNameError('Last name is required'); return false; }
+        setLastNameError(''); return true;
+    };
+
     const handleContinueToPayment = async (e) => {
         e.preventDefault();
+        setSubmitAttempted(true);
         // Validate before proceeding
+        const isFnValid = validateFirstName(guestDetails.firstName);
+        const isLnValid = validateLastName(guestDetails.lastName);
         const isEmailValid = validateEmail(guestDetails.email);
         const isPhoneValid = validatePhone(guestDetails.phone);
-        if (!isEmailValid || !isPhoneValid) return;
+        
+        if (!isFnValid || !isLnValid || !isEmailValid || !isPhoneValid) return;
+        if (transportData.enabled && !transportData.pickupCoords) return;
 
         try {
             setLoading(true);
@@ -474,11 +513,13 @@ const Checkout = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">First Name</label>
-                                            <input required type="text" className={inputClass} style={{ focusRingColor: C[500] }} placeholder="John" value={guestDetails.firstName} onChange={e => setGuestDetails({ ...guestDetails, firstName: e.target.value })} />
+                                            {firstNameError && <div className="flex items-center gap-1.5 mb-2 text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded-lg px-3 py-2"><AlertCircle size={14} />{firstNameError}</div>}
+                                            <input required type="text" className={`${inputClass} ${firstNameError ? 'border-red-400 bg-red-50/50 focus:ring-red-400' : 'border-gray-200'}`} style={!firstNameError ? { '--tw-ring-color': C[500] } : {}} placeholder="John" value={guestDetails.firstName} onChange={e => { setGuestDetails({ ...guestDetails, firstName: e.target.value }); if (firstNameError) validateFirstName(e.target.value); }} onBlur={() => validateFirstName(guestDetails.firstName)} />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Last Name</label>
-                                            <input required type="text" className={inputClass} placeholder="Doe" value={guestDetails.lastName} onChange={e => setGuestDetails({ ...guestDetails, lastName: e.target.value })} />
+                                            {lastNameError && <div className="flex items-center gap-1.5 mb-2 text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded-lg px-3 py-2"><AlertCircle size={14} />{lastNameError}</div>}
+                                            <input required type="text" className={`${inputClass} ${lastNameError ? 'border-red-400 bg-red-50/50 focus:ring-red-400' : 'border-gray-200'}`} style={!lastNameError ? { '--tw-ring-color': C[500] } : {}} placeholder="Doe" value={guestDetails.lastName} onChange={e => { setGuestDetails({ ...guestDetails, lastName: e.target.value }); if (lastNameError) validateLastName(e.target.value); }} onBlur={() => validateLastName(guestDetails.lastName)} />
                                         </div>
 
                                         {/* Email with validation */}
@@ -584,13 +625,14 @@ const Checkout = () => {
                                 hotelDestination={searchParams.get('hotelName') || 'Hotel'}
                                 onTransportChange={setTransportData}
                                 guestCount={urlParams.guests}
+                                submitAttempted={submitAttempted}
                             />
 
                             {/* Continue Button */}
                             <button
                                 onClick={handleContinueToPayment}
-                                disabled={!quote || !guestDetails.firstName || !guestDetails.email || loading}
-                                className="w-full flex items-center justify-center gap-2 text-white py-4 rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl hover:-translate-y-0.5"
+                                disabled={!quote || loading}
+                                className="w-full flex items-center justify-center gap-2 text-white py-4 rounded-xl font-bold text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-xl hover:-translate-y-0.5"
                                 style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
                             >
                                 {loading ? 'Processing...' : 'Continue to Payment'} <ArrowRight size={20} />
@@ -705,15 +747,17 @@ const Checkout = () => {
                                 <div className="mt-5 pt-5 border-t border-gray-100">
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">Promo Code</label>
                                     <div className="flex gap-2">
-                                        <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} className="flex-1 border border-gray-200 rounded-xl p-3 uppercase text-sm bg-gray-50 focus:ring-2 outline-none" style={{ '--tw-ring-color': C[500] }} placeholder="e.g. SUMMER20" />
+                                        <input type="text" value={couponCode} onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); if(couponApplied) { setCouponApplied(''); loadQuote(); } }} className={`flex-1 border ${couponError ? 'border-red-400 focus:ring-red-400 bg-red-50/50' : couponApplied ? 'border-green-400 focus:ring-green-400 bg-green-50/50' : 'border-gray-200 focus:ring-2 bg-gray-50'} rounded-xl p-3 uppercase text-sm outline-none transition-all duration-200`} style={!couponError && !couponApplied ? { '--tw-ring-color': C[500] } : {}} placeholder="e.g. SUMMER20" />
                                         <button
                                             onClick={handleApplyCoupon}
-                                            className="text-white px-5 py-3 rounded-xl font-semibold hover:opacity-90 transition text-sm"
+                                            disabled={loading || !couponCode || couponApplied === couponCode}
+                                            className="text-white px-5 py-3 rounded-xl font-semibold hover:opacity-90 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                             style={{ background: C[800] }}
                                         >
                                             Apply
                                         </button>
                                     </div>
+                                    {couponError && <p className="text-red-600 text-xs mt-2 font-medium flex items-center gap-1"><AlertCircle size={12} /> {couponError}</p>}
                                     {couponApplied && <p className="text-green-600 text-xs mt-2 font-medium flex items-center gap-1"><CheckCircle size={12} /> Coupon {couponApplied} applied!</p>}
                                 </div>
                             )}

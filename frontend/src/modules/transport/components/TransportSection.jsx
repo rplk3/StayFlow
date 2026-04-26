@@ -30,11 +30,16 @@ const C = {
     100: '#89C2D9', 50: '#A9D6E5',
 };
 
+const SedanIcon = ({ size }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>;
+const SUVIcon = ({ size }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M19 6H5c-1.66 0-3 1.34-3 3v8h2v2c0 1.1.9 2 2 2h1c1.1 0 2-.9 2-2v-2h10v2c0 1.1.9 2 2 2h1c1.1 0 2-.9 2-2v-2h2V9c0-1.66-1.34-3-3-3zM7 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm10 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM5 11V8h14v3H5z"/></svg>;
+const VanIcon = ({ size }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M21 9h-4.5V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v10h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-2-3zm-15 8c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm9 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm3-4V9h2.5l1.5 2H18z"/></svg>;
+const LuxuryIcon = ({ size }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M20 9L18 6l-3-2H9L6 6 4 9v7c0 1.1.9 2 2 2h1c1.1 0 2-.9 2-2v-1h6v1c0 1.1.9 2 2 2h1c1.1 0 2-.9 2-2V9zm-13 4c-.83 0-1.5-.67-1.5-1.5S6.17 10 7 10s1.5.67 1.5 1.5S7.83 13 7 13zm10 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>;
+
 const vehicles = [
-    { type: 'sedan', label: 'Sedan', icon: Car, desc: 'Comfortable sedan for 1-3 passengers', rate: 35, base: 500, passengers: 3, color: `from-[${C[500]}] to-[${C[700]}]` },
-    { type: 'suv', label: 'SUV', icon: Car, desc: 'Spacious SUV for up to 5 passengers', rate: 50, base: 800, passengers: 5, color: 'from-emerald-500 to-emerald-600' },
-    { type: 'van', label: 'Van', icon: Truck, desc: 'Mini van for groups up to 8', rate: 65, base: 1000, passengers: 8, color: 'from-amber-500 to-amber-600' },
-    { type: 'luxury', label: 'Luxury', icon: Crown, desc: 'Premium luxury vehicle', rate: 100, base: 2000, passengers: 3, color: 'from-purple-500 to-purple-600' },
+    { type: 'sedan', label: 'Sedan', icon: SedanIcon, desc: 'Comfortable sedan for 1-3 passengers', rate: 35, base: 500, passengers: 3, color: `from-blue-500 to-blue-700` },
+    { type: 'suv', label: 'SUV', icon: SUVIcon, desc: 'Spacious SUV for up to 5 passengers', rate: 50, base: 800, passengers: 5, color: 'from-emerald-500 to-emerald-700' },
+    { type: 'van', label: 'Van', icon: VanIcon, desc: 'Mini van for groups up to 8', rate: 65, base: 1000, passengers: 8, color: 'from-amber-500 to-amber-700' },
+    { type: 'luxury', label: 'Luxury', icon: LuxuryIcon, desc: 'Premium luxury vehicle', rate: 100, base: 2000, passengers: 3, color: 'from-purple-500 to-purple-700' },
 ];
 
 // Map click handler component
@@ -47,7 +52,7 @@ function MapClickHandler({ onMapClick }) {
     return null;
 }
 
-const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, guestCount }) => {
+const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, guestCount, submitAttempted }) => {
     const [enabled, setEnabled] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [pickupAddress, setPickupAddress] = useState('');
@@ -59,8 +64,8 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
     const [specialRequests, setSpecialRequests] = useState('');
     const [estimate, setEstimate] = useState(null);
     const [locating, setLocating] = useState(false);
-    const [mapCenter, setMapCenter] = useState([7.8731, 80.7718]);
-    const [mapZoom, setMapZoom] = useState(8);
+    const [mapCenter, setMapCenter] = useState([6.9271, 79.8612]);
+    const [mapZoom, setMapZoom] = useState(13);
     const mapRef = useRef(null);
 
     // Hotel destination coords (approximate for Sri Lankan cities)
@@ -450,7 +455,7 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
                         </div>
                     )}
                     
-                    {!pickupCoords && (
+                    {!pickupCoords && submitAttempted && (
                         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-700 text-sm flex items-center gap-2">
                             <MapPin size={16} /> Please set your pickup location on the map or use "Use My Location" to get a cost estimate
                         </div>

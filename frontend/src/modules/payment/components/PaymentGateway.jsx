@@ -14,6 +14,7 @@ const C = {
 
 const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, serviceCharge, totalAmount, onSuccess, onFailure, guestDetails, bookingCode, checkIn, checkOut }) => {
     const [cardNumber, setCardNumber] = useState('');
+    const [nameOnCard, setNameOnCard] = useState('');
     const [expiry, setExpiry] = useState('');
     const [cvc, setCvc] = useState('');
     const [processing, setProcessing] = useState(false);
@@ -149,6 +150,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
     };
 
     // Validation errors
+    const [nameError, setNameError] = useState('');
     const [cardError, setCardError] = useState('');
     const [expiryError, setExpiryError] = useState('');
     const [cvcError, setCvcError] = useState('');
@@ -169,6 +171,12 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
             return `${digits.slice(0, 2)} / ${digits.slice(2)}`;
         }
         return digits;
+    };
+
+    // ── Validate name on card ──
+    const validateName = (value) => {
+        if (!value.trim()) { setNameError('Name on card is required'); return false; }
+        setNameError(''); return true;
     };
 
     // ── Validate card number (must be 16 digits) ──
@@ -236,10 +244,11 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
 
     const handlePay = async () => {
         // Validate all fields before payment
+        const isNameValid = validateName(nameOnCard);
         const isCardValid = validateCard(cardNumber);
         const isExpiryValid = validateExpiry(expiry);
         const isCvcValid = validateCvc(cvc);
-        if (!isCardValid || !isExpiryValid || !isCvcValid) return;
+        if (!isNameValid || !isCardValid || !isExpiryValid || !isCvcValid) return;
 
         setProcessing(true);
         setResult(null);
@@ -321,8 +330,8 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                             </div>
 
                             <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 text-left">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
-                                    <UserPlus size={18} className="text-amber-600" />
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: '#1D6FE81A' }}>
+                                    <UserPlus size={18} style={{ color: '#1D6FE8' }} />
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold text-gray-800">View booking in your profile</p>
@@ -391,7 +400,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                 <div className="px-6 py-4 flex items-center gap-3" style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})` }}>
                     <CreditCard size={20} className="text-white" />
                     <h2 className="text-lg font-bold text-white">Payment Information</h2>
-                    <span className="ml-auto text-white text-xs px-3 py-1 rounded-full font-semibold" style={{ background: 'rgba(255,255,255,0.2)' }}>SANDBOX</span>
+                    <span className="ml-auto text-white text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1" style={{ background: 'rgba(255,255,255,0.2)' }}><Lock size={12} /> Secure Payment</span>
                 </div>
                 <div className="p-5 space-y-4">
                     {/* Card Number */}
@@ -406,6 +415,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                         <div className="relative">
                             <input
                                 type="text"
+                                inputMode="numeric"
                                 placeholder="4111 1111 1111 1111"
                                 className={cardError ? errorInputClass : inputClass}
                                 style={!cardError ? { '--tw-ring-color': C[500] } : {}}
@@ -415,25 +425,45 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                                     setCardNumber(formatted);
                                     if (cardError) validateCard(formatted);
                                 }}
+                                onKeyDown={e => { if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Tab') e.preventDefault(); }}
                                 onBlur={() => validateCard(cardNumber)}
                                 maxLength={19}
                             />
                             {/* Card type icon */}
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                                {cardType === 'visa' && (
-                                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">VISA</span>
-                                )}
-                                {cardType === 'mastercard' && (
-                                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-800">MC</span>
-                                )}
-                                {cardType === 'amex' && (
-                                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-green-100 text-green-800">AMEX</span>
-                                )}
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center h-6" style={{ width: '40px' }}>
+                                {cardType === 'visa' && <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" className="h-full object-contain" />}
+                                {cardType === 'mastercard' && <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-full object-contain" />}
+                                {cardType === 'amex' && <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" className="h-full object-contain" />}
+                                {!cardType && <CreditCard size={18} className="text-gray-400" />}
                             </div>
                         </div>
                         <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                             <CreditCard size={11} /> {cardNumber.replace(/\D/g, '').length}/16 digits
                         </p>
+                    </div>
+
+                    {/* Name on Card */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">Name on Card</label>
+                        {nameError && (
+                            <div className="flex items-center gap-1.5 mb-2 text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                                <AlertCircle size={14} />
+                                {nameError}
+                            </div>
+                        )}
+                        <input
+                            type="text"
+                            placeholder="John Doe"
+                            className={nameError ? errorInputClass : inputClass}
+                            style={!nameError ? { '--tw-ring-color': C[500] } : {}}
+                            value={nameOnCard}
+                            onChange={e => {
+                                setNameOnCard(e.target.value);
+                                if (nameError) validateName(e.target.value);
+                            }}
+                            onKeyDown={e => { if (/[0-9]/.test(e.key)) e.preventDefault(); }}
+                            onBlur={() => validateName(nameOnCard)}
+                        />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -449,6 +479,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                             <div className="relative">
                                 <input
                                     type="text"
+                                    inputMode="numeric"
                                     placeholder="MM / YY"
                                     className={expiryError ? errorInputClass : inputClass}
                                     style={!expiryError ? { '--tw-ring-color': C[500] } : {}}
@@ -458,6 +489,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                                         setExpiry(formatted);
                                         if (expiryError) validateExpiry(formatted);
                                     }}
+                                    onKeyDown={e => { if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Tab') e.preventDefault(); }}
                                     onBlur={() => validateExpiry(expiry)}
                                     maxLength={7}
                                 />
@@ -477,6 +509,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                             <div className="relative">
                                 <input
                                     type="password"
+                                    inputMode="numeric"
                                     placeholder="•••"
                                     className={cvcError ? errorInputClass : inputClass}
                                     style={!cvcError ? { '--tw-ring-color': C[500] } : {}}
@@ -486,6 +519,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                                         setCvc(val);
                                         if (cvcError) validateCvc(val);
                                     }}
+                                    onKeyDown={e => { if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Tab') e.preventDefault(); }}
                                     onBlur={() => validateCvc(cvc)}
                                     maxLength={4}
                                 />
