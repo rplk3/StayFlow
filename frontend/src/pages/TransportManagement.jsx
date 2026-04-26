@@ -33,13 +33,14 @@ const TransportManagement = () => {
     const [selected, setSelected] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
 
-    // Forward modal
-    const [showForward, setShowForward] = useState(false);
-    const [forwardData, setForwardData] = useState({ companyName: '', reference: '', notes: '' });
-
+    // Forward modal (removed)
     // Reject modal
     const [showReject, setShowReject] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
+
+    // Assign modal
+    const [showAssignModal, setShowAssignModal] = useState(false);
+    const [assignData, setAssignData] = useState({ requestId: '', driverName: '', vehiclePlate: '' });
 
     const fetchTransports = async () => {
         try {
@@ -78,7 +79,6 @@ const TransportManagement = () => {
             await axios.put(`${API}/${selected._id}/${action}`, body, { headers: headers() });
             Swal.fire({ title: 'Success!', text: `Transport ${action}d successfully!`, icon: 'success', background: dk.card, color: dk.text, timer: 2000, showConfirmButton: false });
             setSelected(null);
-            setShowForward(false);
             setShowReject(false);
             fetchTransports();
         } catch (err) {
@@ -111,6 +111,18 @@ const TransportManagement = () => {
         }
     };
 
+    const doAssign = async (data) => {
+        try {
+            await axios.put(`${API}/${data.requestId}/assign`, { driverName: data.driverName, vehiclePlate: data.vehiclePlate }, { headers: headers() });
+            Swal.fire({ title: 'Success!', text: 'Transport assigned successfully!', icon: 'success', background: dk.card, color: dk.text, timer: 2000, showConfirmButton: false });
+            setShowAssignModal(false);
+            setAssignData({ requestId: '', driverName: '', vehiclePlate: '' });
+            fetchTransports();
+        } catch (err) {
+            Swal.fire({ title: 'Error!', text: err.response?.data?.message || 'Failed to assign', icon: 'error', background: dk.card, color: dk.text });
+        }
+    };
+
     return (
         <div className="animate-fade-in pb-12" style={{ color: dk.text }}>
             {/* Header */}
@@ -122,6 +134,9 @@ const TransportManagement = () => {
                     </div>
                     <p className="mt-1" style={{ color: dk.textSec }}><span className="font-semibold text-white">{total}</span> transport requests</p>
                 </div>
+                <button onClick={() => setShowAssignModal(true)} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold flex items-center gap-2 transition shadow-sm">
+                    <Car size={18} /> Assign Transport
+                </button>
             </div>
 
             {/* Filters */}
@@ -162,7 +177,7 @@ const TransportManagement = () => {
                                 <th className="px-4 py-4 text-left text-xs font-bold uppercase" style={{ color: dk.textSec }}>Vehicle</th>
                                 <th className="px-4 py-4 text-left text-xs font-bold uppercase" style={{ color: dk.textSec }}>Cost</th>
                                 <th className="px-4 py-4 text-left text-xs font-bold uppercase" style={{ color: dk.textSec }}>Status</th>
-                                <th className="px-4 py-4 text-left text-xs font-bold uppercase" style={{ color: dk.textSec }}>Company</th>
+                                <th className="px-4 py-4 text-left text-xs font-bold uppercase" style={{ color: dk.textSec }}>Assign</th>
                                 <th className="px-4 py-4 text-right text-xs font-bold uppercase" style={{ color: dk.textSec }}>Actions</th>
                             </tr>
                         </thead>
@@ -184,7 +199,11 @@ const TransportManagement = () => {
                                                 <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${sc.dot}`}></span>{sc.label}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 text-sm" style={{ color: dk.textSec }}>{t.forwardedToCompany?.companyName || <span className="opacity-50">—</span>}</td>
+                                        <td className="px-4 py-3 text-sm font-semibold">
+                                            <span className={t.assignedDriver ? 'text-green-400' : 'text-red-400'}>
+                                                {t.assignedDriver ? 'Assigned' : 'Not Assigned'}
+                                            </span>
+                                        </td>
                                         <td className="px-4 py-3 text-right">
                                             <button onClick={() => openDetail(t._id)} className="p-2 rounded-lg hover:bg-indigo-500/20 transition" title="View Details">
                                                 <Eye size={18} className="text-indigo-400" />
@@ -287,16 +306,16 @@ const TransportManagement = () => {
                                 </div>
                             )}
 
-                            {/* Forwarded Company */}
-                            {selected.forwardedToCompany?.companyName && (
-                                <div className="bg-purple-900/10 rounded-xl p-4 border border-purple-500/20">
-                                    <p className="font-bold text-purple-400 text-xs mb-3 uppercase tracking-wider flex items-center gap-2"><Send size={14} /> Forwarded to Transport Company</p>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                                        <div><span className="text-purple-500/70 text-xs block mb-0.5">Company:</span> <span className="font-semibold text-purple-200">{selected.forwardedToCompany.companyName}</span></div>
-                                        <div><span className="text-purple-500/70 text-xs block mb-0.5">Reference:</span> <span className="font-semibold text-purple-200">{selected.forwardedToCompany.reference || '—'}</span></div>
-                                        <div><span className="text-purple-500/70 text-xs block mb-0.5">Forwarded:</span> <span className="font-semibold text-purple-200">{selected.forwardedToCompany.forwardedAt ? new Date(selected.forwardedToCompany.forwardedAt).toLocaleString() : '—'}</span></div>
+                            {/* Forwarded Company (removed) */}
+
+                            {/* Assigned Driver / Vehicle Details */}
+                            {selected.assignedDriver && (
+                                <div className="bg-indigo-900/10 rounded-xl p-4 border border-indigo-500/20">
+                                    <p className="font-bold text-indigo-400 text-xs mb-3 uppercase tracking-wider flex items-center gap-2"><Car size={14} /> Assigned Transport details</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                        <div><span className="text-indigo-500/70 text-xs block mb-0.5">Driver Name:</span> <span className="font-semibold text-indigo-200">{selected.assignedDriver}</span></div>
+                                        <div><span className="text-indigo-500/70 text-xs block mb-0.5">Vehicle Plate:</span> <span className="font-semibold text-indigo-200">{selected.assignedVehicle}</span></div>
                                     </div>
-                                    {selected.forwardedToCompany.notes && <p className="text-purple-300 text-xs mt-3 p-3 bg-purple-900/20 rounded-lg">{selected.forwardedToCompany.notes}</p>}
                                 </div>
                             )}
 
@@ -322,9 +341,9 @@ const TransportManagement = () => {
                                             <CheckCircle size={16} /> Mark Complete
                                         </button>
                                     )}
-                                    {['pending', 'confirmed'].includes(selected.status) && (
-                                        <button onClick={() => setShowForward(true)} className="flex items-center gap-1.5 px-5 py-2.5 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 transition shadow-sm">
-                                            <Send size={16} /> Forward to Company
+                                    {selected.status === 'confirmed' && (
+                                        <button onClick={() => doAction('complete')} className="flex items-center gap-1.5 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition shadow-sm">
+                                            <CheckCircle size={16} /> Mark Complete
                                         </button>
                                     )}
                                     <button onClick={() => handleDelete(selected._id)} className="flex items-center gap-1.5 px-5 py-2.5 border border-gray-600 text-gray-400 rounded-lg text-sm font-semibold hover:bg-gray-800 transition ml-auto">
@@ -337,29 +356,46 @@ const TransportManagement = () => {
                 </div>
             )}
 
-            {/* Forward Modal */}
-            {showForward && selected && (
+            {/* Assign Modal */}
+            {showAssignModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                     <div className="rounded-2xl shadow-2xl w-full max-w-md p-8" style={{ background: dk.card, border: `1px solid ${dk.border}` }}>
-                        <h3 className="text-lg font-bold text-purple-400 mb-4 flex items-center gap-2"><Send size={18} /> Forward to Transport Company</h3>
+                        <h3 className="text-lg font-bold text-indigo-400 mb-4 flex items-center gap-2"><Car size={18} /> Assign Transport</h3>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Company Name *</label>
-                                <input type="text" value={forwardData.companyName} onChange={e => setForwardData({ ...forwardData, companyName: e.target.value })} className="w-full px-4 py-3 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 outline-none" style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="e.g. Cabs (Pvt) Ltd" />
+                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Request ID *</label>
+                                <select value={assignData.requestId} onChange={e => setAssignData({ ...assignData, requestId: e.target.value })} className="w-full px-4 py-3 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }}>
+                                    <option value="">Select a pending request</option>
+                                    {transports.filter(t => !t.assignedDriver).map(t => (
+                                        <option key={t._id} value={t._id}>{t._id.slice(-6)} - {t.pickupAddress.slice(0, 15)}...</option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Reference / Confirmation #</label>
-                                <input type="text" value={forwardData.reference} onChange={e => setForwardData({ ...forwardData, reference: e.target.value })} className="w-full px-4 py-3 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 outline-none" style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="e.g. C-2026-0042" />
+                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Available Drivers *</label>
+                                <select value={assignData.driverName} onChange={e => setAssignData({ ...assignData, driverName: e.target.value })} className="w-full px-4 py-3 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }}>
+                                    <option value="">Select a driver</option>
+                                    <option value="Kamal Perera">Kamal Perera</option>
+                                    <option value="Nimal Silva">Nimal Silva</option>
+                                    <option value="Sunil Fernando">Sunil Fernando</option>
+                                    <option value="Jagath Kumara">Jagath Kumara</option>
+                                </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Notes</label>
-                                <textarea value={forwardData.notes} onChange={e => setForwardData({ ...forwardData, notes: e.target.value })} className="w-full px-4 py-3 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 outline-none h-20 resize-none" style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="Additional notes..." />
+                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Available Vehicles *</label>
+                                <select value={assignData.vehiclePlate} onChange={e => setAssignData({ ...assignData, vehiclePlate: e.target.value })} className="w-full px-4 py-3 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }}>
+                                    <option value="">Select a vehicle</option>
+                                    <option value="WP-CAR-2001 (Sedan)">WP-CAR-2001 (Sedan)</option>
+                                    <option value="WP-SUV-5002 (SUV)">WP-SUV-5002 (SUV)</option>
+                                    <option value="WP-VAN-8003 (Van)">WP-VAN-8003 (Van)</option>
+                                    <option value="WP-LUX-1004 (Luxury)">WP-LUX-1004 (Luxury)</option>
+                                </select>
                             </div>
                         </div>
                         <div className="flex gap-3 mt-6">
-                            <button onClick={() => setShowForward(false)} className="px-5 py-3 rounded-lg border text-sm font-semibold transition hover:bg-white/5" style={{ borderColor: dk.border, color: dk.text }}>Cancel</button>
-                            <button onClick={() => doAction('forward', forwardData)} disabled={!forwardData.companyName} className="flex-1 px-5 py-3 rounded-lg bg-purple-600 text-white text-sm font-bold hover:bg-purple-700 disabled:opacity-50 transition">
-                                Send to Company
+                            <button onClick={() => setShowAssignModal(false)} className="px-5 py-3 rounded-lg border text-sm font-semibold transition hover:bg-white/5" style={{ borderColor: dk.border, color: dk.text }}>Cancel</button>
+                            <button onClick={() => doAssign(assignData)} disabled={!assignData.requestId || !assignData.driverName || !assignData.vehiclePlate} className="flex-1 px-5 py-3 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition">
+                                Assign Transport
                             </button>
                         </div>
                     </div>
