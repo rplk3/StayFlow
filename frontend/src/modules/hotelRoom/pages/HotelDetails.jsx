@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { getHotelDetails } from '../services/bookingApi';
-import { Check, Users, Shield, CreditCard, MapPin, Star, Wifi, Waves, Car, Wind, Tv, Dumbbell, Utensils, Briefcase, ArrowLeft, Heart, Share2, Info, ArrowRight, Calendar } from 'lucide-react';
+import { Check, Users, Shield, CreditCard, MapPin, Star, Wifi, Waves, Car, Wind, Tv, Dumbbell, Utensils, Briefcase, ArrowLeft, Share2, Info, ArrowRight, Calendar, ChevronRight, Wine, Sparkles, Shirt, Bell, Coffee } from 'lucide-react';
 
 /* ───────── Color palette (from LandingPage) ───────── */
 const C = {
@@ -20,6 +20,11 @@ const getAmenityIcon = (am) => {
     if (l.includes('gym') || l.includes('fit')) return <Dumbbell size={16} className="text-gray-500" />;
     if (l.includes('breakfast') || l.includes('food') || l.includes('dining') || l.includes('restaurant')) return <Utensils size={16} className="text-gray-500" />;
     if (l.includes('business') || l.includes('work')) return <Briefcase size={16} className="text-gray-500" />;
+    if (l.includes('bar') || l.includes('lounge') || l.includes('drink')) return <Wine size={16} className="text-gray-500" />;
+    if (l.includes('spa') || l.includes('massage')) return <Sparkles size={16} className="text-gray-500" />;
+    if (l.includes('laundry') || l.includes('iron')) return <Shirt size={16} className="text-gray-500" />;
+    if (l.includes('service') || l.includes('desk') || l.includes('reception')) return <Bell size={16} className="text-gray-500" />;
+    if (l.includes('coffee') || l.includes('tea') || l.includes('maker')) return <Coffee size={16} className="text-gray-500" />;
     return <Check size={16} className="text-gray-500" />;
 };
 
@@ -72,8 +77,17 @@ const HotelDetails = () => {
             </header>
 
             <main className="max-w-5xl mx-auto px-4 pt-6">
+                {/* Breadcrumbs */}
+                <div className="flex items-center text-sm font-medium text-gray-500 mb-4 px-2">
+                    <span className="hover:text-blue-600 cursor-pointer transition" onClick={() => navigate('/')}>Home</span>
+                    <ChevronRight size={14} className="mx-1" />
+                    <span className="hover:text-blue-600 cursor-pointer transition" onClick={() => navigate(-1)}>Search Results</span>
+                    <ChevronRight size={14} className="mx-1" />
+                    <span className="text-gray-900 font-bold truncate max-w-[200px] sm:max-w-xs">{hotel.name}</span>
+                </div>
+
                 {/* Hero Section */}
-                <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 mb-8">
+                <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 mb-6 h-auto min-h-min">
                     <div className="relative rounded-2xl overflow-hidden h-[400px]">
                         <img src={(hotel.images && hotel.images[0]) || 'https://images.unsplash.com/photo-1542314831-c6a4d14d8376?q=80&w=1470&auto=format&fit=crop'} alt={hotel.name} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -82,9 +96,6 @@ const HotelDetails = () => {
                         <div className="absolute top-4 right-4 flex gap-2">
                             <button className="p-2.5 bg-white/90 backdrop-blur-sm text-gray-800 rounded-full hover:bg-white transition-transform hover:scale-105 shadow-lg">
                                 <Share2 size={18} />
-                            </button>
-                            <button className="p-2.5 bg-white/90 backdrop-blur-sm text-gray-800 rounded-full hover:bg-white transition-transform hover:scale-105 shadow-lg">
-                                <Heart size={18} className="hover:fill-red-500 hover:text-red-500" />
                             </button>
                         </div>
 
@@ -111,7 +122,14 @@ const HotelDetails = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 px-4 pb-4 text-left">
                         <div className="md:col-span-2">
                             <h3 className="text-xl font-bold mb-3 text-gray-900 border-b pb-2">About this property</h3>
-                            <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">{hotel.description || "No detailed description provided for this property."}</p>
+                            <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line mb-4">
+                                {hotel.description || "Experience a perfect blend of comfort and convenience at this beautiful property. Located in a prime area, it offers easy access to local attractions while providing a peaceful retreat. Enjoy top-notch facilities, exceptional service, and a welcoming atmosphere designed to make your stay unforgettable."}
+                            </p>
+                            <div className="flex flex-wrap gap-3 mt-4">
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold border border-blue-100"><Star size={14} className="fill-current"/> {hotel.starRating} Star Property</div>
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-100"><MapPin size={14} /> City Centre</div>
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-xs font-bold border border-purple-100"><Users size={14} /> Family-Friendly</div>
+                            </div>
                         </div>
                         
                         <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
@@ -131,7 +149,7 @@ const HotelDetails = () => {
 
                 {/* Search Params Context */}
                 {checkIn && checkOut && (
-                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-8 flex flex-col sm:flex-row items-center justify-between text-blue-900 text-sm">
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 flex flex-col sm:flex-row items-center justify-between text-blue-900 text-sm">
                         <div className="flex items-center gap-4 font-semibold">
                             <span>Your Search:</span>
                             <span className="flex items-center gap-1.5"><Calendar size={16} className="text-blue-500" /> {new Date(checkIn).toLocaleDateString()} - {new Date(checkOut).toLocaleDateString()}</span>
@@ -141,7 +159,7 @@ const HotelDetails = () => {
                     </div>
                 )}
 
-                <h2 className="text-3xl font-extrabold text-gray-900 mb-6 flex items-center border-b pb-3 border-gray-200">
+                <h2 className="text-3xl font-extrabold text-gray-900 mb-6 flex items-center border-b pb-3 border-gray-200 mt-2">
                     Available Rooms
                 </h2>
                 
@@ -150,27 +168,32 @@ const HotelDetails = () => {
                         <div key={room._id} className={`bg-white border text-left rounded-2xl overflow-hidden shadow-sm flex flex-col lg:flex-row transition ${room.availableCount > 0 ? 'border-gray-200 hover:border-blue-300' : 'border-red-200 opacity-80'}`}>
                             
                             {/* Room Info Side */}
-                            <div className="p-6 lg:w-1/3 bg-gray-50 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-gray-200 relative">
-                                <div className="absolute top-0 right-0 p-4">
-                                    <Users size={20} className="text-blue-400 opacity-20" />
+                            <div className="lg:w-1/3 bg-gray-50 flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 relative">
+                                <div className="h-48 w-full bg-gray-200 relative">
+                                     <img src={room.images?.[0] || 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80&w=800'} className="w-full h-full object-cover" alt={room.roomType} />
+                                     <div className="absolute top-3 right-3 bg-white/90 p-1.5 rounded-lg shadow-sm">
+                                         <Users size={16} className="text-blue-500" />
+                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 mb-2 leading-tight">{room.roomType}</h3>
-                                {room.description && <p className="text-sm text-gray-600 mb-4 leading-relaxed">{room.description}</p>}
-                                <div className="flex flex-wrap gap-2 mb-4">
-                                    <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm">Room {room.roomNumber || 'TBA'}</span>
-                                    {room.floor && <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm">Floor {room.floor}</span>}
-                                    <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm flex items-center gap-1"><Users size={12} className="text-blue-500" /> {room.capacity} Guests</span>
-                                    <span className={`text-xs font-bold px-2 py-1 rounded shadow-sm ${room.availableCount > 0 ? 'bg-green-100 text-green-800 border-green-200 border' : 'bg-red-100 text-red-800 border-red-200 border'}`}>
-                                        {room.availableCount > 0 ? `${room.availableCount} / ${room.totalRooms} Rooms Available` : 'Sold Out for Dates'}
-                                    </span>
-                                </div>
-                                <p className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-bold">Amenities</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {(room.amenities || []).map(am => (
-                                        <span key={am} className="bg-white px-2 py-0.5 text-[11px] border border-gray-200 rounded font-bold text-gray-700 flex items-center shadow-sm">
-                                            {getAmenityIcon(am)} {am}
+                                <div className="p-6 flex-1 flex flex-col justify-center">
+                                    <h3 className="text-2xl font-black text-gray-900 mb-2 leading-tight">{room.roomType}</h3>
+                                    {room.description && <p className="text-sm text-gray-600 mb-4 leading-relaxed">{room.description}</p>}
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm">Room {room.roomNumber || 'TBA'}</span>
+                                        {room.floor && <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm">Floor {room.floor}</span>}
+                                        <span className="text-xs font-bold bg-white text-gray-600 px-2 py-1 rounded border shadow-sm flex items-center gap-1"><Users size={12} className="text-blue-500" /> {room.capacity} Guests</span>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded shadow-sm ${room.availableCount > 0 ? 'bg-green-100 text-green-800 border-green-200 border' : 'bg-red-100 text-red-800 border-red-200 border'}`}>
+                                            {room.availableCount > 0 ? `${room.availableCount} / ${room.totalRooms} Rooms Available` : 'Sold Out for Dates'}
                                         </span>
-                                    ))}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-bold">Amenities</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {(room.amenities || []).map(am => (
+                                            <span key={am} className="bg-white px-2 py-0.5 text-[11px] border border-gray-200 rounded font-bold text-gray-700 flex items-center shadow-sm">
+                                                {getAmenityIcon(am)} {am}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 

@@ -147,30 +147,53 @@ const SearchResults = () => {
                     
                     {/* Filters Sidebar */}
                     <aside className="w-full md:w-64 shrink-0">
-                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 sticky top-24">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2 mb-4 border-b pb-3"><Filter size={18} style={{ color: C[500] }} /> Filter by</h3>
+                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
+                            <div className="flex items-center justify-between mb-4 border-b pb-3">
+                                <h3 className="font-bold text-gray-900 flex items-center gap-2"><Filter size={18} style={{ color: C[500] }} /> Filters</h3>
+                                <button onClick={clearFilters} className="text-xs font-semibold flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition" style={{ color: C[500] }}><RotateCcw size={12} /> Clear</button>
+                            </div>
                             
-                            <div className="mb-6">
+                            <div className="mb-5">
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Property Name</label>
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                    <input type="text" placeholder="e.g. Hilton" className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                    <input type="text" placeholder="e.g. Hilton" value={nameFilter} onChange={e => setNameFilter(e.target.value)} className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 outline-none" style={{ '--tw-ring-color': C[500] }} />
                                 </div>
                             </div>
-
-                            <div className="mb-6">
+                            <div className="mb-5">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Price Range</label>
+                                <input type="range" min={0} max={maxPrice} step={500} value={priceRange[1]} onChange={e => setPriceRange([0, parseInt(e.target.value)])} className="w-full h-1.5 rounded-full appearance-none cursor-pointer" style={{ accentColor: C[500] }} />
+                                <div className="flex justify-between text-xs text-gray-500 mt-1 font-medium">
+                                    <span>Rs. 0</span>
+                                    <span className="font-bold" style={{ color: C[700] }}>up to Rs. {priceRange[1].toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div className="mb-5">
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Star Rating</label>
-                                <div className="space-y-2">
+                                <div className="space-y-1.5">
                                     {[5, 4, 3, 2, 1].map(star => (
                                         <label key={star} className="flex items-center gap-2 cursor-pointer group">
-                                            <input type="checkbox" className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 border-gray-300" />
+                                            <input type="checkbox" checked={starFilters.includes(star)} onChange={() => toggleStar(star)} className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 border-gray-300" />
                                             <span className="flex items-center text-sm font-medium text-gray-600 group-hover:text-gray-900">
-                                                {star} <Star size={12} className="ml-1 text-yellow-400 fill-yellow-400" /> & up
+                                                {star} <Star size={12} className="ml-1 text-yellow-400 fill-yellow-400" /> &amp; up
                                             </span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
+                            {allAmenities.length > 0 && (
+                                <div className="mb-2">
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">Amenities</label>
+                                    <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                                        {allAmenities.map(am => (
+                                            <label key={am} className="flex items-center gap-2 cursor-pointer group">
+                                                <input type="checkbox" checked={amenityFilters.includes(am)} onChange={() => toggleAmenity(am)} className="rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 border-gray-300" />
+                                                <span className="flex items-center text-xs font-medium text-gray-600 group-hover:text-gray-900">{getAmenityIcon(am)} {am}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </aside>
 
@@ -178,16 +201,14 @@ const SearchResults = () => {
                     <div className="flex-1">
                         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                             <h2 className="text-2xl font-extrabold text-gray-900">
-                                {destination}: <span style={{ color: C[600] }}>{hotels.length} properties found</span>
+                                {destination}: <span style={{ color: C[600] }}>{filteredSorted.length} properties found</span>
                             </h2>
                             <div className="flex items-center gap-2">
+                                <button onClick={() => setShowMap(!showMap)} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold border transition ${showMap ? 'text-white border-transparent' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'}`} style={showMap ? { background: C[500] } : {}}>
+                                    <Map size={15} /> {showMap ? 'List View' : 'Map View'}
+                                </button>
                                 <ArrowUpDown size={16} className="text-gray-400" />
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 focus:ring-2 outline-none cursor-pointer hover:border-gray-300 transition"
-                                    style={{ '--tw-ring-color': C[500] }}
-                                >
+                                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 focus:ring-2 outline-none cursor-pointer hover:border-gray-300 transition" style={{ '--tw-ring-color': C[500] }}>
                                     <option value="recommended">Recommended</option>
                                     <option value="price-low">Price: Low → High</option>
                                     <option value="price-high">Price: High → Low</option>
@@ -195,6 +216,15 @@ const SearchResults = () => {
                                 </select>
                             </div>
                         </div>
+                        {compareList.length > 0 && (
+                            <div className="mb-4 p-3 rounded-xl border flex items-center justify-between" style={{ background: `${C[50]}44`, borderColor: `${C[200]}66` }}>
+                                <span className="text-sm font-semibold" style={{ color: C[700] }}><GitCompareArrows size={14} className="inline mr-1" />{compareList.length} hotel{compareList.length > 1 ? 's' : ''} selected</span>
+                                <div className="flex gap-2">
+                                    <button onClick={() => setShowCompare(true)} disabled={compareList.length < 2} className="px-4 py-1.5 text-white text-xs font-bold rounded-lg disabled:opacity-40 transition" style={{ background: C[500] }}>Compare Now</button>
+                                    <button onClick={() => setCompareList([])} className="px-3 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-100 rounded-lg transition">Clear</button>
+                                </div>
+                            </div>
+                        )}
 
                         {loading ? (
                             <div className="space-y-4">
@@ -219,7 +249,7 @@ const SearchResults = () => {
                             </div>
                         ) : (
                             <div className="space-y-5">
-                                {sortedHotels.map(hotel => (
+                                {filteredSorted.map(hotel => (
                                     <div key={hotel._id} 
                                          onClick={() => navigate(`/hotels/${hotel._id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`)}
                                          className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col sm:flex-row cursor-pointer h-auto sm:h-56 relative">
@@ -233,12 +263,11 @@ const SearchResults = () => {
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent sm:hidden"></div>
                                             
-                                            {/* Floating badge for price range */}
-                                            {hotel.priceRange && (
-                                                <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm shadow-md rounded-md text-[10px] font-extrabold uppercase tracking-wider text-gray-800">
-                                                    {hotel.priceRange.replace('-',' ')}
-                                                </div>
-                                            )}
+                                            {/* Compare checkbox */}
+                                            <label className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-white/90 backdrop-blur-sm shadow-md rounded-md cursor-pointer z-10" onClick={e => e.stopPropagation()}>
+                                                <input type="checkbox" checked={compareList.includes(hotel._id)} onChange={() => toggleCompare(hotel._id)} className="rounded w-3.5 h-3.5 border-gray-300" style={{ accentColor: C[500] }} />
+                                                <span className="text-[10px] font-bold text-gray-700">Compare</span>
+                                            </label>
                                         </div>
 
                                         {/* Content Box */}
@@ -279,9 +308,12 @@ const SearchResults = () => {
                                                     )}
                                                 </div>
 
-                                                <button className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-white text-sm font-bold transition-all shadow-md group-hover:shadow-lg group-hover:-translate-y-0.5 shrink-0" style={{ background: `linear-gradient(135deg, ${C[600]}, ${C[500]})` }}>
-                                                    See Availability <ChevronRight size={16} />
-                                                </button>
+                                                <div className="flex flex-col items-end shrink-0">
+                                                    {getMinPrice(hotel) && <p className="text-lg font-extrabold mb-0.5" style={{ color: C[700] }}>Rs. {getMinPrice(hotel).toLocaleString()}<span className="text-xs font-medium text-gray-400">/night</span></p>}
+                                                    <button className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-white text-sm font-bold transition-all shadow-md group-hover:shadow-lg group-hover:-translate-y-0.5" style={{ background: `linear-gradient(135deg, ${C[600]}, ${C[500]})` }}>
+                                                        See Availability <ChevronRight size={16} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -291,6 +323,30 @@ const SearchResults = () => {
                     </div>
                 </div>
             </main>
+
+            {/* ══ Compare Modal ══ */}
+            {showCompare && compareHotels.length >= 2 && (
+                <div className="fixed inset-0 bg-black/50 z-[100] flex items-end sm:items-center justify-center p-4" onClick={() => setShowCompare(false)}>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[80vh] overflow-auto" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ background: `linear-gradient(135deg, ${C[800]}, ${C[600]})` }}>
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2"><GitCompareArrows size={18} /> Compare Hotels</h3>
+                            <button onClick={() => setShowCompare(false)} className="text-white/70 hover:text-white"><X size={20} /></button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead><tr className="border-b"><th className="p-4 text-left text-gray-500 font-semibold">Feature</th>{compareHotels.map(h => <th key={h._id} className="p-4 text-left font-bold text-gray-900 min-w-[200px]">{h.name}</th>)}</tr></thead>
+                                <tbody>
+                                    <tr className="border-b"><td className="p-3 text-gray-500 font-medium">Star Rating</td>{compareHotels.map(h => <td key={h._id} className="p-3 font-semibold">{h.starRating} <Star size={12} className="inline text-yellow-400 fill-yellow-400" /></td>)}</tr>
+                                    <tr className="border-b bg-gray-50"><td className="p-3 text-gray-500 font-medium">From Price</td>{compareHotels.map(h => <td key={h._id} className="p-3 font-bold" style={{ color: C[700] }}>{getMinPrice(h) ? `Rs. ${getMinPrice(h).toLocaleString()}/night` : 'N/A'}</td>)}</tr>
+                                    <tr className="border-b"><td className="p-3 text-gray-500 font-medium">Location</td>{compareHotels.map(h => <td key={h._id} className="p-3">{h.address || h.city || h.destination}</td>)}</tr>
+                                    <tr className="border-b bg-gray-50"><td className="p-3 text-gray-500 font-medium">Amenities</td>{compareHotels.map(h => <td key={h._id} className="p-3"><div className="flex flex-wrap gap-1">{(h.amenities||[]).map(a => <span key={a} className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px] font-semibold">{a}</span>)}</div></td>)}</tr>
+                                    <tr><td className="p-3"></td>{compareHotels.map(h => <td key={h._id} className="p-3"><button onClick={() => { setShowCompare(false); navigate(`/hotels/${h._id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`); }} className="px-4 py-2 text-white text-xs font-bold rounded-lg" style={{ background: C[500] }}>View Details</button></td>)}</tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
