@@ -40,6 +40,9 @@ const transportSchema = new mongoose.Schema({
         notes: { type: String },
         forwardedAt: { type: Date }
     },
+    // Assignment
+    assignedDriver: { type: String },
+    assignedVehicle: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
 
