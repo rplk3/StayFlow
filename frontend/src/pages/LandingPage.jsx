@@ -22,9 +22,9 @@ const destinations = [
     { name: 'Nuwara Eliya', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1619974643633-12acfdcedd16?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bnV3YXJhJTIwZWxpeWF8ZW58MHx8MHx8fDA%3D' },
     { name: 'Ella', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1566766189268-ecac9118f2b7?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { name: 'Udawalawe', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1559038211-894339d3e99f?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { name: 'Negombo', flag: '🇱🇰', tag: 'Beaches', img: 'https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Sigiriya', flag: '🇱🇰', tag: 'Heritage', img: 'https://images.unsplash.com/photo-1588598198321-9735fd52455b?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { name: 'Trincomalee', flag: '🇱🇰', tag: 'Coastal', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Negombo', flag: '🇱🇰', tag: '2 properties', img: 'https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Sigiriya', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1588598198321-9735fd52455b?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { name: 'Trincomalee', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800' },
 ];
 
 const LandingPage = () => {
@@ -140,20 +140,20 @@ const LandingPage = () => {
             </header>
 
             {/* ═══════ Hero Section with Background Image ═══════ */}
-            <section className="relative pt-16 pb-28 px-4">
+            <section className="relative pt-10 pb-16 px-4">
                 {/* Background image */}
                 <div className="absolute inset-0 z-0">
                     <img src={heroImg} alt="" className="w-full h-full object-cover" />
                     <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${C[900]}ee 0%, ${C[800]}dd 40%, ${C[700]}99 100%)` }}></div>
                 </div>
                 <div className="max-w-6xl mx-auto relative z-10">
-                    <h1 className="text-5xl font-extrabold mb-4 text-white drop-shadow-lg">Find your next stay</h1>
-                    <p className="text-xl text-white/80 mb-2 max-w-lg">Search low prices on hotels, homes and much more...</p>
+                    <h1 className="text-5xl font-extrabold mb-3 text-white drop-shadow-lg">Find your next stay</h1>
+                    <p className="text-xl text-white/80 max-w-lg">Search low prices on hotels, homes and much more...</p>
                 </div>
             </section>
 
             {/* ═══════ Search Box (overlapping hero) ═══════ */}
-            <div className="max-w-6xl mx-auto px-4 relative -mt-10 mb-12 z-20">
+            <div className="max-w-6xl mx-auto px-4 relative -mt-10 mb-8 z-20">
                 <div className="bg-white p-2 rounded-2xl shadow-2xl border border-gray-100 flex flex-col md:flex-row gap-2" style={{ boxShadow: `0 20px 60px ${C[900]}33` }}>
                     {/* Destination */}
                     <div className="flex-1 bg-gray-50 p-3 rounded-xl flex items-center relative border border-gray-200 hover:border-blue-300 transition">
@@ -241,7 +241,7 @@ const LandingPage = () => {
             </div>
 
             {/* ═══════ Main Content ═══════ */}
-            <main className="max-w-6xl mx-auto px-4 pb-20 space-y-14">
+            <main className="max-w-6xl mx-auto px-4 pb-12 space-y-8">
                 {/* Promo Banner (only for non-logged-in users) */}
                 {!user && (
                     <section>
@@ -262,28 +262,6 @@ const LandingPage = () => {
                         </div>
                     </section>
                 )}
-
-                {/* Event Hall CTA */}
-                <section>
-                    <div
-                        onClick={() => navigate('/event-halls')}
-                        className="cursor-pointer group rounded-2xl p-8 flex items-center justify-between shadow-lg hover:shadow-xl transition-all"
-                        style={{ background: `linear-gradient(135deg, ${C[800]}, ${C[600]})` }}
-                    >
-                        <div className="text-white">
-                            <h2 className="text-2xl font-bold mb-2"> Book an Event Hall</h2>
-                            <p className="text-sm max-w-lg" style={{ color: C[100] }}>
-                                Host your dream wedding, conference, or birthday. Browse our venues and reserve the perfect hall for your special occasion.
-                            </p>
-                        </div>
-                        <button
-                            className="px-6 py-3 rounded-xl font-bold text-sm transition shrink-0 group-hover:scale-105"
-                            style={{ background: 'white', color: C[700] }}
-                        >
-                            Browse Halls →
-                        </button>
-                    </div>
-                </section>
 
                 {/* ═══════ Trending Destinations (9 cards) ═══════ */}
                 <section>
@@ -347,11 +325,33 @@ const LandingPage = () => {
                         ))}
                     </div>
                 </section>
+
+                {/* Event Hall CTA */}
+                <section>
+                    <div
+                        onClick={() => navigate('/event-halls')}
+                        className="cursor-pointer group rounded-2xl p-8 flex items-center justify-between shadow-lg hover:shadow-xl transition-all"
+                        style={{ background: `linear-gradient(135deg, ${C[800]}, ${C[600]})` }}
+                    >
+                        <div className="text-white">
+                            <h2 className="text-2xl font-bold mb-2"> Book an Event Hall</h2>
+                            <p className="text-sm max-w-lg" style={{ color: C[100] }}>
+                                Host your dream wedding, conference, or birthday. Browse our venues and reserve the perfect hall for your special occasion.
+                            </p>
+                        </div>
+                        <button
+                            className="px-6 py-3 rounded-xl font-bold text-sm transition shrink-0 group-hover:scale-105"
+                            style={{ background: 'white', color: C[700] }}
+                        >
+                            Browse Halls →
+                        </button>
+                    </div>
+                </section>
             </main>
 
             {/* ═══════ Professional Footer ═══════ */}
             <footer style={{ background: C[900] }} className="text-white">
-                <div className="max-w-6xl mx-auto px-4 py-14">
+                <div className="max-w-6xl mx-auto px-4 py-10">
                     {/* Footer Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
                         {/* Brand */}

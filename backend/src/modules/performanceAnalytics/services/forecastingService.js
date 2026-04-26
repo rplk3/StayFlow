@@ -1,15 +1,11 @@
 /**
  * Forecasting Service
  * 
- * PROGRESS 1: Baseline forecasting using moving average.
- * NO ML model training — uses simple average of last 30 days AnalyticsDaily.
- * 
- * PROGRESS 2/FINAL: This service is designed to be swapped with a trained
- * regression/ML model. Replace getBaselineForecast() with a model-inference
- * function that loads a trained model and generates predictions.
- */
 
-const AnalyticsDaily = require('../models/AnalyticsDaily');
+ *average of last 30 days AnalyticsDaily.
+
+
+
 
 /**
  * Get baseline forecast for the next N days.
@@ -77,16 +73,6 @@ function generateFlatForecast(days, revenue, occupancy) {
     return forecast;
 }
 
-/**
- * PLACEHOLDER for ML-based forecasting (Progress 2/Final)
- * 
- * async function getMLForecast(days) {
- *   // 1. Load trained model from file/cloud
- *   // 2. Prepare feature vectors from AnalyticsDaily
- *   // 3. Run inference
- *   // 4. Return predictions in same format as getBaselineForecast
- * }
- */
 
 module.exports = {
     getBaselineForecast

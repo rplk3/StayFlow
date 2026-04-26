@@ -308,7 +308,7 @@ const Checkout = () => {
 
     // Step indicator
     const StepIndicator = () => (
-        <div className="flex items-center justify-center gap-0 mb-10">
+        <div className="flex items-center justify-center gap-0 mb-6">
             {[
                 { num: 1, label: 'Details & Transport' },
                 { num: 2, label: 'Payment' },
@@ -352,26 +352,26 @@ const Checkout = () => {
     // Success screen
     if (step === 3) {
         return (
-            <div className="max-w-2xl mx-auto p-6 md:p-12 mt-8">
-                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-10 text-center relative overflow-hidden">
+            <div className="max-w-2xl mx-auto p-4 md:p-8 mt-6">
+                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 text-center relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-2" style={{ background: `linear-gradient(90deg, ${C[500]}, ${C[300]}, ${C[100]})` }}></div>
                     <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-30" style={{ background: C[50] }}></div>
                     <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-30" style={{ background: C[100] }}></div>
 
                     <div className="relative z-10">
-                        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg" style={{ background: `linear-gradient(135deg, ${C[500]}, ${C[700]})`, boxShadow: `0 8px 24px ${C[500]}44` }}>
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ background: `linear-gradient(135deg, ${C[500]}, ${C[700]})`, boxShadow: `0 8px 24px ${C[500]}44` }}>
                             <CheckCircle size={40} className="text-white" />
                         </div>
-                        <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Booking Confirmed!</h1>
-                        <p className="text-gray-500 mb-4">Your reservation has been secured successfully</p>
+                        <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Booking Confirmed!</h1>
+                        <p className="text-gray-500 text-sm mb-3">Your reservation has been secured successfully</p>
 
-                        <div className="rounded-2xl p-6 mb-5 border" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
+                        <div className="rounded-2xl p-4 mb-3 border" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
                             <p className="text-sm font-medium mb-1" style={{ color: C[500] }}>Itinerary Code</p>
-                            <p className="text-3xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</p>
+                            <p className="text-2xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</p>
                         </div>
 
                         {/* Explicit Hotel Stay confirmation to prevent confusion */}
-                        <div className="rounded-2xl p-5 mb-5 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
+                        <div className="rounded-2xl p-4 mb-3 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
                             <div className="flex items-center gap-2 mb-2">
                                 <Moon size={18} style={{ color: C[700] }} />
                                 <span className="font-bold text-sm" style={{ color: C[900] }}>Hotel Stay Confirmed</span>
@@ -385,7 +385,7 @@ const Checkout = () => {
                         </div>
 
                         {transportData.enabled && (
-                            <div className="rounded-2xl p-5 mb-5 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
+                            <div className="rounded-2xl p-4 mb-3 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
                                 <div className="flex items-center gap-2 mb-2">
                                     <Car size={18} style={{ color: C[700] }} />
                                     <span className="font-bold text-sm" style={{ color: C[900] }}>Transport Booked</span>
@@ -399,8 +399,8 @@ const Checkout = () => {
                         )}
 
                         {/* Email confirmation message */}
-                        <div className="space-y-3 mb-5">
-                            <div className="flex items-center gap-3 p-4 rounded-xl border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
+                        <div className="space-y-2 mb-3">
+                            <div className="flex items-center gap-3 p-3 rounded-xl border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: `${C[100]}44` }}>
                                     <Mail size={18} style={{ color: C[700] }} />
                                 </div>
@@ -410,7 +410,7 @@ const Checkout = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50 text-left">
+                            <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 text-left">
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
                                     <UserPlus size={18} className="text-amber-600" />
                                 </div>
@@ -424,7 +424,7 @@ const Checkout = () => {
                         {/* Download Invoice + Navigation */}
                         <button
                             onClick={generateInvoicePDF}
-                            className="w-full flex items-center justify-center gap-2 mb-4 px-6 py-3.5 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white"
+                            className="w-full flex items-center justify-center gap-2 mb-3 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white"
                             style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
                         >
                             <Download size={18} />
@@ -450,12 +450,12 @@ const Checkout = () => {
     }
 
     return (
-        <div className="max-w-6xl mx-auto p-4 md:p-8 md:py-10">
+        <div className="max-w-6xl mx-auto p-4 md:p-6 md:py-8">
             <StepIndicator />
 
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col lg:flex-row gap-6">
                 {/* Left Column — Forms */}
-                <div className="lg:w-[62%] space-y-6">
+                <div className="lg:w-[62%] space-y-3">
                     {error && (
                         <div className="bg-red-50 text-red-700 p-4 border border-red-200 rounded-xl flex items-center gap-2 text-sm font-medium">
                             <AlertCircle size={18} /> {error}
@@ -657,7 +657,7 @@ const Checkout = () => {
                             </div>
 
                             {quote && (
-                                <div className="space-y-3 text-sm">
+                                <div className="space-y-2 text-sm">
                                     <div className="flex justify-between text-gray-600">
                                         <span className="flex items-center gap-1"><Moon size={14} /> Room ({quote.nights} nights)</span>
                                         <span className="font-semibold">Rs. {Math.round(quote.roomTotal).toLocaleString()}</span>
@@ -681,14 +681,14 @@ const Checkout = () => {
                                         </div>
                                     )}
 
-                                    <div className="border-t border-gray-200 pt-4 mt-4">
+                                    <div className="border-t border-gray-200 pt-3 mt-3">
                                         <div className="flex justify-between items-center">
                                             <span className="text-base font-bold text-gray-900">Grand Total</span>
                                             <span className="text-2xl font-extrabold text-gray-900">Rs. {grandTotal.toLocaleString()}</span>
                                         </div>
                                     </div>
 
-                                    <div className="rounded-xl p-4 mt-3 border space-y-2" style={{ background: `${C[50]}22`, borderColor: `${C[100]}66` }}>
+                                    <div className="rounded-xl p-3 mt-2 border space-y-1.5" style={{ background: `${C[50]}22`, borderColor: `${C[100]}66` }}>
                                         <div className="flex justify-between" style={{ color: C[800] }}>
                                             <span className="font-semibold text-xs">Due Now:</span>
                                             <span className="font-bold text-sm">Rs. {Math.round(quote.dueNow + (transportData.enabled ? transportData.estimatedCost : 0)).toLocaleString()}</span>

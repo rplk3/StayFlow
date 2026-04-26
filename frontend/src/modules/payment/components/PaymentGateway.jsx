@@ -274,9 +274,9 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
     // Show result state
     if (result) {
         return (
-            <div className="space-y-6">
-                <div className={`rounded-2xl border p-8 text-center ${result.success ? 'border-green-200' : 'bg-red-50 border-red-200'}`} style={result.success ? { background: `${C[50]}33`, borderColor: `${C[200]}66` } : {}}>
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${result.success ? '' : 'bg-red-100'}`} style={result.success ? { background: `${C[100]}66` } : {}}>
+            <div className="space-y-4">
+                <div className={`rounded-2xl border p-5 text-center ${result.success ? 'border-green-200' : 'bg-red-50 border-red-200'}`} style={result.success ? { background: `${C[50]}33`, borderColor: `${C[200]}66` } : {}}>
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 ${result.success ? '' : 'bg-red-100'}`} style={result.success ? { background: `${C[100]}66` } : {}}>
                         {result.success ?
                             <CheckCircle size={32} style={{ color: C[700] }} /> :
                             <XCircle size={32} className="text-red-600" />
@@ -289,8 +289,8 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                         {result.message}
                     </p>
                     {result.success && result.payment && (
-                        <div className="mt-4 bg-white rounded-xl p-4 border text-left text-sm" style={{ borderColor: `${C[200]}44` }}>
-                            <div className="flex justify-between mb-2">
+                        <div className="mt-3 bg-white rounded-xl p-3 border text-left text-sm" style={{ borderColor: `${C[200]}44` }}>
+                            <div className="flex justify-between mb-1.5">
                                 <span className="text-gray-500">Transaction Ref</span>
                                 <span className="font-mono font-semibold text-gray-800">{result.payment.transactionReference}</span>
                             </div>
@@ -309,8 +309,8 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
 
                     {/* ── Email confirmation message ── */}
                     {result.success && (
-                        <div className="mt-5 space-y-3">
-                            <div className="flex items-center gap-3 p-4 rounded-xl border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
+                        <div className="mt-3 space-y-2">
+                            <div className="flex items-center gap-3 p-3 rounded-xl border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: `${C[100]}44` }}>
                                     <Mail size={18} style={{ color: C[700] }} />
                                 </div>
@@ -320,7 +320,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50 text-left">
+                            <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 text-left">
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
                                     <UserPlus size={18} className="text-amber-600" />
                                 </div>
@@ -356,11 +356,11 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Payment Summary */}
-            <div className="p-5 rounded-xl border" style={{ background: `linear-gradient(135deg, ${C[50]}33, white)`, borderColor: `${C[100]}66` }}>
-                <h4 className="text-sm font-bold mb-3" style={{ color: C[800] }}>Payment Summary</h4>
-                <div className="space-y-2 text-sm">
+            <div className="p-4 rounded-xl border" style={{ background: `linear-gradient(135deg, ${C[50]}33, white)`, borderColor: `${C[100]}66` }}>
+                <h4 className="text-sm font-bold mb-2" style={{ color: C[800] }}>Payment Summary</h4>
+                <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between text-gray-600">
                         <span>{bookingType === 'event' ? 'Hall Charge' : 'Room Charge'}</span>
                         <span className="font-semibold">Rs. {(amount || 0).toLocaleString()}</span>
@@ -393,7 +393,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                     <h2 className="text-lg font-bold text-white">Payment Information</h2>
                     <span className="ml-auto text-white text-xs px-3 py-1 rounded-full font-semibold" style={{ background: 'rgba(255,255,255,0.2)' }}>SANDBOX</span>
                 </div>
-                <div className="p-6 space-y-5">
+                <div className="p-5 space-y-4">
                     {/* Card Number */}
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1.5">Card Number</label>
