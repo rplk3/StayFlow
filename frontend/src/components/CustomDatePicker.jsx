@@ -34,9 +34,18 @@ const CustomDatePicker = ({ dateRange, setDateRange }) => {
 
     const handleSelect = (ranges) => {
         const { selection } = ranges;
+        let endDate = selection.endDate;
+        
+        // Enforce maximum stay of 7 days
+        const diffTime = Math.abs(selection.endDate - selection.startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays > 7) {
+            endDate = addDays(selection.startDate, 7);
+        }
+
         setDateRange({
             checkIn: format(selection.startDate, 'yyyy-MM-dd'),
-            checkOut: format(selection.endDate, 'yyyy-MM-dd')
+            checkOut: format(endDate, 'yyyy-MM-dd')
         });
     };
 
