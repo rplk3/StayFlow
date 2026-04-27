@@ -351,6 +351,31 @@ const Checkout = () => {
         doc.save(`StayFlow_Booking_${bookingCode || 'receipt'}.pdf`);
     };
 
+    // Add booking to calendar (.ics download)
+    const handleAddToCalendar = () => {
+        const start = urlParams.checkIn?.replace(/-/g, '') || '';
+        const end = urlParams.checkOut?.replace(/-/g, '') || '';
+        const icsContent = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//StayFlow//Booking//EN',
+            'BEGIN:VEVENT',
+            `DTSTART;VALUE=DATE:${start}`,
+            `DTEND;VALUE=DATE:${end}`,
+            `SUMMARY:StayFlow Hotel Booking - ${bookingCode || 'Reservation'}`,
+            `DESCRIPTION:Your hotel stay. Booking Reference: ${bookingCode}`,
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\r\n');
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `StayFlow_Booking_${bookingCode || 'event'}.ics`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     // Step indicator
     const StepIndicator = () => (
         <div className="flex items-center justify-center gap-0 mb-6">
@@ -387,135 +412,147 @@ const Checkout = () => {
 
     if (loading && !quote) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-                <div className="w-12 h-12 border-4 rounded-full animate-spin" style={{ borderColor: C[100], borderTopColor: C[700] }}></div>
-                <p className="text-gray-500 font-medium">Checking availability and calculating rates...</p>
+        <div className="min-h-screen bg-cover bg-center bg-fixed relative" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')" }}>
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-md"></div>
+            <div className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] gap-4 pt-20">
+                <div className="w-12 h-12 border-4 rounded-full animate-spin shadow-lg" style={{ borderColor: C[100], borderTopColor: C[700] }}></div>
+                <p className="text-gray-800 font-bold bg-white/80 px-4 py-2 rounded-lg shadow-sm">Checking availability and calculating rates...</p>
             </div>
+        </div>
         );
     }
 
     // Success screen
     if (step === 3) {
         return (
-            <div className="max-w-2xl mx-auto p-4 md:p-8 mt-6">
-                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-2" style={{ background: `linear-gradient(90deg, ${C[500]}, ${C[300]}, ${C[100]})` }}></div>
-                    <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-30" style={{ background: C[50] }}></div>
-                    <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-30" style={{ background: C[100] }}></div>
+        <div className="min-h-screen bg-cover bg-center bg-fixed relative" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1920&q=80')" }}>
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-md"></div>
+            <div className="relative z-10 max-w-5xl mx-auto p-4 md:p-8 pt-10">
+                {/* Horizontal Success Card */}
+                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1.5" style={{ background: `linear-gradient(90deg, ${C[500]}, ${C[300]}, ${C[100]})` }}></div>
 
-                    <div className="relative z-10">
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ background: `linear-gradient(135deg, ${C[500]}, ${C[700]})`, boxShadow: `0 8px 24px ${C[500]}44` }}>
-                            <CheckCircle size={40} className="text-white" />
-                        </div>
-                        <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Booking Confirmed!</h1>
-                        <p className="text-gray-500 text-sm mb-3">Your reservation has been secured successfully</p>
-
-                        <div className="rounded-2xl py-2 px-4 mb-3 border" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
-                            <p className="text-sm font-medium mb-1" style={{ color: C[500] }}>Itinerary Code</p>
-                            <p className="text-2xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</p>
-                        </div>
-
-                        <div className="flex flex-col gap-3 mb-6">
-                            {/* Explicit Hotel Stay confirmation to prevent confusion */}
-                            <div className="rounded-2xl p-4 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Moon size={18} style={{ color: C[700] }} />
-                                    <span className="font-bold text-sm" style={{ color: C[900] }}>Hotel Stay Confirmed</span>
+                    <div className="flex flex-col lg:flex-row">
+                        {/* Left — Confirmation Header + Details */}
+                        <div className="lg:w-[55%] p-6 lg:p-8 lg:border-r border-gray-100">
+                            {/* Success Badge */}
+                            <div className="flex items-center gap-4 mb-5">
+                                <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: `linear-gradient(135deg, ${C[500]}, ${C[700]})`, boxShadow: `0 8px 24px ${C[500]}33` }}>
+                                    <CheckCircle size={32} className="text-white" />
                                 </div>
-                                <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: C[600] }}>
-                                    <div><span style={{ color: C[300] }}>Check-in:</span> {urlParams.checkIn}</div>
-                                    <div><span style={{ color: C[300] }}>Check-out:</span> {urlParams.checkOut}</div>
-                                    <div><span style={{ color: C[300] }}>Guests:</span> {urlParams.guests}</div>
-                                    <div><span style={{ color: C[300] }}>Duration:</span> {quote?.nights} Night(s)</div>
+                                <div>
+                                    <h1 className="text-xl font-extrabold text-gray-900">Booking Confirmed!</h1>
+                                    <p className="text-gray-500 text-sm">Your reservation has been secured</p>
                                 </div>
                             </div>
 
-                            {transportData.enabled && (
-                                <div className="rounded-2xl p-4 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
+                            {/* Itinerary Code */}
+                            <div className="rounded-xl py-3 px-4 mb-4 border flex items-center justify-between" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
+                                <span className="text-sm font-medium" style={{ color: C[500] }}>Itinerary Code</span>
+                                <span className="text-xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</span>
+                            </div>
+
+                            {/* Booking Details Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                                <div className="rounded-xl p-3 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
                                     <div className="flex items-center gap-2 mb-2">
-                                        <Car size={18} style={{ color: C[700] }} />
-                                        <span className="font-bold text-sm" style={{ color: C[900] }}>Transport Booked</span>
+                                        <Moon size={16} style={{ color: C[700] }} />
+                                        <span className="font-bold text-xs" style={{ color: C[900] }}>Hotel Stay</span>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: C[600] }}>
-                                        <div><span style={{ color: C[300] }}>Vehicle:</span> {transportData.vehicleType}</div>
-                                        <div><span style={{ color: C[300] }}>Cost:</span> Rs. {transportData.estimatedCost?.toLocaleString()}</div>
-                                        <div className="col-span-2"><span style={{ color: C[300] }}>Pickup:</span> {transportData.pickupAddress}</div>
+                                    <div className="grid grid-cols-2 gap-1 text-xs" style={{ color: C[600] }}>
+                                        <div><span className="text-gray-400">In:</span> {urlParams.checkIn}</div>
+                                        <div><span className="text-gray-400">Out:</span> {urlParams.checkOut}</div>
+                                        <div><span className="text-gray-400">Guests:</span> {urlParams.guests}</div>
+                                        <div><span className="text-gray-400">Nights:</span> {quote?.nights}</div>
                                     </div>
                                 </div>
-                            )}
 
-                            {/* Email confirmation message */}
-                            <div className="flex items-center gap-3 p-3 rounded-xl border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: `${C[100]}44` }}>
-                                    <Mail size={18} style={{ color: C[700] }} />
+                                {transportData.enabled && (
+                                    <div className="rounded-xl p-3 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Car size={16} style={{ color: C[700] }} />
+                                            <span className="font-bold text-xs" style={{ color: C[900] }}>Transport</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-1 text-xs" style={{ color: C[600] }}>
+                                            <div><span className="text-gray-400">Vehicle:</span> {transportData.vehicleType}</div>
+                                            <div><span className="text-gray-400">Cost:</span> Rs. {transportData.estimatedCost?.toLocaleString()}</div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Notices */}
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2.5 p-2.5 rounded-lg border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: `${C[100]}44` }}>
+                                        <Mail size={14} style={{ color: C[700] }} />
+                                    </div>
+                                    <p className="text-xs text-gray-500">Confirmation sent to <strong className="text-gray-700">{guestDetails.email}</strong></p>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-800">Confirmation email sent!</p>
-                                    <p className="text-xs text-gray-500">A booking confirmation email has been sent to <strong>{guestDetails.email}</strong>. Please check your inbox.</p>
+                                <div className="flex items-center gap-2.5 p-2.5 rounded-lg border border-gray-100 bg-gray-50 text-left">
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: '#1D6FE81A' }}>
+                                        <UserPlus size={14} style={{ color: '#1D6FE8' }} />
+                                    </div>
+                                    <p className="text-xs text-gray-500">Sign in with <strong className="text-gray-700">{guestDetails.email}</strong> to manage bookings</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right — Actions */}
+                        <div className="lg:w-[45%] p-6 lg:p-8 flex flex-col justify-between bg-gray-50/50">
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-bold text-gray-800 mb-3">Quick Actions</h3>
+                                <button
+                                    onClick={handleAddToCalendar}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all border border-gray-200 text-gray-700 hover:bg-white hover:shadow-sm bg-white"
+                                >
+                                    <Calendar size={16} /> Add to Calendar
+                                </button>
+                                <button
+                                    onClick={generateInvoicePDF}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 text-white"
+                                    style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}33` }}
+                                >
+                                    <Download size={16} /> Download Invoice
+                                </button>
+
+                                {/* Share */}
+                                <div className="flex items-center gap-2 pt-2">
+                                    <span className="text-xs text-gray-400 flex items-center gap-1"><Share2 size={12} /> Share:</span>
+                                    <a href={`https://wa.me/?text=${encodeURIComponent(`I just booked my stay at ${searchParams.get('hotelName') || 'StayFlow'}! Ref: ${bookingCode}`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-green-50 text-green-700 hover:bg-green-100 transition-colors text-xs font-semibold">
+                                        <MessageCircle size={12} /> WhatsApp
+                                    </a>
+                                    <a href={`mailto:?subject=My StayFlow Booking&body=${encodeURIComponent(`I just booked at ${searchParams.get('hotelName') || 'StayFlow'}! Ref: ${bookingCode}`)}`} className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors text-xs font-semibold">
+                                        <Mail size={12} /> Email
+                                    </a>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 text-left">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: '#1D6FE81A' }}>
-                                    <UserPlus size={18} style={{ color: '#1D6FE8' }} />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-800">View booking in your profile</p>
-                                    <p className="text-xs text-gray-500">Sign in or create an account with <strong>{guestDetails.email}</strong> to view and manage your booking details anytime.</p>
-                                </div>
+                            {/* Navigation */}
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    onClick={() => navigate('/my-trips')}
+                                    className="flex-1 text-white py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-md"
+                                    style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})` }}
+                                >
+                                    View My Trips
+                                </button>
+                                <button onClick={() => navigate('/')} className="flex-1 border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-semibold text-sm hover:bg-white transition bg-white">
+                                    Home
+                                </button>
                             </div>
-                        </div>
-
-                        {/* Actions (Buttons) */}
-                        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                            <button
-                                onClick={handleAddToCalendar}
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all border border-gray-200 text-gray-700 hover:bg-gray-50"
-                            >
-                                <Calendar size={18} />
-                                Add to Calendar
-                            </button>
-                            <button
-                                onClick={generateInvoicePDF}
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white"
-                                style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
-                            >
-                                <Download size={18} />
-                                Download Invoice
-                            </button>
-                        </div>
-                        
-                        {/* Share Links */}
-                        <div className="flex flex-wrap items-center justify-center gap-4 mb-6 pt-4 border-t border-gray-100">
-                            <span className="text-sm font-medium text-gray-500 flex items-center gap-1.5"><Share2 size={16} /> Share Booking:</span>
-                            <a href={`https://wa.me/?text=${encodeURIComponent(`I just booked my stay at ${searchParams.get('hotelName') || 'StayFlow'}! Booking Ref: ${bookingCode}`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 hover:bg-green-100 transition-colors text-xs font-semibold">
-                                <MessageCircle size={14} /> WhatsApp
-                            </a>
-                            <a href={`mailto:?subject=My StayFlow Booking&body=${encodeURIComponent(`I just booked my stay at ${searchParams.get('hotelName') || 'StayFlow'}! Booking Ref: ${bookingCode}`)}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors text-xs font-semibold">
-                                <Mail size={14} /> Email
-                            </a>
-                        </div>
-
-                        <div className="flex gap-3 justify-center">
-                            <button
-                                onClick={() => navigate('/my-trips')}
-                                className="text-white px-8 py-3.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg"
-                                style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
-                            >
-                                View My Trips
-                            </button>
-                            <button onClick={() => navigate('/')} className="border-2 border-gray-200 text-gray-600 px-6 py-3.5 rounded-xl font-semibold hover:bg-gray-50 transition">
-                                Back to Home
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         );
     }
 
     return (
-        <div className="max-w-6xl mx-auto p-4 md:p-6 md:py-8">
+        <div className="min-h-screen bg-cover bg-center bg-fixed relative" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')" }}>
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-md"></div>
+            <div className="relative z-10 max-w-6xl mx-auto p-4 md:p-6 md:py-8 pt-8">
             <StepIndicator />
 
             <div className="flex flex-col lg:flex-row gap-6">
@@ -540,12 +577,12 @@ const Checkout = () => {
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">First Name</label>
                                             {firstNameError && <div className="flex items-center gap-1.5 mb-2 text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded-lg px-3 py-2"><AlertCircle size={14} />{firstNameError}</div>}
-                                            <input required type="text" className={`${inputClass} ${firstNameError ? 'border-red-400 bg-red-50/50 focus:ring-red-400' : 'border-gray-200'}`} style={!firstNameError ? { '--tw-ring-color': C[500] } : {}} placeholder="John" value={guestDetails.firstName} onChange={e => { setGuestDetails({ ...guestDetails, firstName: e.target.value }); if (firstNameError) validateFirstName(e.target.value); }} onBlur={() => validateFirstName(guestDetails.firstName)} />
+                                            <input required type="text" className={`${inputClass} ${firstNameError ? 'border-red-400 bg-red-50/50 focus:ring-red-400' : 'border-gray-200'}`} style={!firstNameError ? { '--tw-ring-color': C[500] } : {}} placeholder="John" value={guestDetails.firstName} onChange={e => { const val = e.target.value.replace(/[^A-Za-z\s]/g, ''); setGuestDetails({ ...guestDetails, firstName: val }); if (firstNameError) validateFirstName(val); }} onBlur={() => validateFirstName(guestDetails.firstName)} />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Last Name</label>
                                             {lastNameError && <div className="flex items-center gap-1.5 mb-2 text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded-lg px-3 py-2"><AlertCircle size={14} />{lastNameError}</div>}
-                                            <input required type="text" className={`${inputClass} ${lastNameError ? 'border-red-400 bg-red-50/50 focus:ring-red-400' : 'border-gray-200'}`} style={!lastNameError ? { '--tw-ring-color': C[500] } : {}} placeholder="Doe" value={guestDetails.lastName} onChange={e => { setGuestDetails({ ...guestDetails, lastName: e.target.value }); if (lastNameError) validateLastName(e.target.value); }} onBlur={() => validateLastName(guestDetails.lastName)} />
+                                            <input required type="text" className={`${inputClass} ${lastNameError ? 'border-red-400 bg-red-50/50 focus:ring-red-400' : 'border-gray-200'}`} style={!lastNameError ? { '--tw-ring-color': C[500] } : {}} placeholder="Doe" value={guestDetails.lastName} onChange={e => { const val = e.target.value.replace(/[^A-Za-z\s]/g, ''); setGuestDetails({ ...guestDetails, lastName: val }); if (lastNameError) validateLastName(val); }} onBlur={() => validateLastName(guestDetails.lastName)} />
                                         </div>
 
                                         {/* Email with validation */}
@@ -581,7 +618,7 @@ const Checkout = () => {
                                                     {phoneError}
                                                 </div>
                                             )}
-                                            <div className="relative flex" ref={countryPickerRef}>
+                                            <div className="relative flex z-50" ref={countryPickerRef}>
                                                 {/* Country code selector */}
                                                 <button
                                                     type="button"
@@ -603,7 +640,8 @@ const Checkout = () => {
                                                     placeholder="77 123 4567"
                                                     value={guestDetails.phone}
                                                     onChange={e => {
-                                                        const val = e.target.value.replace(/[^\d\s-]/g, '');
+                                                        const val = e.target.value.replace(/\D/g, '');
+                                                        if (val.length > Math.max(...selectedCountry.phoneLengths)) return;
                                                         setGuestDetails({ ...guestDetails, phone: val });
                                                         if (phoneError) validatePhone(val);
                                                     }}
@@ -734,8 +772,8 @@ const Checkout = () => {
                                         <span>Taxes & Fees</span>
                                         <span className="font-semibold">Rs. {Math.round(quote.taxesFees).toLocaleString()}</span>
                                     </div>
-                                    {quote.discount > 0 && (
-                                        <div className="flex justify-between text-green-600">
+                                    {quote?.discount > 0 && (
+                                        <div className="flex justify-between" style={{ color: C[600] }}>
                                             <span className="flex items-center gap-1"><Tag size={14} /> Coupon Discount</span>
                                             <span className="font-semibold">- Rs. {Math.round(quote.discount).toLocaleString()}</span>
                                         </div>
@@ -756,16 +794,18 @@ const Checkout = () => {
                                         </div>
                                     </div>
 
-                                    <div className="rounded-xl p-3 mt-2 border space-y-1.5" style={{ background: `${C[50]}22`, borderColor: `${C[100]}66` }}>
-                                        <div className="flex justify-between" style={{ color: C[800] }}>
-                                            <span className="font-semibold text-xs">Due Now:</span>
-                                            <span className="font-bold text-sm">Rs. {Math.round(quote.dueNow + (transportData.enabled ? transportData.estimatedCost : 0)).toLocaleString()}</span>
+                                    {quote && (
+                                        <div className="rounded-xl p-3 mt-2 border space-y-1.5" style={{ background: `${C[50]}22`, borderColor: `${C[100]}66` }}>
+                                            <div className="flex justify-between" style={{ color: C[800] }}>
+                                                <span className="font-semibold text-xs">Due Now:</span>
+                                                <span className="font-bold text-sm">Rs. {Math.round(quote.dueNow + (transportData.enabled ? transportData.estimatedCost : 0)).toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between text-gray-500 text-xs">
+                                                <span>Due at Hotel:</span>
+                                                <span className="font-semibold">Rs. {Math.round(quote.dueAtHotel).toLocaleString()}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex justify-between text-gray-500 text-xs">
-                                            <span>Due at Hotel:</span>
-                                            <span className="font-semibold">Rs. {Math.round(quote.dueAtHotel).toLocaleString()}</span>
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                             )}
 
@@ -791,6 +831,7 @@ const Checkout = () => {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     );
 };
