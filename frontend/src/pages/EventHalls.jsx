@@ -10,11 +10,17 @@ import { useAuth } from '../context/AuthContext';
 
 const API = 'http://localhost:5000/api/event-halls';
 
-/* ───────── Color palette (matching LandingPage) ───────── */
+/* ───────── Global Color System ───────── */
 const C = {
-    900: '#012A4A', 800: '#013A63', 700: '#01497C', 600: '#014F86',
-    500: '#2A6F97', 400: '#2C7DA0', 300: '#468FAF', 200: '#61A5C2',
-    100: '#89C2D9', 50: '#A9D6E5',
+    // Semantic Tokens
+    primary: '#0F2D52', action: '#1D6FE8', accent: '#F59E0B', 
+    success: '#16A34A', alert: '#C0392B', bg: '#F4F6F9', 
+    card: '#FFFFFF', text: '#1A1A2E',
+    
+    // Legacy mapping to prevent breakages
+    900: '#0F2D52', 800: '#0F2D52', 700: '#0F2D52', 600: '#1D6FE8',
+    500: '#1D6FE8', 400: '#1D6FE8', 300: '#60A5FA', 200: '#BFDBFE',
+    100: '#DBEAFE', 50: '#F0F9FF',
 };
 
 const eventTypes = ['Wedding', 'Conference', 'Birthday', 'Corporate', 'Seminar', 'Exhibition', 'Other'];

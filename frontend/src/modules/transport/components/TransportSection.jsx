@@ -23,11 +23,17 @@ const pickupIcon = new L.Icon({
     iconAnchor: [12, 41],
 });
 
-/* ───────── Color palette (matching LandingPage) ───────── */
+/* ───────── Global Color System ───────── */
 const C = {
-    900: '#012A4A', 800: '#013A63', 700: '#01497C', 600: '#014F86',
-    500: '#2A6F97', 400: '#2C7DA0', 300: '#468FAF', 200: '#61A5C2',
-    100: '#89C2D9', 50: '#A9D6E5',
+    // Semantic Tokens
+    primary: '#0F2D52', action: '#1D6FE8', accent: '#F59E0B', 
+    success: '#16A34A', alert: '#C0392B', bg: '#F4F6F9', 
+    card: '#FFFFFF', text: '#1A1A2E',
+    
+    // Legacy mapping to prevent breakages
+    900: '#0F2D52', 800: '#0F2D52', 700: '#0F2D52', 600: '#1D6FE8',
+    500: '#1D6FE8', 400: '#1D6FE8', 300: '#60A5FA', 200: '#BFDBFE',
+    100: '#DBEAFE', 50: '#F0F9FF',
 };
 
 const SedanIcon = ({ size }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>;

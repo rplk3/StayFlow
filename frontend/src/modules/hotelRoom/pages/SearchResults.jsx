@@ -3,11 +3,17 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchHotels } from '../services/bookingApi';
 import { Star, MapPin, Wifi, Car, Wind, Waves, Tv, Dumbbell, Utensils, Briefcase, Check, Filter, Search, Calendar, Users, ChevronRight, ArrowUpDown, Map, X, GitCompareArrows, RotateCcw } from 'lucide-react';
 
-/* ───────── Color palette (from LandingPage) ───────── */
+/* ───────── Global Color System ───────── */
 const C = {
-    900: '#012A4A', 800: '#013A63', 700: '#01497C', 600: '#014F86',
-    500: '#2A6F97', 400: '#2C7DA0', 300: '#468FAF', 200: '#61A5C2',
-    100: '#89C2D9', 50: '#A9D6E5',
+    // Semantic Tokens
+    primary: '#0F2D52', action: '#1D6FE8', accent: '#F59E0B', 
+    success: '#16A34A', alert: '#C0392B', bg: '#F4F6F9', 
+    card: '#FFFFFF', text: '#1A1A2E',
+    
+    // Legacy mapping to prevent breakages
+    900: '#0F2D52', 800: '#0F2D52', 700: '#0F2D52', 600: '#1D6FE8',
+    500: '#1D6FE8', 400: '#1D6FE8', 300: '#60A5FA', 200: '#BFDBFE',
+    100: '#DBEAFE', 50: '#F0F9FF',
 };
 
 const getAmenityIcon = (am) => {
@@ -227,15 +233,30 @@ const SearchResults = () => {
                         )}
 
                         {loading ? (
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                                 {[1, 2, 3].map(n => (
-                                    <div key={n} className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 animate-pulse h-48">
-                                        <div className="w-64 bg-gray-200 rounded-xl"></div>
-                                        <div className="flex-1 space-y-3 py-2">
-                                            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-                                            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                                            <div className="h-4 bg-gray-200 rounded w-full mt-4"></div>
-                                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                    <div key={n} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col sm:flex-row h-auto sm:h-56 animate-pulse">
+                                        <div className="w-full sm:w-72 h-48 sm:h-full bg-gray-200 shrink-0"></div>
+                                        <div className="p-5 flex flex-col flex-1 w-full">
+                                            <div className="flex justify-between items-start mb-2 gap-2">
+                                                <div className="h-6 bg-gray-200 rounded-md w-1/2"></div>
+                                                <div className="h-6 bg-gray-200 rounded-md w-12 shrink-0"></div>
+                                            </div>
+                                            <div className="h-3 bg-gray-200 rounded-md w-1/3 mb-4"></div>
+                                            <div className="space-y-2 mt-1 mb-4 flex-1">
+                                                <div className="h-3 bg-gray-200 rounded-md w-full"></div>
+                                                <div className="h-3 bg-gray-200 rounded-md w-4/5"></div>
+                                            </div>
+                                            <div className="flex items-end justify-between mt-auto pt-4 border-t border-gray-50">
+                                                <div className="flex gap-2">
+                                                    <div className="h-4 w-12 bg-gray-200 rounded-full"></div>
+                                                    <div className="h-4 w-12 bg-gray-200 rounded-full"></div>
+                                                </div>
+                                                <div className="flex flex-col items-end gap-2">
+                                                    <div className="h-6 w-24 bg-gray-200 rounded-md"></div>
+                                                    <div className="h-10 w-32 bg-gray-200 rounded-xl mt-1"></div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

@@ -2,16 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { validateAndQuote, createHold, checkoutBooking, createTransport } from '../services/bookingApi';
 import { useAuth } from '../../../context/AuthContext';
-import { CheckCircle, AlertCircle, User, MapPin, ArrowRight, ArrowLeft, Car, Lock, Calendar, Moon, ChevronDown, Phone, Tag, Download, Mail, UserPlus } from 'lucide-react';
+import { Check, CheckCircle, AlertCircle, User, MapPin, ArrowRight, ArrowLeft, Car, Lock, Calendar, Moon, ChevronDown, Phone, Tag, Download, Mail, UserPlus, Share2, MessageCircle } from 'lucide-react';
 import jsPDF from 'jspdf';
 import TransportSection from '../../transport/components/TransportSection';
 import PaymentGateway from '../../payment/components/PaymentGateway';
 
-/* ───────── Color palette (matching LandingPage) ───────── */
+/* ───────── Global Color System ───────── */
 const C = {
-    900: '#012A4A', 800: '#013A63', 700: '#01497C', 600: '#014F86',
-    500: '#2A6F97', 400: '#2C7DA0', 300: '#468FAF', 200: '#61A5C2',
-    100: '#89C2D9', 50: '#A9D6E5',
+    // Semantic Tokens
+    primary: '#0F2D52', action: '#1D6FE8', accent: '#F59E0B', 
+    success: '#16A34A', alert: '#C0392B', bg: '#F4F6F9', 
+    card: '#FFFFFF', text: '#1A1A2E',
+    
+    // Legacy mapping to prevent breakages
+    900: '#0F2D52', 800: '#0F2D52', 700: '#0F2D52', 600: '#1D6FE8',
+    500: '#1D6FE8', 400: '#1D6FE8', 300: '#60A5FA', 200: '#BFDBFE',
+    100: '#DBEAFE', 50: '#F0F9FF',
 };
 
 /* ───────── Country data for phone picker ───────── */
@@ -356,14 +362,14 @@ const Checkout = () => {
                 <React.Fragment key={s.num}>
                     <div className="flex flex-col items-center">
                         <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-500 ${step >= s.num ? 'text-white shadow-lg' : 'bg-gray-200 text-gray-500'}`}
-                            style={step >= s.num ? { background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` } : {}}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-500 ${step === s.num ? 'text-white shadow-lg' : step > s.num ? 'bg-blue-50 border-2' : 'bg-gray-200 text-gray-500'}`}
+                            style={step === s.num ? { background: `linear-gradient(135deg, ${C.primary || C[900]}, ${C.action || C[600]})`, boxShadow: `0 4px 14px ${C.action || C[600]}44` } : step > s.num ? { color: C.action || C[600], borderColor: C.action || C[600] } : {}}
                         >
-                            {step > s.num ? <CheckCircle size={18} /> : s.num}
+                            {step > s.num ? <Check size={20} style={{ color: C.action || C[600] }} /> : s.num}
                         </div>
                         <span
-                            className={`text-xs mt-2 font-medium whitespace-nowrap ${step >= s.num ? 'font-semibold' : 'text-gray-400'}`}
-                            style={step >= s.num ? { color: C[700] } : {}}
+                            className={`text-xs mt-2 font-medium whitespace-nowrap ${step >= s.num ? 'font-bold' : 'text-gray-400'}`}
+                            style={step >= s.num ? { color: C.primary || C[900] } : {}}
                         >
                             {s.label}
                         </span>
@@ -404,41 +410,41 @@ const Checkout = () => {
                         <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Booking Confirmed!</h1>
                         <p className="text-gray-500 text-sm mb-3">Your reservation has been secured successfully</p>
 
-                        <div className="rounded-2xl p-4 mb-3 border" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
+                        <div className="rounded-2xl py-2 px-4 mb-3 border" style={{ background: `${C[50]}33`, borderColor: `${C[100]}66` }}>
                             <p className="text-sm font-medium mb-1" style={{ color: C[500] }}>Itinerary Code</p>
                             <p className="text-2xl font-extrabold tracking-wider" style={{ color: C[700] }}>{bookingCode}</p>
                         </div>
 
-                        {/* Explicit Hotel Stay confirmation to prevent confusion */}
-                        <div className="rounded-2xl p-4 mb-3 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
-                            <div className="flex items-center gap-2 mb-2">
-                                <Moon size={18} style={{ color: C[700] }} />
-                                <span className="font-bold text-sm" style={{ color: C[900] }}>Hotel Stay Confirmed</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: C[600] }}>
-                                <div><span style={{ color: C[300] }}>Check-in:</span> {urlParams.checkIn}</div>
-                                <div><span style={{ color: C[300] }}>Check-out:</span> {urlParams.checkOut}</div>
-                                <div><span style={{ color: C[300] }}>Guests:</span> {urlParams.guests}</div>
-                                <div><span style={{ color: C[300] }}>Duration:</span> {quote?.nights} Night(s)</div>
-                            </div>
-                        </div>
-
-                        {transportData.enabled && (
-                            <div className="rounded-2xl p-4 mb-3 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
+                        <div className="flex flex-col gap-3 mb-6">
+                            {/* Explicit Hotel Stay confirmation to prevent confusion */}
+                            <div className="rounded-2xl p-4 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <Car size={18} style={{ color: C[700] }} />
-                                    <span className="font-bold text-sm" style={{ color: C[900] }}>Transport Booked</span>
+                                    <Moon size={18} style={{ color: C[700] }} />
+                                    <span className="font-bold text-sm" style={{ color: C[900] }}>Hotel Stay Confirmed</span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: C[600] }}>
-                                    <div><span style={{ color: C[300] }}>Vehicle:</span> {transportData.vehicleType}</div>
-                                    <div><span style={{ color: C[300] }}>Cost:</span> Rs. {transportData.estimatedCost?.toLocaleString()}</div>
-                                    <div className="col-span-2"><span style={{ color: C[300] }}>Pickup:</span> {transportData.pickupAddress}</div>
+                                    <div><span style={{ color: C[300] }}>Check-in:</span> {urlParams.checkIn}</div>
+                                    <div><span style={{ color: C[300] }}>Check-out:</span> {urlParams.checkOut}</div>
+                                    <div><span style={{ color: C[300] }}>Guests:</span> {urlParams.guests}</div>
+                                    <div><span style={{ color: C[300] }}>Duration:</span> {quote?.nights} Night(s)</div>
                                 </div>
                             </div>
-                        )}
 
-                        {/* Email confirmation message */}
-                        <div className="space-y-2 mb-3">
+                            {transportData.enabled && (
+                                <div className="rounded-2xl p-4 border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}44` }}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Car size={18} style={{ color: C[700] }} />
+                                        <span className="font-bold text-sm" style={{ color: C[900] }}>Transport Booked</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: C[600] }}>
+                                        <div><span style={{ color: C[300] }}>Vehicle:</span> {transportData.vehicleType}</div>
+                                        <div><span style={{ color: C[300] }}>Cost:</span> Rs. {transportData.estimatedCost?.toLocaleString()}</div>
+                                        <div className="col-span-2"><span style={{ color: C[300] }}>Pickup:</span> {transportData.pickupAddress}</div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Email confirmation message */}
                             <div className="flex items-center gap-3 p-3 rounded-xl border text-left" style={{ background: `${C[50]}22`, borderColor: `${C[200]}33` }}>
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: `${C[100]}44` }}>
                                     <Mail size={18} style={{ color: C[700] }} />
@@ -450,8 +456,8 @@ const Checkout = () => {
                             </div>
 
                             <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 text-left">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
-                                    <UserPlus size={18} className="text-amber-600" />
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: '#1D6FE81A' }}>
+                                    <UserPlus size={18} style={{ color: '#1D6FE8' }} />
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold text-gray-800">View booking in your profile</p>
@@ -460,15 +466,35 @@ const Checkout = () => {
                             </div>
                         </div>
 
-                        {/* Download Invoice + Navigation */}
-                        <button
-                            onClick={generateInvoicePDF}
-                            className="w-full flex items-center justify-center gap-2 mb-3 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white"
-                            style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
-                        >
-                            <Download size={18} />
-                            Download Invoice PDF
-                        </button>
+                        {/* Actions (Buttons) */}
+                        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                            <button
+                                onClick={handleAddToCalendar}
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all border border-gray-200 text-gray-700 hover:bg-gray-50"
+                            >
+                                <Calendar size={18} />
+                                Add to Calendar
+                            </button>
+                            <button
+                                onClick={generateInvoicePDF}
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white"
+                                style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
+                            >
+                                <Download size={18} />
+                                Download Invoice
+                            </button>
+                        </div>
+                        
+                        {/* Share Links */}
+                        <div className="flex flex-wrap items-center justify-center gap-4 mb-6 pt-4 border-t border-gray-100">
+                            <span className="text-sm font-medium text-gray-500 flex items-center gap-1.5"><Share2 size={16} /> Share Booking:</span>
+                            <a href={`https://wa.me/?text=${encodeURIComponent(`I just booked my stay at ${searchParams.get('hotelName') || 'StayFlow'}! Booking Ref: ${bookingCode}`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 hover:bg-green-100 transition-colors text-xs font-semibold">
+                                <MessageCircle size={14} /> WhatsApp
+                            </a>
+                            <a href={`mailto:?subject=My StayFlow Booking&body=${encodeURIComponent(`I just booked my stay at ${searchParams.get('hotelName') || 'StayFlow'}! Booking Ref: ${bookingCode}`)}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors text-xs font-semibold">
+                                <Mail size={14} /> Email
+                            </a>
+                        </div>
 
                         <div className="flex gap-3 justify-center">
                             <button

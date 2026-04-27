@@ -3,10 +3,17 @@ import { MessageCircle, X, Send, Bot, User, Loader2, Mic, MicOff } from 'lucide-
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
+/* ───────── Global Color System ───────── */
 const C = {
-    900: '#012A4A', 800: '#013A63', 700: '#01497C', 600: '#014F86',
-    500: '#2A6F97', 400: '#2C7DA0', 300: '#468FAF', 200: '#61A5C2',
-    100: '#89C2D9', 50: '#A9D6E5',
+    // Semantic Tokens
+    primary: '#0F2D52', action: '#1D6FE8', accent: '#F59E0B', 
+    success: '#16A34A', alert: '#C0392B', bg: '#F4F6F9', 
+    card: '#FFFFFF', text: '#1A1A2E',
+    
+    // Legacy mapping to prevent breakages
+    900: '#0F2D52', 800: '#0F2D52', 700: '#0F2D52', 600: '#1D6FE8',
+    500: '#1D6FE8', 400: '#1D6FE8', 300: '#60A5FA', 200: '#BFDBFE',
+    100: '#DBEAFE', 50: '#F0F9FF',
 };
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -14,6 +21,7 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 const CustomerChatWidget = () => {
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(true);
     const [messages, setMessages] = useState([
         { id: 1, sender: 'bot', text: 'Hi there! I am your StayFlow virtual assistant. How can I help you today?' }
     ]);
@@ -31,6 +39,13 @@ const CustomerChatWidget = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowTooltip(false);
+        }, 5000);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         if (!SpeechRecognition) return;
@@ -190,14 +205,31 @@ const CustomerChatWidget = () => {
                 </div>
             )}
 
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`p-4 rounded-full shadow-2xl text-white transition-all duration-300 transform hover:scale-105 flex items-center justify-center ${isOpen ? 'rotate-90' : ''}`}
-                style={{ background: isOpen ? C[900] : `linear-gradient(135deg, ${C[600]}, ${C[500]})` }}
-                aria-label="Chat Support"
-            >
-                {isOpen ? <X size={28} className="-rotate-90" /> : <MessageCircle size={28} />}
-            </button>
+            <div className="relative flex items-center justify-end group">
+                {!isOpen && (
+                    <div 
+                        className={`absolute right-full mr-4 bg-white text-gray-800 text-sm font-semibold px-4 py-2 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-gray-100 flex items-center gap-2 whitespace-nowrap transition-all duration-300 pointer-events-none cursor-pointer ${showTooltip ? 'opacity-100 translate-x-0 group-hover:pointer-events-auto' : 'opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 group-hover:pointer-events-auto'}`}
+                        onClick={() => setIsOpen(true)}
+                    >
+                        <span className="relative flex h-2 w-2 mr-1">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                        </span>
+                        Need help?
+                        <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-white rotate-45 border-r border-t border-gray-100"></div>
+                    </div>
+                )}
+                <button
+                    onClick={() => { setIsOpen(!isOpen); setShowTooltip(false); }}
+                    onMouseEnter={() => !isOpen && setShowTooltip(true)}
+                    onMouseLeave={() => !isOpen && setShowTooltip(false)}
+                    className={`p-4 rounded-full shadow-2xl text-white transition-all duration-300 transform hover:scale-105 flex items-center justify-center ${isOpen ? 'rotate-90' : ''}`}
+                    style={{ background: isOpen ? C[900] : `linear-gradient(135deg, ${C[600]}, ${C[500]})` }}
+                    aria-label="Chat Support"
+                >
+                    {isOpen ? <X size={28} className="-rotate-90" /> : <MessageCircle size={28} />}
+                </button>
+            </div>
         </div>
     );
 };
