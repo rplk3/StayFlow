@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Search, Plus, Eye, CheckCircle, XCircle, X, ChevronLeft, ChevronRight, Calendar, Clock, Users, MapPin, Trash2, Loader2, PartyPopper, Edit, List, Landmark } from 'lucide-react';
 import Swal from 'sweetalert2';
 
-const API = 'http://localhost:5000/api/event-halls';
+const API = 'http://localhost:5001/api/event-halls';
 const dk = { bg: '#0f1117', card: '#1a1d27', elevated: '#252830', border: '#2d3039', text: '#f1f5f9', textSec: '#94a3b8' };
 const token = () => localStorage.getItem('token');
 const headers = () => ({ Authorization: `Bearer ${token()}` });
@@ -43,12 +43,12 @@ const EventHallManagement = () => {
     const [confirmNote, setConfirmNote] = useState('');
 
     // Fetch
-    const fetchHalls = async () => { 
-        try { 
-            setLoading(true); 
-            const r = await axios.get(`${API}/admin/halls`, { headers: headers() }); 
-            setHalls(r.data); 
-        } catch { } finally { setLoading(false); } 
+    const fetchHalls = async () => {
+        try {
+            setLoading(true);
+            const r = await axios.get(`${API}/admin/halls`, { headers: headers() });
+            setHalls(r.data);
+        } catch { } finally { setLoading(false); }
     };
 
     const fetchBookings = async () => {
@@ -87,16 +87,16 @@ const EventHallManagement = () => {
             images: hallForm.images.split(',').map(s => s.trim()).filter(Boolean)
         };
         try {
-            if (hallModal === 'new') { 
-                await axios.post(`${API}/admin/halls`, data, { headers: headers() }); 
+            if (hallModal === 'new') {
+                await axios.post(`${API}/admin/halls`, data, { headers: headers() });
                 Swal.fire({ title: 'Created!', text: 'Hall created successfully.', icon: 'success', background: dk.card, color: dk.text, timer: 2000, showConfirmButton: false });
-            } else { 
-                await axios.put(`${API}/admin/halls/${hallModal._id}`, data, { headers: headers() }); 
+            } else {
+                await axios.put(`${API}/admin/halls/${hallModal._id}`, data, { headers: headers() });
                 Swal.fire({ title: 'Updated!', text: 'Hall updated successfully.', icon: 'success', background: dk.card, color: dk.text, timer: 2000, showConfirmButton: false });
             }
             setHallModal(null); fetchHalls();
-        } catch (err) { 
-            Swal.fire({ title: 'Error!', text: err.response?.data?.message || 'Failed to save', icon: 'error', background: dk.card, color: dk.text }); 
+        } catch (err) {
+            Swal.fire({ title: 'Error!', text: err.response?.data?.message || 'Failed to save', icon: 'error', background: dk.card, color: dk.text });
         }
     };
 
@@ -114,24 +114,24 @@ const EventHallManagement = () => {
         });
 
         if (result.isConfirmed) {
-            try { 
-                await axios.delete(`${API}/admin/halls/${id}`, { headers: headers() }); 
+            try {
+                await axios.delete(`${API}/admin/halls/${id}`, { headers: headers() });
                 Swal.fire({ title: 'Deactivated!', text: 'Hall deactivated.', icon: 'success', background: dk.card, color: dk.text, timer: 2000, showConfirmButton: false });
-                fetchHalls(); 
+                fetchHalls();
             }
-            catch { 
-                Swal.fire({ title: 'Error!', text: 'Failed to deactivate', icon: 'error', background: dk.card, color: dk.text }); 
+            catch {
+                Swal.fire({ title: 'Error!', text: 'Failed to deactivate', icon: 'error', background: dk.card, color: dk.text });
             }
         }
     };
 
     // Booking actions
     const openBookingDetail = async (id) => {
-        try { 
-            const r = await axios.get(`${API}/admin/bookings/${id}`, { headers: headers() }); 
-            setSelectedBooking(r.data); 
-        } catch { 
-            Swal.fire({ title: 'Error!', text: 'Failed to load booking', icon: 'error', background: dk.card, color: dk.text }); 
+        try {
+            const r = await axios.get(`${API}/admin/bookings/${id}`, { headers: headers() });
+            setSelectedBooking(r.data);
+        } catch {
+            Swal.fire({ title: 'Error!', text: 'Failed to load booking', icon: 'error', background: dk.card, color: dk.text });
         }
     };
 
@@ -140,10 +140,40 @@ const EventHallManagement = () => {
             await axios.put(`${API}/admin/bookings/${selectedBooking._id}/${action}`, body, { headers: headers() });
             Swal.fire({ title: 'Success!', text: `Booking ${action}d!`, icon: 'success', background: dk.card, color: dk.text, timer: 2000, showConfirmButton: false });
             setSelectedBooking(null); setShowRejectModal(false); fetchBookings();
-        } catch (err) { 
-            Swal.fire({ title: 'Error!', text: err.response?.data?.message || `Failed to ${action}`, icon: 'error', background: dk.card, color: dk.text }); 
+        } catch (err) {
+            Swal.fire({ title: 'Error!', text: err.response?.data?.message || `Failed to ${action}`, icon: 'error', background: dk.card, color: dk.text });
         }
     };
+
+    // ================= VALIDATION LOGIC =================
+
+    // Text and Numbers only
+    const handleAlphanumericChange = (e, field) => {
+        const cleanValue = e.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+        setHallForm({ ...hallForm, [field]: cleanValue });
+    };
+
+    // Text only (no numbers)
+    const handleTextOnlyChange = (e, field) => {
+        const cleanValue = e.target.value.replace(/[0-9]/g, '');
+        setHallForm({ ...hallForm, [field]: cleanValue });
+    };
+
+    // Capacity validation: block '-', '+', 'e', '.'
+    const handleCapacityKeyDown = (e) => {
+        if (['-', '+', 'e', 'E', '.'].includes(e.key)) {
+            e.preventDefault();
+        }
+    };
+
+    // Price validation: block '-', '+', 'e' (allow '.')
+    const handlePriceKeyDown = (e) => {
+        if (['-', '+', 'e', 'E'].includes(e.key)) {
+            e.preventDefault();
+        }
+    };
+
+    // ====================================================
 
     const inputClass = "w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 outline-none";
 
@@ -280,18 +310,65 @@ const EventHallManagement = () => {
                             <button onClick={() => setHallModal(null)} className="p-2 hover:bg-white/10 rounded-lg transition"><X size={20} className="text-gray-400" /></button>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="col-span-2"><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Hall Name *</label><input value={hallForm.name} onChange={e => setHallForm({ ...hallForm, name: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} /></div>
-                            <div className="col-span-2"><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Description</label><textarea value={hallForm.description} onChange={e => setHallForm({ ...hallForm, description: e.target.value })} className={`${inputClass} h-20 resize-none`} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} /></div>
-                            <div><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Location</label><input value={hallForm.location} onChange={e => setHallForm({ ...hallForm, location: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} /></div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Min Capacity</label><input type="number" value={hallForm.capacityMin} onChange={e => setHallForm({ ...hallForm, capacityMin: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} /></div>
-                                <div><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Max Capacity</label><input type="number" value={hallForm.capacityMax} onChange={e => setHallForm({ ...hallForm, capacityMax: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} /></div>
+
+                            {/* Hall Name - Text and Numbers only */}
+                            <div className="col-span-2">
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Hall Name *</label>
+                                <input value={hallForm.name} onChange={e => handleAlphanumericChange(e, 'name')} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="Only text and numbers allowed" />
                             </div>
-                            <div><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Price Per Hour (Rs.) *</label><input type="number" value={hallForm.pricePerHour} onChange={e => setHallForm({ ...hallForm, pricePerHour: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} /></div>
-                            <div><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Price Per Day (Rs.)</label><input type="number" value={hallForm.pricePerDay} onChange={e => setHallForm({ ...hallForm, pricePerDay: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} /></div>
-                            <div className="col-span-2"><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Facilities <span className="font-normal opacity-70">(comma separated)</span></label><input value={hallForm.facilities} onChange={e => setHallForm({ ...hallForm, facilities: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="WiFi, Projector, Sound System, AC" /></div>
-                            <div className="col-span-2"><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Event Types <span className="font-normal opacity-70">(comma separated)</span></label><input value={hallForm.eventTypes} onChange={e => setHallForm({ ...hallForm, eventTypes: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="Wedding, Conference, Birthday" /></div>
-                            <div className="col-span-2"><label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Image URLs <span className="font-normal opacity-70">(comma separated)</span></label><input value={hallForm.images} onChange={e => setHallForm({ ...hallForm, images: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} /></div>
+
+                            {/* Description - Anything */}
+                            <div className="col-span-2">
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Description</label>
+                                <textarea value={hallForm.description} onChange={e => setHallForm({ ...hallForm, description: e.target.value })} className={`${inputClass} h-20 resize-none`} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} />
+                            </div>
+
+                            {/* Location - Text only */}
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Location</label>
+                                <input value={hallForm.location} onChange={e => handleTextOnlyChange(e, 'location')} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="Only text allowed" />
+                            </div>
+
+                            {/* Capacity - No negative */}
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Min Capacity</label>
+                                    <input type="number" min="0" value={hallForm.capacityMin} onChange={e => setHallForm({ ...hallForm, capacityMin: e.target.value })} onKeyDown={handleCapacityKeyDown} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Max Capacity</label>
+                                    <input type="number" min="0" value={hallForm.capacityMax} onChange={e => setHallForm({ ...hallForm, capacityMax: e.target.value })} onKeyDown={handleCapacityKeyDown} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} />
+                                </div>
+                            </div>
+
+                            {/* Price - No negative */}
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Price Per Hour (Rs.) *</label>
+                                <input type="number" min="0" value={hallForm.pricePerHour} onChange={e => setHallForm({ ...hallForm, pricePerHour: e.target.value })} onKeyDown={handlePriceKeyDown} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Price Per Day (Rs.)</label>
+                                <input type="number" min="0" value={hallForm.pricePerDay} onChange={e => setHallForm({ ...hallForm, pricePerDay: e.target.value })} onKeyDown={handlePriceKeyDown} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} />
+                            </div>
+
+                            {/* Facilities - Text only */}
+                            <div className="col-span-2">
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Facilities <span className="font-normal opacity-70">(comma separated, text only)</span></label>
+                                <input value={hallForm.facilities} onChange={e => handleTextOnlyChange(e, 'facilities')} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="WiFi, Projector, Sound System, AC" />
+                            </div>
+
+                            {/* Event Types - Text only */}
+                            <div className="col-span-2">
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Event Types <span className="font-normal opacity-70">(comma separated, text only)</span></label>
+                                <input value={hallForm.eventTypes} onChange={e => handleTextOnlyChange(e, 'eventTypes')} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} placeholder="Wedding, Conference, Birthday" />
+                            </div>
+
+                            {/* Images - As it is */}
+                            <div className="col-span-2">
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Image URLs <span className="font-normal opacity-70">(comma separated)</span></label>
+                                <input value={hallForm.images} onChange={e => setHallForm({ ...hallForm, images: e.target.value })} className={inputClass} style={{ background: dk.elevated, borderColor: dk.border, color: dk.text }} />
+                            </div>
+
                         </div>
                         <div className="flex gap-3 mt-6">
                             <button onClick={() => setHallModal(null)} className="px-5 py-3 rounded-lg border text-sm font-semibold transition hover:bg-white/5" style={{ borderColor: dk.border, color: dk.text }}>Cancel</button>
