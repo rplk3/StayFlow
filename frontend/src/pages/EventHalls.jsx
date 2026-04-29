@@ -555,11 +555,11 @@ const EventHalls = () => {
                                             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">First Name *</label>
-                                                    <input type="text" className={inputClass} style={{ '--tw-ring-color': C[500] }} placeholder="John" value={guestDetails.firstName} onChange={e => setGuestDetails({ ...guestDetails, firstName: e.target.value })} />
+                                                    <input type="text" className={inputClass} style={{ '--tw-ring-color': C[500] }} placeholder="John" value={guestDetails.firstName} onChange={e => setGuestDetails({ ...guestDetails, firstName: e.target.value.replace(/[^a-zA-Z\s]/g, '') })} />
                                                 </div>
                                                 <div>
                                                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">Last Name *</label>
-                                                    <input type="text" className={inputClass} style={{ '--tw-ring-color': C[500] }} placeholder="Doe" value={guestDetails.lastName} onChange={e => setGuestDetails({ ...guestDetails, lastName: e.target.value })} />
+                                                    <input type="text" className={inputClass} style={{ '--tw-ring-color': C[500] }} placeholder="Doe" value={guestDetails.lastName} onChange={e => setGuestDetails({ ...guestDetails, lastName: e.target.value.replace(/[^a-zA-Z\s]/g, '') })} />
                                                 </div>
 
                                                 {/* Email with validation */}
@@ -607,10 +607,11 @@ const EventHalls = () => {
                                                             type="tel"
                                                             className={`flex-1 px-4 py-3 border rounded-r-xl outline-none text-sm bg-gray-50 transition-all focus:ring-2 focus:border-transparent ${phoneError ? 'border-red-400 bg-red-50/50 focus:ring-red-400' : 'border-gray-200'}`}
                                                             style={!phoneError ? { '--tw-ring-color': C[500] } : {}}
-                                                            placeholder="77 123 4567"
+                                                            placeholder="771234567"
+                                                            maxLength={9}
                                                             value={guestDetails.phone}
                                                             onChange={e => {
-                                                                const val = e.target.value.replace(/[^\d\s-]/g, '');
+                                                                const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 9);
                                                                 setGuestDetails({ ...guestDetails, phone: val });
                                                                 if (phoneError) validatePhone(val);
                                                             }}
