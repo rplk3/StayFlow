@@ -1,3 +1,4 @@
+@import url('https://fonts.cdnfonts.com/css/google-sans');
 @import "tailwindcss";
 
 @theme {
@@ -10,7 +11,7 @@
   --color-textPrimary: #111827;
   --color-textSecondary: #6B7280;
 
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: 'Product Sans', 'Google Sans', sans-serif;
 
   --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.05);
 

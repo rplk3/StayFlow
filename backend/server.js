@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const hotelRoutes = require('./routes/hotelRoutes');
 
 const app = express();
 
@@ -12,8 +13,9 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/hotels', hotelRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
