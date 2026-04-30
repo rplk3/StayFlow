@@ -14,6 +14,7 @@ const BotChat = () => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isListening, setIsListening] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
     const recognitionRef = useRef(null);
     const finalTranscriptRef = useRef('');
     const messagesEndRef = useRef(null);
@@ -65,7 +66,7 @@ const BotChat = () => {
                 finalTranscriptRef.current = '';
                 // Small delay to allow state update, then auto-send
                 setTimeout(() => {
-                    sendMessage(transcript);
+                    sendMessage(transcript, true);
                 }, 100);
             }
         };
@@ -104,7 +105,7 @@ const BotChat = () => {
     };
 
     // Core send function (used by form submit and auto-send)
-    const sendMessage = async (messageText) => {
+    const sendMessage = async (messageText, wasSpoken = false) => {
         const userMsg = messageText.trim();
         if (!userMsg) return;
 
@@ -114,7 +115,17 @@ const BotChat = () => {
 
         try {
             const res = await queryAnalytics(userMsg);
-            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: res.data.answer }]);
+            const answer = res.data.answer;
+            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: answer }]);
+            
+            if (wasSpoken && window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(answer);
+                utterance.onstart = () => setIsSpeaking(true);
+                utterance.onend = () => setIsSpeaking(false);
+                utterance.onerror = () => setIsSpeaking(false);
+                window.speechSynthesis.speak(utterance);
+            }
         } catch (error) {
             // Show actual backend error if available
             const errMsg = error.response?.data?.answer
@@ -122,6 +133,15 @@ const BotChat = () => {
                 || error.message
                 || 'Sorry, I encountered an error processing your request.';
             setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: errMsg }]);
+            
+            if (wasSpoken && window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(errMsg);
+                utterance.onstart = () => setIsSpeaking(true);
+                utterance.onend = () => setIsSpeaking(false);
+                utterance.onerror = () => setIsSpeaking(false);
+                window.speechSynthesis.speak(utterance);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -152,6 +172,14 @@ const BotChat = () => {
                     <p className="text-xs" style={{ color: dk.textSec }}>Powered by StayFlow BI</p>
                 </div>
                 <div className="ml-auto flex items-center gap-1.5">
+                    {isSpeaking && (
+                        <div className="flex items-center gap-1 mr-2 px-2 py-1 bg-indigo-500/20 rounded border border-indigo-500/30">
+                            <div className="w-1 h-3 bg-indigo-400 rounded-full animate-bounce"></div>
+                            <div className="w-1 h-4 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: '100ms'}}></div>
+                            <div className="w-1 h-3 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: '200ms'}}></div>
+                            <span className="text-[10px] text-indigo-400 font-bold ml-1 uppercase tracking-wider">Speaking</span>
+                        </div>
+                    )}
                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
                     <span className="text-xs font-medium" style={{ color: '#34d399' }}>Online</span>
                 </div>
