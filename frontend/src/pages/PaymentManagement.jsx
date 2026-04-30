@@ -175,18 +175,20 @@ const PaymentManagement = () => {
         doc.save(`Invoice_${payment.transactionReference}.pdf`);
     };
 
+    const statusClass = 'bg-indigo-900/40 text-indigo-100 border border-indigo-400/60 font-bold tracking-wide shadow-sm';
+    
     const statusColors = {
-        paid: 'bg-green-900/30 text-green-400 border border-green-500/30',
-        pending: 'bg-yellow-900/30 text-yellow-400 border border-yellow-500/30',
-        failed: 'bg-red-900/30 text-red-500 border border-red-500/30',
-        refunded: 'bg-purple-900/30 text-purple-400 border border-purple-500/30'
+        paid: statusClass,
+        pending: statusClass,
+        failed: statusClass,
+        refunded: statusClass
     };
 
     const refundStatusColors = {
-        requested: 'bg-yellow-900/30 text-yellow-400 border border-yellow-500/30',
-        approved: 'bg-blue-900/30 text-blue-400 border border-blue-500/30',
-        processed: 'bg-green-900/30 text-green-400 border border-green-500/30',
-        rejected: 'bg-red-900/30 text-red-500 border border-red-500/30'
+        requested: statusClass,
+        approved: statusClass,
+        processed: statusClass,
+        rejected: statusClass
     };
 
     const buttonClass = "px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition-all hover:-translate-y-0.5";
@@ -239,10 +241,10 @@ const PaymentManagement = () => {
                     {/* Stats */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         {[
-                            { label: 'Total', value: total, color: 'text-indigo-400 border-indigo-500/20 bg-indigo-900/10' },
-                            { label: 'Paid', value: payments.filter(p => p.payment.paymentStatus === 'paid').length, color: 'text-green-400 border-green-500/20 bg-green-900/10' },
-                            { label: 'Pending', value: payments.filter(p => p.payment.paymentStatus === 'pending').length, color: 'text-yellow-400 border-yellow-500/20 bg-yellow-900/10' },
-                            { label: 'Failed', value: payments.filter(p => p.payment.paymentStatus === 'failed').length, color: 'text-red-400 border-red-500/20 bg-red-900/10' }
+                            { label: 'Total', value: total, color: 'text-indigo-100 border-indigo-500/30 bg-indigo-900/20' },
+                            { label: 'Paid', value: payments.filter(p => p.payment.paymentStatus === 'paid').length, color: 'text-indigo-200 border-indigo-500/20 bg-indigo-900/10' },
+                            { label: 'Pending', value: payments.filter(p => p.payment.paymentStatus === 'pending').length, color: 'text-indigo-200 border-indigo-500/20 bg-indigo-900/10' },
+                            { label: 'Failed', value: payments.filter(p => p.payment.paymentStatus === 'failed').length, color: 'text-indigo-200 border-indigo-500/20 bg-indigo-900/10' }
                         ].map(s => (
                             <div key={s.label} className={`p-4 rounded-xl border ${s.color}`}>
                                 <p className="text-xs font-semibold opacity-70 uppercase tracking-wider">{s.label}</p>
@@ -347,12 +349,12 @@ const PaymentManagement = () => {
                                                         <button onClick={() => handleRefundAction(refund._id, 'approve')} disabled={processingId === refund._id}
                                                             className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 transition shadow-md">Approve</button>
                                                         <button onClick={() => handleRefundAction(refund._id, 'reject')} disabled={processingId === refund._id}
-                                                            className="px-5 py-2.5 bg-red-900/30 border border-red-500/30 text-red-500 rounded-lg text-sm font-semibold hover:bg-red-900/50 disabled:opacity-50 transition shadow-sm">Reject</button>
+                                                            className="px-5 py-2.5 bg-gray-800 border border-gray-600 text-gray-300 rounded-lg text-sm font-semibold hover:bg-gray-700 hover:text-white disabled:opacity-50 transition shadow-sm">Reject</button>
                                                     </>
                                                 )}
                                                 {refund.refundStatus === 'approved' && (
                                                     <button onClick={() => handleRefundAction(refund._id, 'process')} disabled={processingId === refund._id}
-                                                        className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 disabled:opacity-50 transition shadow-md">
+                                                        className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 transition shadow-md">
                                                         {processingId === refund._id ? 'Processing...' : 'Process Refund'}
                                                     </button>
                                                 )}
@@ -436,14 +438,18 @@ const PaymentManagement = () => {
                                                 {['paid', 'pending', 'failed', 'refunded'].map(s => (
                                                     <button key={s} onClick={() => handleStatusUpdate(selectedPayment.payment._id, s)}
                                                         disabled={selectedPayment.payment.paymentStatus === s}
-                                                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition disabled:opacity-30 border ${s === 'paid' ? 'border-green-500/30 bg-green-900/20 text-green-400 hover:bg-green-900/40' : s === 'pending' ? 'border-yellow-500/30 bg-yellow-900/20 text-yellow-400 hover:bg-yellow-900/40' : s === 'failed' ? 'border-red-500/30 bg-red-900/20 text-red-500 hover:bg-red-900/40' : 'border-purple-500/30 bg-purple-900/20 text-purple-400 hover:bg-purple-900/40'}`}>
-                                                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                                                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition disabled:opacity-40 border ${
+                                                            selectedPayment.payment.paymentStatus === s 
+                                                            ? 'border-indigo-400 bg-indigo-600 text-white shadow-md shadow-indigo-600/30' 
+                                                            : 'border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
+                                                        }`}>
+                                                        {s}
                                                     </button>
                                                 ))}
                                             </div>
                                         </div>
-                                        <button onClick={() => handleVerify(selectedPayment.payment._id)} className="w-full justify-center px-4 py-2.5 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 rounded-lg text-sm font-semibold hover:bg-emerald-900/50 transition flex items-center gap-2">
-                                            <ShieldCheck size={16} /> Verify Payment Authenticity
+                                        <button onClick={() => handleVerify(selectedPayment.payment._id)} className="w-full justify-center px-4 py-3 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
+                                            <ShieldCheck size={18} /> Verify Payment Authenticity
                                         </button>
 
                                         {/* Refund info */}
