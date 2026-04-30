@@ -4,8 +4,7 @@ import { queryAnalytics } from '../../../services/api';
 
 const dk = { card: '#1a1d27', elevated: '#252830', border: '#2d3039', text: '#f1f5f9', textSec: '#94a3b8' };
 
-// Check if browser supports SpeechRecognition
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// Speech API config not needed as we use MediaRecorder
 
 const BotChat = () => {
     const [messages, setMessages] = useState([{
@@ -15,8 +14,8 @@ const BotChat = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
-    const recognitionRef = useRef(null);
-    const finalTranscriptRef = useRef('');
+    const mediaRecorderRef = useRef(null);
+    const audioChunksRef = useRef([]);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -27,84 +26,102 @@ const BotChat = () => {
         scrollToBottom();
     }, [messages]);
 
-    // ── Speech Recognition setup ──
     useEffect(() => {
-        if (!SpeechRecognition) return;
-
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        recognition.lang = 'en-US';
-
-        recognition.onresult = (event) => {
-            let finalTranscript = '';
-            let interimTranscript = '';
-
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript;
-                } else {
-                    interimTranscript += transcript;
-                }
-            }
-
-            // Store final transcript for auto-send
-            if (finalTranscript) {
-                finalTranscriptRef.current = finalTranscript;
-            }
-
-            // Show interim results in real-time, lock in final
-            setInput(finalTranscript || interimTranscript);
-        };
-
-        recognition.onend = () => {
-            setIsListening(false);
-            // Auto-send if we got a valid final transcript
-            const transcript = finalTranscriptRef.current.trim();
-            if (transcript) {
-                finalTranscriptRef.current = '';
-                // Small delay to allow state update, then auto-send
-                setTimeout(() => {
-                    sendMessage(transcript, true);
-                }, 100);
-            }
-        };
-
-        recognition.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
-            setIsListening(false);
-            finalTranscriptRef.current = '';
-        };
-
-        recognitionRef.current = recognition;
-
         return () => {
-            recognition.abort();
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+                mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+                mediaRecorderRef.current.stop();
+            }
         };
     }, []);
 
-    const toggleListening = () => {
-        if (!SpeechRecognition) {
-            setMessages(prev => [...prev, {
-                id: Date.now(), sender: 'bot',
-                text: 'Sorry, speech recognition is not supported in your browser. Please use Chrome or Edge.'
-            }]);
-            return;
-        }
-
+    const toggleListening = async () => {
         if (isListening) {
-            finalTranscriptRef.current = input.trim(); // capture whatever is in input
-            recognitionRef.current?.stop();
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+                mediaRecorderRef.current.stop();
+            }
+            setIsListening(false);
         } else {
-            setInput('');
-            finalTranscriptRef.current = '';
-            recognitionRef.current?.start();
-            setIsListening(true);
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(stream);
+                mediaRecorderRef.current = mediaRecorder;
+                audioChunksRef.current = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) {
+                        audioChunksRef.current.push(e.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
+                    stream.getTracks().forEach(track => track.stop());
+
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        const base64data = reader.result.split(',')[1];
+                        submitAudioMessage(audioBlob, base64data, audioBlob.type || 'audio/webm');
+                    };
+                };
+
+                mediaRecorder.start();
+                setIsListening(true);
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                setMessages(prev => [...prev, {
+                    id: Date.now(), sender: 'bot',
+                    text: 'Microphone access denied or not available.'
+                }]);
+            }
         }
     };
 
-    // Core send function (used by form submit and auto-send)
+    const handleBotResponse = (answer, wasSpoken) => {
+        setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: answer }]);
+        if (wasSpoken && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(answer);
+            utterance.onstart = () => setIsSpeaking(true);
+            utterance.onend = () => setIsSpeaking(false);
+            utterance.onerror = () => setIsSpeaking(false);
+            window.speechSynthesis.speak(utterance);
+        }
+    };
+
+    const handleBotError = (error, wasSpoken) => {
+        const errMsg = error.response?.data?.answer
+            || error.response?.data?.error
+            || error.message
+            || 'Sorry, I encountered an error processing your request.';
+        setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: errMsg }]);
+        
+        if (wasSpoken && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(errMsg);
+            utterance.onstart = () => setIsSpeaking(true);
+            utterance.onend = () => setIsSpeaking(false);
+            utterance.onerror = () => setIsSpeaking(false);
+            window.speechSynthesis.speak(utterance);
+        }
+    };
+
+    const submitAudioMessage = async (audioBlob, base64data, mimeType) => {
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setMessages(prev => [...prev, { id: Date.now(), sender: 'user', isAudio: true, audioUrl }]);
+        setIsLoading(true);
+
+        try {
+            const res = await queryAnalytics('', { data: base64data, mimeType });
+            handleBotResponse(res.data.answer, true);
+        } catch (error) {
+            handleBotError(error, true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const sendMessage = async (messageText, wasSpoken = false) => {
         const userMsg = messageText.trim();
         if (!userMsg) return;
@@ -115,33 +132,9 @@ const BotChat = () => {
 
         try {
             const res = await queryAnalytics(userMsg);
-            const answer = res.data.answer;
-            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: answer }]);
-            
-            if (wasSpoken && window.speechSynthesis) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(answer);
-                utterance.onstart = () => setIsSpeaking(true);
-                utterance.onend = () => setIsSpeaking(false);
-                utterance.onerror = () => setIsSpeaking(false);
-                window.speechSynthesis.speak(utterance);
-            }
+            handleBotResponse(res.data.answer, wasSpoken);
         } catch (error) {
-            // Show actual backend error if available
-            const errMsg = error.response?.data?.answer
-                || error.response?.data?.error
-                || error.message
-                || 'Sorry, I encountered an error processing your request.';
-            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: errMsg }]);
-            
-            if (wasSpoken && window.speechSynthesis) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(errMsg);
-                utterance.onstart = () => setIsSpeaking(true);
-                utterance.onend = () => setIsSpeaking(false);
-                utterance.onerror = () => setIsSpeaking(false);
-                window.speechSynthesis.speak(utterance);
-            }
+            handleBotError(error, wasSpoken);
         } finally {
             setIsLoading(false);
         }
@@ -223,7 +216,11 @@ const BotChat = () => {
                                     ? { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white' }
                                     : { background: dk.elevated, color: dk.text, border: `1px solid ${dk.border}` }
                                 }>
-                                {msg.text}
+                                {msg.isAudio ? (
+                                    <audio src={msg.audioUrl} controls className="h-10 w-48 max-w-full rounded-md opacity-90" />
+                                ) : (
+                                    msg.text
+                                )}
                             </div>
                             {msg.sender === 'user' && (
                                 <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mb-1"
@@ -264,7 +261,7 @@ const BotChat = () => {
                             <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
                             <div className="absolute w-5 h-5 rounded-full bg-red-500 opacity-30 animate-ping"></div>
                         </div>
-                        <span className="text-xs font-medium text-red-400">Listening... speak your question</span>
+                        <span className="text-xs font-medium text-red-400">Recording...</span>
                     </div>
                 )}
                 <div className="flex items-center gap-2">

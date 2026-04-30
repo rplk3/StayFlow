@@ -16,7 +16,7 @@ const C = {
     100: '#DBEAFE', 50: '#F0F9FF',
 };
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// Global Color System
 
 const CustomerChatWidget = () => {
     const location = useLocation();
@@ -29,8 +29,8 @@ const CustomerChatWidget = () => {
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
     const [isListening, setIsListening] = useState(false);
-    const recognitionRef = useRef(null);
-    const finalTranscriptRef = useRef('');
+    const mediaRecorderRef = useRef(null);
+    const audioChunksRef = useRef([]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -48,61 +48,74 @@ const CustomerChatWidget = () => {
     }, []);
 
     useEffect(() => {
-        if (!SpeechRecognition) return;
-
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        recognition.lang = 'en-US';
-
-        recognition.onresult = (event) => {
-            let finalTranscript = '';
-            let interimTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
-                } else {
-                    interimTranscript += event.results[i][0].transcript;
-                }
-            }
-            if (finalTranscript) finalTranscriptRef.current = finalTranscript;
-            setInput(finalTranscript || interimTranscript);
-        };
-
-        recognition.onend = () => {
-            setIsListening(false);
-            const transcript = finalTranscriptRef.current.trim();
-            if (transcript) {
-                finalTranscriptRef.current = '';
-                setTimeout(() => {
-                    submitMessage(transcript);
-                }, 100);
+        // Cleanup if component unmounts while recording
+        return () => {
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+                mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+                mediaRecorderRef.current.stop();
             }
         };
-
-        recognition.onerror = (e) => {
-            console.error('Speech error:', e.error);
-            setIsListening(false);
-            finalTranscriptRef.current = '';
-        };
-
-        recognitionRef.current = recognition;
-        return () => recognition.abort();
     }, []);
 
-    const toggleListening = () => {
-        if (!SpeechRecognition) {
-            setMessages(prev => [...prev, { id: Date.now(), sender: 'bot', text: 'Speech recognition is not supported in this browser.' }]);
-            return;
-        }
+    const toggleListening = async () => {
         if (isListening) {
-            finalTranscriptRef.current = input.trim();
-            recognitionRef.current?.stop();
+            // Stop recording
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+                mediaRecorderRef.current.stop();
+            }
+            setIsListening(false);
         } else {
-            setInput('');
-            finalTranscriptRef.current = '';
-            recognitionRef.current?.start();
-            setIsListening(true);
+            // Start recording
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(stream);
+                mediaRecorderRef.current = mediaRecorder;
+                audioChunksRef.current = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) {
+                        audioChunksRef.current.push(e.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
+                    
+                    // Stop all audio tracks
+                    stream.getTracks().forEach(track => track.stop());
+
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        const base64data = reader.result.split(',')[1];
+                        submitAudioMessage(audioBlob, base64data, audioBlob.type || 'audio/webm');
+                    };
+                };
+
+                mediaRecorder.start();
+                setIsListening(true);
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                setMessages(prev => [...prev, { id: Date.now(), sender: 'bot', text: 'Microphone access denied or not available.' }]);
+            }
+        }
+    };
+
+    const submitAudioMessage = async (audioBlob, base64data, mimeType) => {
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setMessages(prev => [...prev, { id: Date.now(), sender: 'user', isAudio: true, audioUrl }]);
+        setLoading(true);
+
+        try {
+            const res = await axios.post('http://localhost:5000/api/chatbot/ask', {
+                message: '',
+                audio: { data: base64data, mimeType: mimeType }
+            });
+            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: res.data.reply }]);
+        } catch (error) {
+            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: 'Sorry, I am having trouble connecting right now. Please try again later.' }]);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -154,7 +167,11 @@ const CustomerChatWidget = () => {
                                         {m.sender === 'user' ? <User size={14} /> : <Bot size={14} />}
                                     </div>
                                     <div className={`p-3 rounded-2xl text-sm ${m.sender === 'user' ? 'text-white rounded-br-sm' : 'bg-white border shadow-sm text-gray-800 rounded-bl-sm'} whitespace-pre-wrap leading-relaxed`} style={m.sender === 'user' ? { backgroundColor: C[500] } : {}}>
-                                        {m.text}
+                                        {m.isAudio ? (
+                                            <audio src={m.audioUrl} controls className="h-10 w-48 max-w-full" />
+                                        ) : (
+                                            m.text
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -176,7 +193,7 @@ const CustomerChatWidget = () => {
                                     <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
                                     <div className="absolute w-4 h-4 rounded-full bg-red-500 opacity-30 animate-ping"></div>
                                 </div>
-                                <span className="text-xs font-medium text-red-500">Listening...</span>
+                                <span className="text-xs font-medium text-red-500">Recording...</span>
                             </div>
                         )}
                         <div className="flex items-center gap-2">

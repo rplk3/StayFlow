@@ -45,8 +45,8 @@ const queryCustomerDatabaseTool = {
 
 exports.askChatbot = async (req, res) => {
     try {
-        const { message } = req.body;
-        if (!message) return res.status(400).json({ error: 'Message is required' });
+        const { message, audio } = req.body;
+        if (!message && !audio) return res.status(400).json({ error: 'Message or audio is required' });
 
         const systemPrompt = `
 You are the advanced helpful Customer Support AI Assistant for StayFlow, an online hotel and event booking platform.
@@ -70,7 +70,15 @@ Rules:
             }
         });
         
-        let response = await chat.sendMessage({ message });
+        let inputMessage = message || "Please listen to this voice message and respond accordingly.";
+        if (audio && audio.data && audio.mimeType) {
+            inputMessage = [
+                { text: inputMessage },
+                { inlineData: { data: audio.data, mimeType: audio.mimeType } }
+            ];
+        }
+        
+        let response = await chat.sendMessage({ message: inputMessage });
 
         // Handle function calling if the model decides it needs data
         if (response.functionCalls && response.functionCalls.length > 0) {
