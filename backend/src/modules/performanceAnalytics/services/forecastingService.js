@@ -1,11 +1,10 @@
 /**
  * Forecasting Service
  * 
+ * average of last 30 days AnalyticsDaily.
+ */
 
- *average of last 30 days AnalyticsDaily.
-
-
-
+const AnalyticsDaily = require('../models/AnalyticsDaily');
 
 /**
  * Get baseline forecast for the next N days.
