@@ -13,10 +13,10 @@ const API = 'http://localhost:5000/api/event-halls';
 /* ───────── Global Color System ───────── */
 const C = {
     // Semantic Tokens
-    primary: '#0F2D52', action: '#1D6FE8', accent: '#F59E0B', 
-    success: '#16A34A', alert: '#C0392B', bg: '#F4F6F9', 
+    primary: '#0F2D52', action: '#1D6FE8', accent: '#F59E0B',
+    success: '#16A34A', alert: '#C0392B', bg: '#F4F6F9',
     card: '#FFFFFF', text: '#1A1A2E',
-    
+
     // Legacy mapping to prevent breakages
     900: '#0F2D52', 800: '#0F2D52', 700: '#0F2D52', 600: '#1D6FE8',
     500: '#1D6FE8', 400: '#1D6FE8', 300: '#60A5FA', 200: '#BFDBFE',

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Search, Plus, Eye, CheckCircle, XCircle, X, ChevronLeft, ChevronRight, Calendar, Clock, Users, MapPin, Trash2, Loader2, PartyPopper, Edit, List, Landmark } from 'lucide-react';
 import Swal from 'sweetalert2';
 
-const API = 'http://localhost:5001/api/event-halls';
+const API = 'http://localhost:5000/api/event-halls';
 const dk = { bg: '#0f1117', card: '#1a1d27', elevated: '#252830', border: '#2d3039', text: '#f1f5f9', textSec: '#94a3b8' };
 const token = () => localStorage.getItem('token');
 const headers = () => ({ Authorization: `Bearer ${token()}` });
