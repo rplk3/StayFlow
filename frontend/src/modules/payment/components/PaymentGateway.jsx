@@ -348,8 +348,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
                             {/* Download Invoice Button */}
                             <button
                                 onClick={generateInvoicePDF}
-                                className="w-full flex items-center justify-center gap-2 mt-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white"
-                                style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
+                                className="w-full flex items-center justify-center gap-2 mt-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/30 border border-blue-500"
                             >
                                 <Download size={18} />
                                 Download Invoice PDF
@@ -546,8 +545,7 @@ const PaymentGateway = ({ bookingId, bookingType, userId, amount, taxAmount, ser
             <button
                 onClick={handlePay}
                 disabled={processing || !cardNumber || !expiry || !cvc}
-                className="w-full flex items-center justify-center gap-2 text-white py-4 rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl hover:-translate-y-0.5"
-                style={{ background: `linear-gradient(135deg, ${C[700]}, ${C[500]})`, boxShadow: `0 4px 14px ${C[500]}44` }}
+                className="w-full flex items-center justify-center gap-2 text-white py-4 rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl hover:-translate-y-0.5 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/40 border border-blue-500"
             >
                 {processing ? (
                     <><Loader2 size={20} className="animate-spin" /> Processing Payment...</>
