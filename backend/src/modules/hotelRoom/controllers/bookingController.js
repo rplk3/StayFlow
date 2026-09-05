@@ -2,6 +2,7 @@ const Booking = require('../models/Booking');
 const Room = require('../models/Room');
 const RatePlan = require('../models/RatePlan');
 const Coupon = require('../models/Coupon');
+const { sendBookingConfirmation } = require('../../../services/emailService');
 
 // Step 6, 7: Validate inventory, coupon, calculate pricing
 exports.validateAndQuote = async (req, res) => {
@@ -138,8 +139,8 @@ exports.checkout = async (req, res) => {
         booking.status = 'CONFIRMED';
         await booking.save();
 
-        // Step 13: Send confirmation email (Mock)
-        console.log(`[EMAIL MOCK] Sending confirmation to ${booking.guestDetails.email} for Booking ${booking.bookingCode}`);
+        // Step 13: Send confirmation email (real Gmail)
+        sendBookingConfirmation(booking).catch(err => console.error('Email send error:', err));
 
         res.json({ success: true, booking });
     } catch (err) {

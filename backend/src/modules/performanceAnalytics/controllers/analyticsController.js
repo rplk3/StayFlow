@@ -145,9 +145,9 @@ exports.resolveAlert = async (req, res) => {
  */
 exports.handleChatQuery = async (req, res) => {
     try {
-        const { message } = req.body;
-        if (!message) {
-            return res.status(400).json({ answer: "Please provide a message." });
+        const { message, audio } = req.body;
+        if (!message && !audio) {
+            return res.status(400).json({ answer: "Please provide a message or audio." });
         }
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -176,10 +176,15 @@ If the user asks a question COMPLETELY UNRELATED to the hotel's performance anal
 
         const ai = new GoogleGenAI({ apiKey: apiKey });
 
+        let parts = [{ text: `${contextData}\n\nUser Question: ${message || "Please answer the question in the voice message."}` }];
+        if (audio && audio.data && audio.mimeType) {
+            parts.push({ inlineData: { data: audio.data, mimeType: audio.mimeType } });
+        }
+
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: [
-                { role: 'user', parts: [{ text: `${contextData}\n\nUser Question: ${message}` }] }
+                { role: 'user', parts: parts }
             ],
             config: {
                 systemInstruction: systemInstruction,

@@ -26,8 +26,8 @@ exports.processPayment = async (req, res) => {
             return res.status(400).json({ message: 'bookingId, bookingType, userId, and totalAmount are required' });
         }
 
-        // Sandbox: simulate payment processing (90% success rate)
-        const isSuccess = Math.random() > 0.1;
+        // Sandbox: simulate payment processing (always succeed in dev)
+        const isSuccess = true;
         const transactionReference = generateTransactionRef();
 
         const payment = await Payment.create({
