@@ -33,6 +33,25 @@ const destinations = [
     { name: 'Trincomalee', flag: '🇱🇰', tag: '1 property', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800' },
 ];
 
+const GuestGoOption = ({ onGo }) => (
+    <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-200 bg-white">
+        <div className="p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-indigo-600 font-bold mb-2">Guest Go Option</p>
+                <h3 className="text-2xl font-extrabold text-gray-900">Invite guests and book faster</h3>
+                <p className="mt-2 text-sm text-gray-500 max-w-xl">Use the Guest Go flow to quickly set your headcount, share the invite, and move directly to event hall reservations.</p>
+            </div>
+            <button
+                type="button"
+                onClick={onGo}
+                className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+            >
+                Go
+            </button>
+        </div>
+    </div>
+);
+
 const LandingPage = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
@@ -87,6 +106,10 @@ const LandingPage = () => {
 
     const handleDestinationClick = (name) => {
         navigate(`/hotels/results?destination=${encodeURIComponent(name)}&guests=2`);
+    };
+
+    const handleBrowseHalls = () => {
+        navigate('/event-halls');
     };
 
     /* ── Counter helper ── */
@@ -332,26 +355,54 @@ const LandingPage = () => {
                     </div>
                 </section>
 
-                {/* Event Hall CTA */}
-                <section>
+                {/* CTAs */}
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Event Hall CTA */}
                     <div
                         onClick={() => navigate('/event-halls')}
-                        className="cursor-pointer group rounded-2xl p-8 flex items-center justify-between shadow-lg hover:shadow-xl transition-all"
+                        className="cursor-pointer group rounded-2xl p-8 flex flex-col justify-between shadow-lg hover:shadow-xl transition-all"
                         style={{ background: `linear-gradient(135deg, ${C[800]}, ${C[600]})` }}
                     >
-                        <div className="text-white">
+                        <div className="text-white mb-6">
                             <h2 className="text-2xl font-bold mb-2"> Book an Event Hall</h2>
-                            <p className="text-sm max-w-lg" style={{ color: C[100] }}>
+                            <p className="text-sm" style={{ color: C[100] }}>
                                 Host your dream wedding, conference, or birthday. Browse our venues and reserve the perfect hall for your special occasion.
                             </p>
                         </div>
                         <button
-                            className="px-6 py-3 rounded-xl font-bold text-sm transition shrink-0 group-hover:scale-105"
+                            type="button"
+                            onClick={handleBrowseHalls}
+                            className="px-6 py-3 rounded-xl font-bold text-sm transition self-start group-hover:scale-105"
                             style={{ background: 'white', color: C[700] }}
                         >
                             Browse Halls →
                         </button>
                     </div>
+
+                    {/* Transport CTA */}
+                    <div
+                        onClick={() => navigate('/transport')}
+                        className="cursor-pointer group rounded-2xl p-8 flex flex-col justify-between shadow-lg hover:shadow-xl transition-all"
+                        style={{ background: `linear-gradient(135deg, ${C[600]}, ${C[400]})` }}
+                    >
+                        <div className="text-white mb-6">
+                            <h2 className="text-2xl font-bold mb-2"> Book a Ride</h2>
+                            <p className="text-sm" style={{ color: C[100] }}>
+                                Need a ride to or from the hotel? Or exploring the city? Book a premium vehicle with a professional driver instantly.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            className="px-6 py-3 rounded-xl font-bold text-sm transition self-start group-hover:scale-105"
+                            style={{ background: 'white', color: C[700] }}
+                        >
+                            Book Transport →
+                        </button>
+                    </div>
+                </section>
+
+                <section className="mt-6">
+                    <GuestGoOption onGo={handleBrowseHalls} />
                 </section>
             </main>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Car, Truck, Crown, Users, Clock, Calendar, Loader2 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -47,6 +47,7 @@ const vehicles = [
     { type: 'van', label: 'Van', icon: VanIcon, desc: 'Mini van for groups up to 8', rate: 65, base: 1000, passengers: 8, color: 'from-amber-500 to-amber-700' },
     { type: 'luxury', label: 'Luxury', icon: LuxuryIcon, desc: 'Premium luxury vehicle', rate: 100, base: 2000, passengers: 3, color: 'from-purple-500 to-purple-700' },
 ];
+const DEST_COORDS = { lat: 6.9271, lng: 79.8612 };
 
 // Map click handler component
 function MapClickHandler({ onMapClick }) {
@@ -60,7 +61,6 @@ function MapClickHandler({ onMapClick }) {
 
 const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, guestCount, submitAttempted }) => {
     const [enabled, setEnabled] = useState(false);
-    const [expanded, setExpanded] = useState(false);
     const [pickupAddress, setPickupAddress] = useState('');
     const [pickupCoords, setPickupCoords] = useState(null);
     const [pickupDate, setPickupDate] = useState(checkInDate ? new Date(checkInDate) : new Date());
@@ -73,42 +73,27 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
     const [mapCenter, setMapCenter] = useState([6.9271, 79.8612]);
     const [mapZoom, setMapZoom] = useState(13);
     const mapRef = useRef(null);
-
-    // Hotel destination coords (approximate for Sri Lankan cities)
-    const destCoords = { lat: 6.9271, lng: 79.8612 };
-
-    useEffect(() => {
-        if (checkInDate) setPickupDate(new Date(checkInDate));
-    }, [checkInDate]);
-
-    // Autofill passengers when guestCount changes
-    useEffect(() => {
-        if (guestCount && guestCount > 0) {
-            setPassengerCount(guestCount);
-        }
-    }, [guestCount]);
-
-    // Auto-estimate when coords or vehicle changes
-    useEffect(() => {
-        if (enabled && pickupCoords) {
-            fetchEstimate();
-        }
-    }, [pickupCoords, vehicleType, enabled]);
-
     // Format date for API
-    const formatDateForApi = (date) => {
+    const formatDateForApi = useCallback((date) => {
         if (!date) return '';
         const d = new Date(date);
         return d.toISOString().split('T')[0];
-    };
+    }, []);
+    const now = new Date();
+    const minTimeToday = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const pickupDateStr = pickupDate ? formatDateForApi(pickupDate) : '';
+    const todayStr = formatDateForApi(now);
+    const isPickupToday = pickupDateStr === todayStr;
 
-    const fetchEstimate = async () => {
-        if (!pickupCoords) return;
+    const fetchEstimate = useCallback(async (coordsOverride, vehicleTypeOverride) => {
+        const effectiveCoords = coordsOverride || pickupCoords;
+        const effectiveVehicleType = vehicleTypeOverride || vehicleType;
+        if (!effectiveCoords) return;
         try {
             const res = await estimateTransportCost({
-                pickupCoords,
-                dropoffCoords: destCoords,
-                vehicleType
+                pickupCoords: effectiveCoords,
+                dropoffCoords: DEST_COORDS,
+                vehicleType: effectiveVehicleType
             });
             setEstimate(res.data);
             onTransportChange({
@@ -116,10 +101,10 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
                 pickupDate: formatDateForApi(pickupDate),
                 pickupTime,
                 pickupAddress,
-                pickupCoords,
+                pickupCoords: effectiveCoords,
                 dropoffAddress: hotelDestination || 'Hotel',
-                dropoffCoords: destCoords,
-                vehicleType,
+                dropoffCoords: DEST_COORDS,
+                vehicleType: effectiveVehicleType,
                 passengerCount,
                 specialRequests,
                 estimatedDistance: res.data.estimatedDistance,
@@ -128,12 +113,11 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
         } catch (err) {
             console.error('Estimate failed:', err);
         }
-    };
+    }, [pickupCoords, vehicleType, onTransportChange, pickupDate, pickupTime, pickupAddress, hotelDestination, passengerCount, specialRequests, formatDateForApi]);
 
     const handleToggle = () => {
         const newState = !enabled;
         setEnabled(newState);
-        setExpanded(newState);
         if (!newState) {
             setEstimate(null);
             onTransportChange({ enabled: false, estimatedCost: 0 });
@@ -159,9 +143,12 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
                 } catch {
                     setPickupAddress(`${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`);
                 }
+                if (enabled) {
+                    void fetchEstimate(coords, vehicleType);
+                }
                 setLocating(false);
             },
-            (err) => {
+            () => {
                 alert('Unable to get your location. Please select on the map.');
                 setLocating(false);
             },
@@ -179,9 +166,12 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
         } catch {
             setPickupAddress(`${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`);
         }
+        if (enabled) {
+            void fetchEstimate(coords, vehicleType);
+        }
     };
 
-    const handleFieldChange = () => {
+    const handleFieldChange = useCallback(() => {
         if (enabled && pickupCoords) {
             onTransportChange({
                 enabled: true,
@@ -190,7 +180,7 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
                 pickupAddress,
                 pickupCoords,
                 dropoffAddress: hotelDestination || 'Hotel',
-                dropoffCoords: destCoords,
+                dropoffCoords: DEST_COORDS,
                 vehicleType,
                 passengerCount,
                 specialRequests,
@@ -198,9 +188,9 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
                 estimatedCost: estimate?.estimatedCost || 0
             });
         }
-    };
+    }, [enabled, pickupCoords, onTransportChange, pickupDate, pickupTime, pickupAddress, hotelDestination, vehicleType, passengerCount, specialRequests, estimate, formatDateForApi]);
 
-    useEffect(() => { handleFieldChange(); }, [pickupDate, pickupTime, passengerCount, specialRequests, pickupAddress]);
+    useEffect(() => { handleFieldChange(); }, [handleFieldChange]);
 
     return (
         <div className="rounded-2xl border-2 overflow-hidden transition-all duration-300" style={{ borderColor: enabled ? C[500] : '#e5e7eb', borderStyle: enabled ? 'solid' : 'dashed' }}>
@@ -325,7 +315,14 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
                             <div className="transport-datepicker-wrapper">
                                 <DatePicker
                                     selected={pickupDate}
-                                    onChange={(date) => setPickupDate(date)}
+                                    onChange={(date) => {
+                                        if (!date) return;
+                                        setPickupDate(date);
+                                        const selectedDate = formatDateForApi(date);
+                                        if (selectedDate === todayStr && pickupTime < minTimeToday) {
+                                            setPickupTime(minTimeToday);
+                                        }
+                                    }}
                                     minDate={new Date()}
                                     dateFormat="MMMM d, yyyy"
                                     placeholderText="Select pickup date"
@@ -337,7 +334,14 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
 
                         <div>
                             <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-2"><Clock size={14} /> Pickup Time</label>
-                            <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm bg-gray-50" style={{ '--tw-ring-color': C[500] }} />
+                            <input
+                                type="time"
+                                min={isPickupToday ? minTimeToday : undefined}
+                                value={pickupTime}
+                                onChange={(e) => setPickupTime(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm bg-gray-50"
+                                style={{ '--tw-ring-color': C[500] }}
+                            />
                         </div>
                         <div>
                             <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-2"><Users size={14} /> Passengers</label>
@@ -410,7 +414,12 @@ const TransportSection = ({ checkInDate, hotelDestination, onTransportChange, gu
                                     <button
                                         type="button"
                                         key={v.type}
-                                        onClick={() => setVehicleType(v.type)}
+                                    onClick={() => {
+                                        setVehicleType(v.type);
+                                        if (enabled && pickupCoords) {
+                                            void fetchEstimate(pickupCoords, v.type);
+                                        }
+                                    }}
                                         className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 ${selected ? 'shadow-md' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'}`}
                                         style={selected ? { borderColor: C[500], background: `${C[50]}44`, boxShadow: `0 4px 14px ${C[500]}22` } : {}}
                                     >

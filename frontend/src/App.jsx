@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
+
+const queryClient = new QueryClient();
 import AdminLayout from './layouts/AdminLayout';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
@@ -30,10 +33,20 @@ import MyPayments from './modules/payment/pages/MyPayments';
 import PaymentManagement from './pages/PaymentManagement';
 import CustomerChatWidget from './components/CustomerChatWidget';
 
+// Transport Driver Pages
+import DriverLoginPage from './pages/Driver/DriverLoginPage';
+import DriverRegisterPage from './pages/Driver/DriverRegisterPage';
+import DriverDashboard from './pages/Driver/DriverDashboard';
+
+// Guest Transport Pages
+import TransportBooking from './pages/TransportBooking';
+import MyTransportBookings from './pages/MyTransportBookings';
+
 
 function App() {
   return (
-    <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
       <Router>
         <Routes>
           {/* Public Routes */}
@@ -42,6 +55,17 @@ function App() {
           <Route path="/register" element={<AuthPage />} />
           <Route path="/admin-login" element={<AdminAuthPage />} />
           <Route path="/admin-register" element={<AdminAuthPage />} />
+          <Route path="/admin/login" element={<Navigate to="/admin-login" replace />} />
+          <Route path="/admin/register" element={<Navigate to="/admin-register" replace />} />
+          
+          {/* Driver Routes */}
+          <Route path="/driver/login" element={<DriverLoginPage />} />
+          <Route path="/driver/register" element={<DriverRegisterPage />} />
+          <Route path="/driver/dashboard" element={<DriverDashboard />} />
+
+          {/* Guest Transport Route */}
+          <Route path="/transport" element={<TransportBooking />} />
+
           <Route path="/hotels/search" element={<SearchPage />} />
         <Route path="/hotels/results" element={<SearchResults />} />
         <Route path="/hotels/:id" element={<HotelDetails />} />
@@ -53,6 +77,7 @@ function App() {
           <Route path="/my-account" element={<MyAccount />} />
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/my-event-bookings" element={<MyEventBookings />} />
+          <Route path="/my-transport-bookings" element={<MyTransportBookings />} />
           <Route path="/my-payments" element={<MyPayments />} />
         </Route>
 
@@ -79,6 +104,7 @@ function App() {
       <CustomerChatWidget />
     </Router>
     </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

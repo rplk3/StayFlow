@@ -15,6 +15,11 @@ const eventHallRoutes = require('./modules/eventHall/routes/eventHallRoutes');
 const authRoutes = require('./modules/auth/routes/authRoutes');
 const paymentRoutes = require('./modules/payment/routes/paymentRoutes');
 const chatbotRoutes = require('./modules/chatbot/routes/chatbotRoutes');
+const driverAuthRoutes = require('./modules/driver/routes/driverAuthRoutes');
+
+const vehicleRoutes = require('./modules/transport/routes/vehicleRoutes');
+const driverRoutes = require('./modules/driver/routes/driverRoutes');
+const transportBookingRoutes = require('./modules/transport/routes/transportBookingRoutes');
 
 const app = express();
 
@@ -36,6 +41,11 @@ app.use('/api/event-halls', eventHallRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/driver-auth', driverAuthRoutes);
+
+app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/drivers', driverRoutes);
+app.use('/api/transport-bookings', transportBookingRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
