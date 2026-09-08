@@ -7,14 +7,6 @@ This system is designed to handle room reservations, event hall bookings, staff 
 
 ## Key Features
 
-### 📊 Performance Analytics
-*   **Daily Aggregation**: Automatically calculates daily occupancy rates, revenue, and bookings across both hotel and event channels.
-*   **Trend Forecasting**: Uses simple moving averages combined with simulated variance to predict forward-looking revenue and occupancy trends.
-*   **Smart Alerts (Anomaly Detection):** Rule-based continuous monitoring that flashes active dashboard alerts for:
-    *   *Revenue Leaks:* Flags days where requested refunds exceed a high threshold.
-    *   *Revenue Drops:* Flags a sudden severe drop in revenue against a 30-day average constraint.
-    *   *High Cancellations:* Detects unusual spikes in daily customer cancellations.
-*   **Detailed Reporting**: Ability to export key analytic metrics to PDF.
 
 ### 🏨 Core Booking System
 *   **Hotel Booking Flow**: Search available rooms, date-pickers, and secure checkout. 
